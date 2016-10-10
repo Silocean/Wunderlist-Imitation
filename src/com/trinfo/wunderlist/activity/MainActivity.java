@@ -76,7 +76,7 @@ public class MainActivity extends SlidingActivity {
 		
 		sm.setShadowWidth(50);
 		sm.setShadowDrawable(R.drawable.shadow);
-		sm.setBehindOffset(160);
+		sm.setBehindOffset(100);
 		sm.setFadeDegree(0.35f);
 		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		

@@ -19,7 +19,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 import cn.jpush.android.api.JPushInterface;
 
-import com.slidingmenu.lib.app.SlidingActivity;
 import com.trinfo.wunderlist.R;
 import com.trinfo.wunderlist.entity.Common;
 import com.trinfo.wunderlist.entity.CommonUser;
@@ -64,7 +63,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 			if(msg.arg1 == MSG_CONNECT_TIMEOUT){
 				Toast.makeText(getApplicationContext(), "连接超时!", Toast.LENGTH_SHORT).show();
 			} else if(msg.arg1 == MSG_SUCCESS_LOGIN){
-				Intent intent = new Intent(getApplicationContext(), SlidingActivity.class);
+				Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 				startActivity(intent);
 				finish();
 			} else if(msg.arg1 == MSG_WRONG_PASSWORD){

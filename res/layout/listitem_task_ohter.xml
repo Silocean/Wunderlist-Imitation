@@ -84,7 +84,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="-10dip"
-                android:src="@drawable/task_receivers_icon" />
+                android:src="@drawable/task_receivers_icon_normal" />
         </RelativeLayout>
     </RelativeLayout>
 

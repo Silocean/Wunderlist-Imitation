@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/taskdetails_icon"
-            android:src="@drawable/task_receivers_icon" />
+            android:src="@drawable/task_receivers_icon_selector" />
     </RelativeLayout>
 
     <ScrollView
@@ -59,33 +59,6 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical" >
-
-            <RelativeLayout
-                android:id="@+id/taskdetails_receivers"
-                android:layout_width="fill_parent"
-                android:layout_height="50dip"
-                android:background="@drawable/row_bg_icon_selector" >
-
-                <ImageView
-                    android:id="@+id/taskdetails_receivers_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:duplicateParentState="true"
-                    android:src="@drawable/taskdetails_icon_receivers_selector" />
-
-                <TextView
-                    android:id="@+id/taskdetails_receivers_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@id/taskdetails_receivers_icon"
-                    android:duplicateParentState="true"
-                    android:hint="任务接收人"
-                    android:textColor="@drawable/groupname_color_selector"
-                    android:textSize="16sp" />
-            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"

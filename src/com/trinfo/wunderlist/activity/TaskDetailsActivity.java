@@ -47,8 +47,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 
 	private ImageView checkboxImageView;
 	private EditText titleEditText;
+	private ImageView taskReceiversIcon;
 	private ImageView starIcon;
-	private RelativeLayout receiversRelativeLayout;
 	private RelativeLayout deadlineRelativeLayout;
 	private RelativeLayout clockRelativeLayout;
 	private ImageView enddateiImageView;
@@ -59,7 +59,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private TextView replyEmailTextView;
 	private TextView replyContentTextView;
 	private TextView replyTimeTextView;
-	private TextView receiversTextView;
 
 	private EditText replyContentEditText;
 	private Button replyButton;
@@ -98,10 +97,10 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		checkboxImageView.setOnClickListener(this);
 		titleEditText = (EditText) findViewById(R.id.taskdetails_title);
 		titleEditText.setOnClickListener(this);
+		taskReceiversIcon = (ImageView) findViewById(R.id.task_receivers_icon);
+		taskReceiversIcon.setOnClickListener(this);
 		starIcon = (ImageView) findViewById(R.id.taskdetails_icon);
 		starIcon.setOnClickListener(this);
-		receiversRelativeLayout = (RelativeLayout) findViewById(R.id.taskdetails_receivers);
-		receiversRelativeLayout.setOnClickListener(this);
 		deadlineRelativeLayout = (RelativeLayout) findViewById(R.id.taskdetais_deadline);
 		deadlineRelativeLayout.setOnClickListener(this);
 		clockRelativeLayout = (RelativeLayout) findViewById(R.id.taskdetais_clock);
@@ -124,7 +123,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		replyEmailTextView = (TextView) findViewById(R.id.task_reply_email);
 		replyContentTextView = (TextView) findViewById(R.id.task_reply_content);
 		replyTimeTextView = (TextView) findViewById(R.id.task_reply_time);
-		receiversTextView = (TextView) findViewById(R.id.taskdetails_receivers_text);
 		this.initData();
 		this.getReply();
 		this.getTaskReceivers();
@@ -177,7 +175,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 */
 	private void disableView() {
 		this.titleEditText.setEnabled(false);
-		this.receiversRelativeLayout.setEnabled(false);
+		this.taskReceiversIcon.setEnabled(false);
 		this.deadlineRelativeLayout.setEnabled(false);
 		this.clockRelativeLayout.setEnabled(false);
 		this.starIcon.setEnabled(false);
@@ -414,9 +412,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			if (receivers.size() > 0) {
-				receiversTextView.setText(receivers.size() + "个接收人");
-			}
 		}
 
 		@Override
@@ -482,7 +477,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 						TASKNORMAL, COMPLETEORCANCELTONORMAL);
 				checkboxImageView.setImageResource(R.drawable.wl_task_checkbox);
 				this.titleEditText.setEnabled(true);
-				this.receiversRelativeLayout.setEnabled(true);
+				this.taskReceiversIcon.setEnabled(true);
 				this.deadlineRelativeLayout.setEnabled(true);
 				this.clockRelativeLayout.setEnabled(true);
 				this.starIcon.setEnabled(true);
@@ -499,7 +494,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			}
 			break;
 		}
-		case R.id.taskdetails_receivers: {
+		case R.id.task_receivers_icon: {
 			Intent intent = new Intent(getApplicationContext(),
 					ReceiversActivity.class);
 			intent.putExtra("title", task.getSubject());
@@ -725,7 +720,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 					.getBooleanExtra("isReceiversChange", false);
 			receivers = data.getStringArrayListExtra("receivers");
 			receiversId = data.getStringArrayListExtra("receiversId");
-			this.updateReceiverView(data.getIntExtra("receiversNum", 0));
 			break;
 		default:
 			break;
@@ -755,16 +749,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			sb.append("</string>");
 		}
 		return sb;
-	}
-
-	/**
-	 * 更新接收人视图
-	 * 
-	 * @param
-	 * @param receiversStr
-	 */
-	private void updateReceiverView(int receiverNum) {
-		receiversTextView.setText(receiverNum + "个接收人");
 	}
 
 	/**
