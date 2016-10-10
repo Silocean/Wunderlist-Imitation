@@ -8,15 +8,20 @@ import java.util.LinkedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,10 +60,10 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private TextView enddateTextView;
 	private ImageView clockiImageView;
 	private TextView clockTextView;
-	private RelativeLayout taskReplyRelativeLayout;
-	private TextView replyEmailTextView;
-	private TextView replyContentTextView;
-	private TextView replyTimeTextView;
+	
+	private ListView listView;
+	private LinkedList<Reply> replys;
+	private ChatListViewAdapter adapter;
 
 	private EditText replyContentEditText;
 	private Button replyButton;
@@ -76,7 +81,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private String remindnum = null;
 	private String remindtype = null;
 	private String priority = null;
-	private String replyContent = null;
 	private boolean isReceiversChange = false;
 	private ArrayList<String> receivers = new ArrayList<String>();
 	private ArrayList<String> receiversId = new ArrayList<String>();
@@ -119,11 +123,10 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		LayoutParams layoutParams = replyContentEditText.getLayoutParams();
 		layoutParams.width = width;
 		replyContentEditText.setLayoutParams(layoutParams);
-		taskReplyRelativeLayout = (RelativeLayout) findViewById(R.id.task_reply_layout);
-		taskReplyRelativeLayout.setOnClickListener(this);
-		replyEmailTextView = (TextView) findViewById(R.id.task_reply_email);
-		replyContentTextView = (TextView) findViewById(R.id.task_reply_content);
-		replyTimeTextView = (TextView) findViewById(R.id.task_reply_time);
+		listView = (ListView)findViewById(R.id.chat_listview);
+		replys = new LinkedList<Reply>();
+		adapter = new ChatListViewAdapter(getApplicationContext(), replys);
+		listView.setAdapter(adapter);
 		this.initData();
 		this.getReply();
 		this.getTaskReceivers();
@@ -241,7 +244,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 */
 	private class GetReply extends
 			AsyncTask<String, Integer, LinkedList<Reply>> {
-		LinkedList<Reply> replys = new LinkedList<Reply>();
 		
 		@Override
 		protected LinkedList<Reply> doInBackground(String... arg0) {
@@ -263,10 +265,9 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 
 		@Override
 		protected void onPostExecute(LinkedList<Reply> replys) {
-			if (replys.size() != 0) {
-				Reply reply = replys.getLast();
-				updateReplyView(reply);
-			}
+			adapter.setData(replys);
+			adapter.notifyDataSetChanged();
+			listView.setSelection(listView.getCount() - 1);
 		}
 
 		@Override
@@ -523,16 +524,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			}
 			break;
 		}
-		case R.id.task_reply_layout: {
-			Intent intent = new Intent(getApplicationContext(),
-					ReplyActivity.class);
-			intent.putExtra("title", task.getSubject());
-			intent.putExtra("taskId", task.getTaskId());
-			startActivityForResult(intent, 2);
-			this.overridePendingTransition(R.anim.translate_in,
-					R.anim.translate_out);
-			break;
-		}
 		case R.id.taskreply_reply: {
 			String content = replyContentEditText.getText().toString().trim();
 			if (content.equals("")) {
@@ -631,7 +622,10 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 					reply.setReplyContent(content);
 					reply.setCreateDate(TimeConvertTool
 							.convertToString(new Date()));
-					updateReplyView(reply);
+					replys.add(reply);
+					adapter.setData(replys);
+					adapter.notifyDataSetChanged();
+					listView.setSelection(listView.getCount());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -729,9 +723,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (resultCode) {
-		case 1: // 更新回复
-			this.updateReplyView((Reply) data.getSerializableExtra("reply"));
-			break;
 		case 3: // 更新接收人
 			isReceiversChange = data
 					.getBooleanExtra("isReceiversChange", false);
@@ -766,19 +757,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			sb.append("</string>");
 		}
 		return sb;
-	}
-
-	/**
-	 * 更新下部回复界面视图
-	 * 
-	 * @param reply
-	 */
-	private void updateReplyView(Reply reply) {
-		taskReplyRelativeLayout.setVisibility(View.VISIBLE);
-		replyEmailTextView.setText(reply.getUserEmail());
-		replyContentTextView.setText(replyContent);
-		replyTimeTextView.setText(TimeConvertTool.calDateTime(reply
-				.getCreateDate()));
 	}
 
 	@Override
@@ -1012,6 +990,100 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				JPushUtil.getRandomSendNo(), receiverId.replaceAll("-", "_"),
 				mfrom, "任务信息发生变更");
 		System.out.println(result.getErrcode() + "===" + result.getErrmsg());
+	}
+	
+	private class ChatListViewAdapter extends BaseAdapter {
+		
+		LinkedList<Reply> list;
+		LayoutInflater inflater;
+		
+		ViewHolder holder;
+		
+		private final int type_left=0;
+		private final int type_right=1;
+		private final int type_count=2;
+		
+		public ChatListViewAdapter(Context context, LinkedList<Reply> list) {
+			this.list = list;
+			inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+		
+		public void setData(LinkedList<Reply> list) {
+			this.list = list;
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public int getCount() {
+			return list.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return list.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			int type=getItemViewType(position);
+			if(null==convertView){
+				holder = new ViewHolder();
+				switch(type){
+				case type_right:
+					convertView = inflater.inflate( R.layout.chat_item_msg_text_right, null);
+					//holder.headImage = (ImageView)convertView.findViewById(R.id.chat_item_headimage);
+					holder.sendTimeTextView = (TextView)convertView.findViewById(R.id.chat_item_sendtime);
+					holder.replyTextView = (TextView)convertView.findViewById(R.id.chat_item_chatcontent);
+					break;
+				case type_left:
+					convertView = inflater.inflate( R.layout.chat_item_msg_text_left, null);
+					//holder.headImage = (ImageView)convertView.findViewById(R.id.chat_item_headimage);
+					holder.sendTimeTextView = (TextView)convertView.findViewById(R.id.chat_item_sendtime);
+					holder.replyTextView = (TextView)convertView.findViewById(R.id.chat_item_chatcontent);
+					break;
+				}
+				convertView.setTag(holder);
+			}else{
+				holder=(ViewHolder)convertView.getTag();
+			}
+			
+			Reply reply = list.get(position);
+			
+			// useremail
+			//String userEmail = reply.getUserEmail();
+			
+			// 时间
+			String sendTime = reply.getCreateDate();
+			holder.sendTimeTextView.setText(sendTime);
+			
+			// 内容
+			String replyContent = reply.getReplyContent();
+			holder.replyTextView.setText(replyContent);
+			
+			return convertView;
+		}
+
+		@Override
+		public int getItemViewType(int position) {
+			return (list.get(position).getUserId().equals(CommonUser.USERID)) ? type_right : type_left;
+		}
+		
+		@Override
+		public int getViewTypeCount() {
+			return type_count;
+		}
+
+		private class ViewHolder {
+			//private ImageView headImage;
+			private TextView sendTimeTextView;
+			private TextView replyTextView;
+		}
+		
 	}
 	
 }
