@@ -3,212 +3,251 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/sidebar_bg_color" >
-    
-    <RelativeLayout 
+
+    <RelativeLayout
+        android:id="@+id/taskdetails_topbar"
         android:layout_width="fill_parent"
         android:layout_height="60dip"
-        android:id="@+id/taskdetails_topbar"
         android:layout_alignParentTop="true"
+        android:background="@drawable/wl_sidebar_topbar"
         android:focusable="true"
-   		android:focusableInTouchMode="true"
-        android:background="@drawable/wl_sidebar_topbar" >
-        <ImageView 
+        android:focusableInTouchMode="true" >
+
+        <ImageView
+            android:id="@+id/taskdetails_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/taskdetails_checkbox"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:src="@drawable/checkbox_icon_selector" />
-        <EditText 
-            android:layout_width="220dip"
-            android:layout_height="wrap_content"
+
+        <EditText
             android:id="@+id/taskdetails_title"
-            android:layout_toRightOf="@id/taskdetails_checkbox"
-            android:layout_marginLeft="5dip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="项目标题"
+            android:layout_marginLeft="5dip"
+            android:layout_toRightOf="@id/taskdetails_checkbox"
+            android:background="@null"
             android:maxLines="2"
-            android:background="@null" />
-        <ImageView 
+            android:text="项目标题" />
+
+        <ImageView
+            android:id="@+id/taskdetails_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:id="@+id/taskdetails_icon"
             android:src="@drawable/wl_task_ribbon" />
+
+        <ImageView
+            android:id="@+id/task_receivers_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/taskdetails_icon"
+            android:src="@drawable/task_receivers_icon" />
     </RelativeLayout>
-    
-    <ScrollView 
+
+    <ScrollView
+        android:id="@+id/taskdetails_scrollview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@id/taskdetails_topbar"
-        android:id="@+id/taskdetails_scrollview" >
-        <LinearLayout 
+        android:layout_below="@id/taskdetails_topbar" >
+
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical" >
-            <RelativeLayout 
+
+            <RelativeLayout
+                android:id="@+id/taskdetails_receivers"
                 android:layout_width="fill_parent"
                 android:layout_height="50dip"
-                android:id="@+id/taskdetails_receivers"
                 android:background="@drawable/row_bg_icon_selector" >
-                <ImageView 
+
+                <ImageView
+                    android:id="@+id/taskdetails_receivers_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/taskdetails_receivers_icon"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:duplicateParentState="true"
                     android:src="@drawable/taskdetails_icon_receivers_selector" />
-                <TextView 
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+
+                <TextView
                     android:id="@+id/taskdetails_receivers_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_toRightOf="@id/taskdetails_receivers_icon"
-                    android:layout_centerVertical="true"
+                    android:duplicateParentState="true"
                     android:hint="任务接收人"
-                    android:textSize="16sp"
-                    android:duplicateParentState="true"
-                    android:textColor="@drawable/groupname_color_selector" />
+                    android:textColor="@drawable/groupname_color_selector"
+                    android:textSize="16sp" />
             </RelativeLayout>
-            <RelativeLayout 
+
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="50dip"
-                android:id="@+id/taskdetais_deadline"
-                android:background="@drawable/row_bg_icon_selector" >
-                <ImageView 
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/taskdetails_deadline_icon"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:duplicateParentState="true"
-                    android:src="@drawable/taskdetails_icon_deadline_selector" />
-                <TextView 
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/taskdetails_deadline_text"
-                    android:layout_toRightOf="@id/taskdetails_deadline_icon"
-                    android:layout_centerVertical="true"
-                    android:hint="截止日期"
-                    android:textSize="16sp"
-                    android:duplicateParentState="true"
-                    android:textColor="@drawable/groupname_color_selector" />
-            </RelativeLayout>
-            <RelativeLayout 
-                android:layout_width="fill_parent"
-                android:layout_height="50dip"
-                android:id="@+id/taskdetais_clock"
-                android:background="@drawable/row_bg_icon_selector" >
-                <ImageView 
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/taskdetails_clock_icon"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:duplicateParentState="true"
-                    android:src="@drawable/taskdetails_icon_clock_selector" />
-                <TextView 
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/taskdetails_clock_text"
-                    android:layout_toRightOf="@id/taskdetails_clock_icon"
-                    android:layout_centerVertical="true"
-                    android:hint="提醒我"
-                    android:textSize="16sp"
-                    android:duplicateParentState="true"
-                    android:textColor="@drawable/groupname_color_selector" />
-            </RelativeLayout>
-            <RelativeLayout 
+                android:layout_height="50dip" >
+
+                <RelativeLayout
+                    android:id="@+id/taskdetais_deadline"
+                    android:layout_width="fill_parent"
+                    android:layout_height="50dip"
+                    android:layout_weight="1"
+                    android:background="@drawable/row_bg_icon_selector" >
+
+                    <ImageView
+                        android:id="@+id/taskdetails_deadline_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:duplicateParentState="true"
+                        android:src="@drawable/taskdetails_icon_deadline_selector" />
+
+                    <TextView
+                        android:id="@+id/taskdetails_deadline_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@id/taskdetails_deadline_icon"
+                        android:duplicateParentState="true"
+                        android:hint="截止日期"
+                        android:textColor="@drawable/groupname_color_selector"
+                        android:textSize="16sp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/taskdetais_clock"
+                    android:layout_width="fill_parent"
+                    android:layout_height="50dip"
+                    android:layout_weight="1"
+                    android:background="@drawable/row_bg_icon_selector" >
+
+                    <ImageView
+                        android:id="@+id/taskdetails_clock_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:duplicateParentState="true"
+                        android:src="@drawable/taskdetails_icon_clock_selector" />
+
+                    <TextView
+                        android:id="@+id/taskdetails_clock_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@id/taskdetails_clock_icon"
+                        android:duplicateParentState="true"
+                        android:hint="提醒我"
+                        android:textColor="@drawable/groupname_color_selector"
+                        android:textSize="16sp" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="100dip"
+                android:layout_marginBottom="10dip"
                 android:layout_marginLeft="10dip"
                 android:layout_marginRight="10dip"
                 android:layout_marginTop="10dip"
-                android:layout_marginBottom="10dip"
                 android:background="@drawable/row_bg_icon_selector" >
+
                 <EditText
+                    android:id="@+id/taskdetails_note"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:id="@+id/taskdetails_note"
                     android:layout_centerInParent="true"
-                    android:hint="笔记..."
                     android:background="@drawable/taskdetails_textfield_bg_selector"
-                    android:textSize="14sp"
                     android:focusable="false"
-                    android:gravity="top" />
+                    android:gravity="top"
+                    android:hint="笔记..."
+                    android:textSize="14sp" />
             </RelativeLayout>
-            <RelativeLayout 
-		       	android:layout_width="fill_parent"
-		       	android:layout_height="wrap_content"
-		       	android:id="@+id/task_reply_layout"
-		       	android:visibility="gone"
-		       	android:background="@drawable/wl_sidebar_topbar" >
-		        <ImageView 
-		            android:layout_width="30dip"
-		            android:layout_height="30dip"
-		            android:id="@+id/task_reply_headimage"
-		            android:layout_alignParentLeft="true"
-		            android:layout_marginLeft="10dip"
-		           	android:layout_marginTop="8dip"
-		            android:background="@drawable/wl_receivers_list_userhead" />
-		        <TextView 
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:id="@+id/task_reply_email"
-		            android:layout_toRightOf="@id/task_reply_headimage"
-		            android:layout_marginLeft="10dip"
-		            android:layout_marginTop="-6dip"
-		            android:layout_alignTop="@id/task_reply_headimage" />
-		        <TextView 
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:id="@+id/task_reply_content"
-		            android:layout_toRightOf="@id/task_reply_headimage"
-		            android:layout_below="@id/task_reply_email"
-		            android:layout_marginTop="3dip"
-		            android:ellipsize="end"
-		            android:singleLine="true"
-		            android:layout_alignLeft="@id/task_reply_email"
-		            android:textSize="10sp" />
-		        <TextView
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:id="@+id/task_reply_time"
-		            android:layout_alignTop="@id/task_reply_email"
-		            android:layout_alignParentRight="true"
-		            android:layout_marginRight="10dip"
-		            android:textSize="11sp"
-		            android:textColor="@color/sidebar_useremail_color" />
-		    </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/task_reply_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/wl_sidebar_topbar"
+                android:visibility="gone" >
+
+                <ImageView
+                    android:id="@+id/task_reply_headimage"
+                    android:layout_width="30dip"
+                    android:layout_height="30dip"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="10dip"
+                    android:layout_marginTop="8dip"
+                    android:background="@drawable/wl_receivers_list_userhead" />
+
+                <TextView
+                    android:id="@+id/task_reply_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/task_reply_headimage"
+                    android:layout_marginLeft="10dip"
+                    android:layout_marginTop="-6dip"
+                    android:layout_toRightOf="@id/task_reply_headimage" />
+
+                <TextView
+                    android:id="@+id/task_reply_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/task_reply_email"
+                    android:layout_below="@id/task_reply_email"
+                    android:layout_marginTop="3dip"
+                    android:layout_toRightOf="@id/task_reply_headimage"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/task_reply_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignTop="@id/task_reply_email"
+                    android:layout_marginRight="10dip"
+                    android:textColor="@color/sidebar_useremail_color"
+                    android:textSize="11sp" />
+            </RelativeLayout>
         </LinearLayout>
     </ScrollView>
-	<RelativeLayout 
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:id="@+id/taskdetails_bottomLayout"
-	    android:layout_alignParentBottom="true"
-	    android:layout_marginBottom="5dip" >
-	    <EditText 
-	        android:layout_width="240dip"
-	        android:layout_height="wrap_content"
-	        android:id="@+id/taskreply_comment"
-	        android:layout_alignParentLeft="true"
-	        android:layout_marginLeft="5dip"
-	        android:layout_centerVertical="true"
-	        android:hint="@string/activity_reply_addcomment"
-	        android:background="@drawable/wl_add_message_edit_text"
-	        android:maxLines="3"
-	        android:textSize="14sp"/>
-	    <Button 
-	        android:layout_width="50dip"
-	        android:layout_height="40dip"
-	        android:id="@+id/taskreply_reply"
-	        android:layout_alignParentRight="true"
-	        android:layout_centerVertical="true"
-	        android:layout_marginRight="5dip"
-	        android:text="@string/activity_reply_sendbutton"
-	        android:textColor="@color/walkthrough_button_text_color"
-	        android:background="@drawable/walkthrough_loginbutton_icon_selector" />
-	</RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/taskdetails_bottomLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dip" >
+
+        <EditText
+            android:id="@+id/taskreply_comment"
+            android:layout_width="240dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:background="@drawable/wl_add_message_edit_text"
+            android:hint="@string/activity_reply_addcomment"
+            android:maxLines="3"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/taskreply_reply"
+            android:layout_width="50dip"
+            android:layout_height="40dip"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dip"
+            android:background="@drawable/walkthrough_loginbutton_icon_selector"
+            android:text="@string/activity_reply_sendbutton"
+            android:textColor="@color/walkthrough_button_text_color" />
+    </RelativeLayout>
+
 </RelativeLayout>

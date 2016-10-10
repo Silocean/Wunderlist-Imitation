@@ -3,75 +3,89 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants" >
-    
-    <RelativeLayout 
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" >
-        <RelativeLayout 
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:id="@+id/task_left_relativelayout"
-	        android:layout_alignParentLeft="true"
-	        android:background="@drawable/wl_task_background_left" >
-		    <ImageView 
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:id="@+id/task_left_checkbox"
-		        android:layout_centerInParent="true"
-		        android:src="@drawable/checkbox_icon_selector" />
-	    </RelativeLayout>
-	    
-        <RelativeLayout 
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:id="@+id/task_right_relativelayout"
-	        android:layout_alignParentRight="true"
-	        android:background="@drawable/wl_task_background_right" >
-		    <ImageView 
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:id="@+id/task_right_icon"
-		        android:layout_centerInParent="true" />
-	    </RelativeLayout>
-        
-	    <RelativeLayout 
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:id="@+id/task_middle_relativelayout"
-	        android:layout_toRightOf="@id/task_left_relativelayout"
-	        android:layout_toLeftOf="@id/task_right_relativelayout"
-	        android:background="@drawable/task_middle_bg_selector" >
-	        <RelativeLayout 
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:layout_centerVertical="true" >
-	            <TextView 
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:id="@+id/task_middle_subject"
-		        android:layout_marginLeft="10dip"
-		        android:singleLine="true"
-		        android:ellipsize="end" />
-		        <RelativeLayout 
-		            android:layout_width="fill_parent"
-		            android:layout_height="wrap_content"
-		            android:layout_below="@id/task_middle_subject"
-		            android:layout_marginTop="2dip"
-		            android:layout_alignLeft="@id/task_middle_subject" >
-		            <TextView 
-		                android:layout_width="wrap_content"
-		                android:layout_height="wrap_content"
-		                android:id="@+id/task_middle_enddate"
-		                android:layout_alignParentLeft="true"
-		                android:textSize="10sp"
-		                android:textColor="@color/task_date_active_text_color"
-		                android:layout_centerVertical="true" />
-		        </RelativeLayout>
-	        </RelativeLayout>
-	    </RelativeLayout>
-    
-	    
+
+        <RelativeLayout
+            android:id="@+id/task_left_relativelayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/wl_task_background_left" >
+
+            <ImageView
+                android:id="@+id/task_left_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/checkbox_icon_selector" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/task_right_relativelayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/wl_task_background_right" >
+
+            <ImageView
+                android:id="@+id/task_right_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/task_middle_relativelayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/task_right_relativelayout"
+            android:layout_toRightOf="@id/task_left_relativelayout"
+            android:background="@drawable/task_middle_bg_selector" >
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true" >
+
+                <TextView
+                    android:id="@+id/task_middle_subject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dip"
+                    android:ellipsize="end"
+                    android:singleLine="true" />
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/task_middle_subject"
+                    android:layout_below="@id/task_middle_subject"
+                    android:layout_marginTop="2dip" >
+
+                    <TextView
+                        android:id="@+id/task_middle_enddate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/task_date_active_text_color"
+                        android:textSize="10sp" />
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/task_receivers_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="-10dip"
+                android:src="@drawable/task_receivers_icon" />
+        </RelativeLayout>
     </RelativeLayout>
-   
+
 </RelativeLayout>

@@ -120,9 +120,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	public static long duration = 0L;
 	public static long timeStart = 0L;
 	public static long timeEnd = 0L;
-	
+
 	private UIHandler handler = new UIHandler();
-	
+
 	@SuppressLint("HandlerLeak")
 	private class UIHandler extends Handler {
 		@Override
@@ -143,7 +143,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 
 	public MainFragment() {
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -482,7 +482,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		adapter.setData(tasksTotal);
 		adapter.notifyDataSetChanged();
 	}
-	
+
 	/**
 	 * 解析单个任务json字符串
 	 * 
@@ -833,6 +833,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 						R.color.listitem_text_complete_color));
 				holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags()
 						| Paint.STRIKE_THRU_TEXT_FLAG);
+				holder.taskReveiversIcon.setEnabled(false);
 				if (task.getPriority() != null
 						&& !task.getPriority().equals("")
 						&& task.getPriority().equals("1")) { // 该任务是星标任务
@@ -976,6 +977,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					.findViewById(R.id.task_middle_subject);
 			holder.taskIcon = (ImageView) convertView
 					.findViewById(R.id.task_right_icon);
+			holder.taskReveiversIcon = (ImageView) convertView
+					.findViewById(R.id.task_receivers_icon);
 			if (task.getPriority() != null && !task.getPriority().equals("")
 					&& task.getPriority().equals("1")) { // 该任务是星标任务
 				holder.taskIcon
@@ -1000,6 +1003,12 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					}
 					intent.putExtra("isComplete", isComplete);
 					startActivityForResult(intent, 1);
+				}
+			});
+			holder.taskReveiversIcon.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Toast.makeText(mainActivity, "icon", Toast.LENGTH_SHORT).show();
 				}
 			});
 		}
@@ -1033,6 +1042,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			private TextView taskTitle;
 			private TextView taskEnddate;
 			private ImageView taskIcon;
+			private ImageView taskReveiversIcon;
 			private RelativeLayout taskCompleteLayout;
 			private TextView taskCompleteCountTextView;
 			private ImageView taskCompleteVisibleIcon;

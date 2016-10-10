@@ -38,7 +38,6 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 	private ArrayList<String> newAddReceivers;
 	private ArrayList<String> newAddReceiversId;
 	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_receiver);
