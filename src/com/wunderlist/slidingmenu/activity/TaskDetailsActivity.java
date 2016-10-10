@@ -72,14 +72,11 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private String remindnum = null;
 	private String remindtype = null;
 	private boolean isReceiversChange = false;
-	private String receiversStr = null;
-	private String[] receivers = new String[]{User.USEREMAIL};
+	private ArrayList<String> receivers = new ArrayList<String>();
 	private boolean isTaskChange = false;
 	private boolean isTaskStatusChange = false;
 	
 	private Bundle bundle = new Bundle();
-	
-	private ArrayList<String> list = new ArrayList<String>();
 	
 	private StringBuilder sb = new StringBuilder();
 
@@ -451,18 +448,13 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 
 		@Override
 		protected void onPostExecute(String json) {
-			int num = 0;
 			try {
-				num = parseReceiverJSON(json);
+				receivers = parseReceiverJSON(json);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			if (num > 0) {
-				receiversTextView.setText(num + "个接收人");
-			}
-			receivers = new String[num];
-			for (int i=0; i<list.size(); i++) {
-				receivers[i] = list.get(i);
+			if (receivers.size() > 0) {
+				receiversTextView.setText(receivers.size() + "个接收人");
 			}
 		}
 
@@ -478,22 +470,22 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * @param json
 	 * @return 返回数据条目数量
 	 */
-	private int parseReceiverJSON(String json) throws Exception {
-		int num = 0;
+	private ArrayList<String> parseReceiverJSON(String json) throws Exception {
+		ArrayList<String> receivers = new ArrayList<String>();
 		if (json != null) {
 			JSONObject object = new JSONObject(json);
-			num = Integer.parseInt(object.getString("rows"));
-			if(num > 0) {
+			int rows = Integer.parseInt(object.getString("rows"));
+			if(rows > 0) {
 				JSONArray array = new JSONArray(object.getString("Items"));
 				for(int i=0; i<array.length(); i++) {
 					JSONObject obj = array.getJSONObject(i);
-					list.add(obj.getString("TOMAILADDR"));
+					receivers.add(obj.getString("TOMAILADDR"));
 				}
 			}
 		} else {
 			System.out.println("网络连接出现问题");
 		}
-		return num;
+		return receivers;
 	}
 
 	@Override
@@ -524,7 +516,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			Intent intent = new Intent(getApplicationContext(),
 					ReceiversActivity.class);
 			intent.putExtra("title", task.getSubject());
-			intent.putExtra("json", receiverJSON);
+			intent.putStringArrayListExtra("receivers", receivers);
 			startActivityForResult(intent, 3);
 			break;
 		}
@@ -575,8 +567,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			break;
 		case 3: // 更新接收人
 			isReceiversChange = data.getBooleanExtra("isReceiversChange", false);
-			receiversStr = data.getStringExtra("receiversStr");
-			receivers = receiversStr.split(":");
+			receivers = data.getStringArrayListExtra("receivers");
 			this.updateReceiverView(data.getIntExtra("receiversNum", 0));
 			break;
 		default:
@@ -589,13 +580,13 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * @param receivers
 	 * @return
 	 */
-	private StringBuilder constructReceiversString(String[] receivers) {
-		if(receivers.length != 0) {
-			for(int i=0; i<receivers.length; i++) {
+	private StringBuilder constructReceiversString(ArrayList<String> receivers) {
+		if(receivers.size() != 0) {
+			for(int i=0; i<receivers.size(); i++) {
 				sb.append("<string>");
-				sb.append(receivers[i]);
+				sb.append(receivers.get(i));
 				sb.append("</string>");
-				if(i != receivers.length-1) {
+				if(i != receivers.size()-1) {
 					sb.append("\n");
 				}
 			}

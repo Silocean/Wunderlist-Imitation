@@ -226,7 +226,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		case NORMALTOCOMPLETEORCANCEL:
 			if(showCompleteTasks) {
 				tasksNormal.remove(position);
-				tasksComplete.add(task);
+				tasksComplete.addFirst(task);
 				tasksTotal.removeAll(tasksTotal);
 				tasksTotal.addAll(tasksNormal);
 				tasksTotal.add(new Task());
@@ -333,6 +333,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				// System.out.println(tasks);
 			} catch (Exception e) {
 				e.printStackTrace();
+				System.out.println("网络连接出现问题");
 			}
 			return tasks;
 		}

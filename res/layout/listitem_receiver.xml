@@ -11,6 +11,8 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="5dip"
         android:layout_marginTop="5dip"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:src="@drawable/wl_receivers_list_userhead" />
     
     <TextView 
@@ -51,8 +53,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/receiver_delete_icon"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:src="@drawable/receivers_list_remove_icon_selector" />

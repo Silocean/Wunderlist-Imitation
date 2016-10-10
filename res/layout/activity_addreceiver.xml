@@ -4,28 +4,44 @@
     android:layout_height="match_parent"
     android:background="@color/sidebar_bg_color" >
     
-    <EditText 
+    <RelativeLayout 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/addreceiver_emal_edittext"
-        android:inputType="textEmailAddress"
-        android:background="@null"
-        android:hint="电子邮件地址..."
-        android:textSize="12sp"
-        android:layout_marginLeft="10dip"
-        android:layout_marginRight="10dip"
+        android:id="@+id/addreceiver_toplayout"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="8dip" />
+	    android:layout_marginTop="8dip" >
+	    <EditText 
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/addreceiver_email_edittext"
+	        android:inputType="textEmailAddress"
+	        android:background="@drawable/wl_add_message_edit_text"
+	        android:hint="电子邮件地址..."
+	        android:textSize="12sp"
+	        android:layout_marginLeft="5dip"
+	        android:layout_marginRight="5dip"
+	        android:layout_centerVertical="true" />
+	    <ImageView 
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/addreceiver_rightaddicon"
+	        android:visibility="gone"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginRight="10dip"
+	        android:layout_centerVertical="true"
+	        android:src="@drawable/addreceiver_useremail_edittext_rightaddicon" />
+    </RelativeLayout>
+    
     <RelativeLayout 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dip"
         android:id="@+id/addreceiver_recenttext_layout"
-        android:layout_below="@id/addreceiver_emal_edittext" >
+        android:layout_below="@id/addreceiver_toplayout" >
 	    <TextView 
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="最近"
+	        android:text="相关联系人"
 	        android:layout_alignParentLeft="true"
 	        android:layout_marginLeft="10dip" />
     </RelativeLayout>

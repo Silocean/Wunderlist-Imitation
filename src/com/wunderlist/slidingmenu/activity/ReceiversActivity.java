@@ -1,9 +1,6 @@
 package com.wunderlist.slidingmenu.activity;
 
-import java.util.LinkedList;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,16 +16,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.example.wunderlist.R;
 import com.wunderlist.entity.User;
-import com.wunderlist.tools.AddReceiverDialogUtil;
 
 public class ReceiversActivity extends ActionbarBaseActivity implements OnClickListener {
 	
 	//private String barTitle = null;
-	private String receiverJSON = null;
 	//private String taskId = null;
 	
 	private ListView listView;
@@ -36,8 +29,9 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 	
 	private Button addButton;
 	
-	private LinkedList<String> orignalReceivers = new LinkedList<String>();
-	private LinkedList<String> receivers;
+	private ArrayList<String> orignalReceivers = new ArrayList<String>();
+	private ArrayList<String> receivers;
+	private ArrayList<String> newAddReceivers;
 	
 	
 	@Override
@@ -52,35 +46,13 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 		super.onCreate(savedInstanceState);
 	}
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuItem item = menu.add(0, 0, 0, "添加");
-		item.setIcon(R.drawable.wl_actionbar_addreceiver);
-		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		return super.onCreateOptionsMenu(menu);
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case 0:
-			//Toast.makeText(getApplicationContext(), "添加接收人", Toast.LENGTH_SHORT).show();
-			AddReceiverDialogUtil addReceiverDialogUtil = new AddReceiverDialogUtil(ReceiversActivity.this);
-			addReceiverDialogUtil.showAddReceiverDialog();
-			break;
-		default:
-			break;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-	
 	/**
 	 * 更新接收人列表
 	 * @param receiverEmail
 	 */
 	public void updateReceiverList(String receiverEmail) {
 		if(!receivers.contains(receiverEmail)) {
-			this.receivers.addLast(receiverEmail);
+			this.receivers.add(receiverEmail);
 			this.updateReceiverList();
 		} else {
 			Toast.makeText(getApplicationContext(), "该接收人已存在", Toast.LENGTH_SHORT).show();
@@ -99,46 +71,15 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 		//barTitle = getIntent().getStringExtra("title");
 		setTitle("成员列表");
 		//taskId = getIntent().getStringExtra("taskId");
-		receiverJSON = getIntent().getStringExtra("json");
-		try {
-			receivers = this.parseGetReceiversJSON(receiverJSON);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		receivers = getIntent().getStringArrayListExtra("receivers");
 		orignalReceivers.addAll(receivers);
 		adapter.setData(receivers);
 		adapter.notifyDataSetChanged();
 	}
 	
-	/**
-	 * 解析获取接收人返回的json字符串
-	 * @param json 要解析的json字符串
-	 * @return 所有接收人
-	 * @throws Exception
-	 */
-	private LinkedList<String> parseGetReceiversJSON(String json) throws Exception {
-		LinkedList<String> receivers = new LinkedList<String>();
-		if(json != null) {
-			JSONObject object = new JSONObject(json);
-			int rows = Integer.parseInt(object.getString("rows"));
-			if(rows > 0) {
-				JSONArray array = new JSONArray(object.getString("Items"));
-				for(int i=0; i<array.length(); i++) {
-					JSONObject obj = array.getJSONObject(i);
-					receivers.add(obj.getString("TOMAILADDR"));
-				}
-			} else {
-				System.out.println("没有数据");
-			}
-		} else {
-			System.out.println("网络连接出现问题");
-		}
-		return receivers;
-	}
-	
 	private class ReceiverListItemAdapter extends BaseAdapter {
 		
-		private LinkedList<String> list;
+		private ArrayList<String> list;
 		private int resId;
 		private LayoutInflater inflater;
 		
@@ -146,11 +87,11 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 		
 		public ReceiverListItemAdapter(Context context, int resId) {
 			this.resId = resId;
-			this.list = new LinkedList<String>();
+			this.list = new ArrayList<String>();
 			inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
 		
-		public void setData(LinkedList<String> receivers) {
+		public void setData(ArrayList<String> receivers) {
 			this.list = receivers;
 		}
 		
@@ -193,6 +134,8 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 						updateReceiverList();
 					}
 				});
+				holder.deleteImageView.setVisibility(View.VISIBLE);
+				holder.owneTextView.setVisibility(View.GONE);
 			}
 			return convertView;
 		}
@@ -212,12 +155,12 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 		if(receivers.containsAll(orignalReceivers) && orignalReceivers.containsAll(receivers)) {
 			isReceiversChange = false; // 表示接收人没有改变
 		}
-		StringBuilder sb = new StringBuilder();
+		/*StringBuilder sb = new StringBuilder();
 		for(int i=0; i<receivers.size(); i++) {
 			sb.append(receivers.get(i)+":");
 		}
-		sb.deleteCharAt(sb.length()-1);
-		intent.putExtra("receiversStr", sb.toString());
+		sb.deleteCharAt(sb.length()-1);*/
+		intent.putStringArrayListExtra("receivers", receivers);
 		intent.putExtra("isReceiversChange", isReceiversChange);
 		intent.putExtra("receiversNum", receivers.size());
 		setResult(3, intent);
@@ -227,7 +170,22 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 	@Override
 	public void onClick(View v) {
 		Intent intent = new Intent(getApplicationContext(), AddReceiverActivity.class);
+		intent.putStringArrayListExtra("receivers", receivers);
 		startActivityForResult(intent, 0);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (resultCode) {
+		case 1:
+			newAddReceivers = data.getStringArrayListExtra("selectedContracts");
+			receivers.addAll(newAddReceivers);
+			adapter.setData(receivers);
+			adapter.notifyDataSetChanged();
+			break;
+		default:
+			break;
+		}
 	}
 
 }

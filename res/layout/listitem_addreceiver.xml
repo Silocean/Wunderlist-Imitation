@@ -11,13 +11,15 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="5dip"
         android:layout_marginTop="5dip"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:src="@drawable/wl_receivers_list_userhead" />
     
     <TextView 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/addreceiver_username"
-        android:text="接收人"
+        android:text="未命名"
         android:textColor="@color/listitem_text_color"
         android:layout_toRightOf="@id/addreceiver_headimage"
         android:layout_marginLeft="7dip"
@@ -37,10 +39,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/addreceiver_add_icon"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:layout_marginRight="5dip"
         android:src="@drawable/addreceiver_list_invite_button_selector" />
     
 </RelativeLayout>
