@@ -2,8 +2,6 @@ package com.wunderlist.slidingmenu.activity;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 
 import org.json.JSONArray;
@@ -22,9 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
+import com.wunderlist.entity.CommonUser;
 import com.wunderlist.entity.Reply;
 import com.wunderlist.entity.Task;
-import com.wunderlist.entity.CommonUser;
 import com.wunderlist.tools.ClockDialogUtil;
 import com.wunderlist.tools.DateTimePickDialogUtil;
 import com.wunderlist.tools.MyActivityManager;
@@ -52,7 +50,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private ImageView clockiImageView;
 	private TextView clockTextView;
 	private RelativeLayout taskReplyRelativeLayout;
-	//private ImageView replyHeadImageView;
 	private TextView replyEmailTextView;
 	private TextView replyContentTextView;
 	private TextView replyTimeTextView;
@@ -107,7 +104,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		replyButton = (Button) findViewById(R.id.taskdetails_reply);
 		replyButton.setOnClickListener(this);
 		taskReplyRelativeLayout = (RelativeLayout) findViewById(R.id.task_reply_layout);
-		//replyHeadImageView = (ImageView) findViewById(R.id.task_reply_headimage);
 		replyEmailTextView = (TextView) findViewById(R.id.task_reply_email);
 		replyContentTextView = (TextView) findViewById(R.id.task_reply_content);
 		replyTimeTextView = (TextView) findViewById(R.id.task_reply_time);
@@ -130,6 +126,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		task = (Task) getIntent().getSerializableExtra("task");
 		barTitle = getIntent().getStringExtra("title");
 		enddate = task.getEnddate();
+		remindnum = task.getRemindnum();
+		remindtype = task.getRemindtype();
 		super.setTitle(barTitle);
 		titleEditText.setText(task.getSubject());
 		subject = task.getSubject();
@@ -161,23 +159,15 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * 根据截止日期更新dateView
 	 */
 	private void changeDateView() {
-		switch (TimeConvertTool.compareDate(enddate)) {
-		case 0: {
-			enddateiImageView
-					.setImageResource(R.drawable.wl_taskdetails_icon_deadline_overdue);
-			enddateTextView.setTextColor(getResources().getColor(
-					R.color.task_date_overdue_text_color));
-			break;
+		if(TimeConvertTool.compareDate(enddate)) {
+			enddateiImageView.setImageResource(R.drawable.wl_taskdetails_icon_deadline_active);
+			enddateTextView.setTextColor(getResources().getColor(R.color.task_date_active_text_color));
+		} else {
+			enddateiImageView.setImageResource(R.drawable.wl_taskdetails_icon_deadline_overdue);
+			enddateTextView.setTextColor(getResources().getColor(R.color.task_date_overdue_text_color));
 		}
-		case 1: {
-			enddateiImageView
-					.setImageResource(R.drawable.wl_taskdetails_icon_deadline_active);
-			enddateTextView.setTextColor(getResources().getColor(
-					R.color.task_date_active_text_color));
-			break;
-		}
-		default:
-			break;
+		if(!remindnum.equals("") && !remindtype.equals("")) {
+			this.changeClockView();
 		}
 	}
 
@@ -185,56 +175,12 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * 根据提醒时间更新clockView
 	 */
 	private void changeClockView() {
-		switch (this.judgeClock(enddate, remindnum, remindtype)) {
-		case 0: {
-			clockiImageView
-					.setImageResource(R.drawable.wl_taskdetails_icon_clock_overdue);
-			clockTextView.setTextColor(getResources().getColor(
-					R.color.task_date_overdue_text_color));
-			break;
-		}
-		case 1: {
-			clockiImageView
-					.setImageResource(R.drawable.wl_taskdetails_icon_clock_active);
-			clockTextView.setTextColor(getResources().getColor(
-					R.color.task_date_active_text_color));
-			break;
-		}
-		default:
-			break;
-		}
-	}
-
-	/**
-	 * 判断提醒提前量
-	 * 
-	 * @param enddate
-	 * @param remindnum
-	 * @param remindtype
-	 * @return 0表示截止日期减去提醒提前量在当前日期之前，1表示之后
-	 */
-	private int judgeClock(String enddate, String remindnum, String remindtype) {
-		Date date = TimeConvertTool.convertToDate(enddate);
-		switch (Integer.parseInt(remindtype)) {
-		case 0: {
-			date.setTime(date.getTime() - (Integer.parseInt(remindnum) * 24 * 60 * 60 * 1000));
-			break;
-		}
-		case 1: {
-			date.setTime(date.getTime() - (Integer.parseInt(remindnum) * 60 * 60 * 1000));
-			break;
-		}
-		case 2: {
-			date.setTime(date.getTime() - (Integer.parseInt(remindnum) * 60 * 1000));
-			break;
-		}
-		default:
-			break;
-		}
-		if (date.before(new Date())) {
-			return 0;
-		} else {
-			return 1;
+		if(TimeConvertTool.judgeClock(enddate, remindnum, remindtype)) {
+			clockiImageView.setImageResource(R.drawable.wl_taskdetails_icon_clock_active);
+			clockTextView.setTextColor(getResources().getColor(R.color.task_date_active_text_color));
+		} else { // 提醒已过期
+			clockiImageView.setImageResource(R.drawable.wl_taskdetails_icon_clock_overdue);
+			clockTextView.setTextColor(getResources().getColor( R.color.task_date_overdue_text_color));
 		}
 	}
 
@@ -335,35 +281,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		} else {
 			if (!dateTime.equals("")) {
 				String enddateStr = "截止至 ";
-				Calendar c = Calendar.getInstance();
-				c.setTime(TimeConvertTool.convertToDate(dateTime));
-				int week = c.get(Calendar.DAY_OF_WEEK);
-				switch (week) {
-				case 1:
-					enddateStr += "周日, ";
-					break;
-				case 2:
-					enddateStr += "周一, ";
-					break;
-				case 3:
-					enddateStr += "周二, ";
-					break;
-				case 4:
-					enddateStr += "周三, ";
-					break;
-				case 5:
-					enddateStr += "周四, ";
-					break;
-				case 6:
-					enddateStr += "周五, ";
-					break;
-				case 7:
-					enddateStr += "周六, ";
-					break;
-				default:
-					break;
-				}
-				enddateStr += dateTime.split(" ")[0].replaceAll("/", ".");
+				enddateStr += TimeConvertTool.convertToSpecialEnddateStr(enddate);
 				enddateTextView.setText(enddateStr);
 				this.changeDateView();
 			} else {

@@ -75,6 +75,8 @@ public class TimeConvertTool {
 					break;
 				}
 				str += enddate.split(" ")[0].replaceAll("/", ".");
+				str += ",";
+				str += enddate.split(" ")[1].split(":")[0] + ":"+ enddate.split(" ")[1].split(":")[1];
 			} else {
 				str = "";
 			}
@@ -83,16 +85,90 @@ public class TimeConvertTool {
 	}
 	
 	/**
+	 * 判断提醒提前量
+	 * 
+	 * @param enddate
+	 * @param remindnum
+	 * @param remindtype
+	 * @return false表示截止日期减去提醒提前量在当前日期之前(提醒已过期)，true表示之后
+	 */
+	public static boolean judgeClock(String enddate, String remindnum, String remindtype) {
+		Date date = TimeConvertTool.convertToDate(enddate);
+		switch (Integer.parseInt(remindtype)) {
+		case 0: {
+			date.setTime(date.getTime() - (Integer.parseInt(remindnum) * 24 * 60 * 60 * 1000));
+			break;
+		}
+		case 1: {
+			date.setTime(date.getTime() - (Integer.parseInt(remindnum) * 60 * 60 * 1000));
+			break;
+		}
+		case 2: {
+			date.setTime(date.getTime() - (Integer.parseInt(remindnum) * 60 * 1000));
+			break;
+		}
+		default:
+			break;
+		}
+		if (date.before(new Date())) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	/**
+	 * 根据截止日期和提醒提前量获取提醒时间
+	 * @param enddate
+	 * @param remindnum
+	 * @param remindtype
+	 * @return
+	 */
+	public static Date getClockTime(String enddate, String remindnum, String remindtype) {
+		Date date = TimeConvertTool.convertToDate(enddate);
+		switch (Integer.parseInt(remindtype)) {
+		case 0: {
+			date.setTime(date.getTime() - (Integer.parseInt(remindnum) * 24 * 60 * 60 * 1000));
+			break;
+		}
+		case 1: {
+			date.setTime(date.getTime() - (Integer.parseInt(remindnum) * 60 * 60 * 1000));
+			break;
+		}
+		case 2: {
+			date.setTime(date.getTime() - (Integer.parseInt(remindnum) * 60 * 1000));
+			break;
+		}
+		default:
+			break;
+		}
+		return date;
+	}
+	
+	/**
 	 * 和当前日期进行比较
 	 * @param dateTime
-	 * @return 0表示比当前日期小，1表示比当前日期大
+	 * @return fasle表示比当前日期小，true表示比当前日期大
 	 */
-	public static int compareDate(String dateTime) {
+	public static boolean compareDate(String dateTime) {
 		Date date = convertToDate(dateTime);
 		if (date.before(new Date())) {
-			return 0;
+			return false;
 		} else {
-			return 1;
+			return true;
+		}
+	}
+	
+	/**
+	 * 和当前日期进行比较
+	 * @param date
+	 * @return fasle表示比当前日期小，true表示比当前日期大
+	 */
+	public static boolean compareDate(Date date) {
+		if (date.before(new Date())) {
+			return false;
+		} else {
+			return true;
 		}
 	}
 	

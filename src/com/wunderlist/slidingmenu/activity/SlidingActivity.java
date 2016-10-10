@@ -2,6 +2,7 @@ package com.wunderlist.slidingmenu.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -24,6 +25,7 @@ public class SlidingActivity extends SherlockFragmentActivity {
 	private static ActionBar actionBar = null;
 	
 	public static Menu menu = null;
+	private MenuItem item = null;
 	
 	public static boolean isRefreshing = true;
 	
@@ -44,13 +46,13 @@ public class SlidingActivity extends SherlockFragmentActivity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		item = menu.add(0, 0, 0, "接收中...");
 		return super.onCreateOptionsMenu(menu);
 	}
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		SlidingActivity.menu = menu;
-		MenuItem item = menu.add(0, 0, 0, "接收中...");
 		if(isRefreshing) {
 			item.setTitle("接收中...");
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -58,6 +60,14 @@ public class SlidingActivity extends SherlockFragmentActivity {
 			item.setTitle("");
 		}
 		return super.onPrepareOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_MENU) { // 屏蔽菜单键
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 	
 	@Override

@@ -1,7 +1,9 @@
 package com.wunderlist.slidingmenu.fragment;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 
 import org.json.JSONArray;
@@ -42,11 +44,13 @@ import android.widget.Toast;
 
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Common;
-import com.wunderlist.entity.Task;
 import com.wunderlist.entity.CommonUser;
+import com.wunderlist.entity.Task;
 import com.wunderlist.slidingmenu.activity.SlidingActivity;
 import com.wunderlist.slidingmenu.activity.TaskDetailsActivity;
 import com.wunderlist.tools.CheckNetwork;
+import com.wunderlist.tools.ClockAlarmUtil;
+import com.wunderlist.tools.ClockTimeComparator;
 import com.wunderlist.tools.EnddateComparator;
 import com.wunderlist.tools.MySharedPreferences;
 import com.wunderlist.tools.StreamTool;
@@ -66,10 +70,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 
 	private static final int NORMALTOCOMPLETEORCANCEL = 1;
 	private static final int COMPLETEORCANCELTONORMAL = 2;
-	
+
 	private static final int SORTBYSUBJECT = 1;
 	private static final int SORTBYENDDATE = 2;
-	
+
 	private SubjectComparator subjectComparator = new SubjectComparator();
 	private EnddateComparator enddateComparator = new EnddateComparator();
 
@@ -103,6 +107,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private static LinkedList<Task> tasksComplete = new LinkedList<Task>();
 	// 临时变量用于保存已完成任务列表
 	private static LinkedList<Task> tempList = new LinkedList<Task>();
+
+	public static ArrayList<Date> clockTimes = new ArrayList<Date>();
+	private Date[] arrayDates = null;
 
 	private Task[] arrayTasksNormal = null;
 	private Task[] arrayTasksComplete = null;
@@ -152,6 +159,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			}
 		});
 		SlidingActivity.setBarTitle("我的任务");
+		clockTimes.removeAll(clockTimes);
 		this.getPreferences();
 		listView = (ListView) view.findViewById(R.id.tasklist);
 		listView.setOnScrollListener(this);
@@ -240,11 +248,29 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	 */
 	@SuppressLint("NewApi")
 	private void getTaskBoxList() {
-		SlidingActivity.setIsRefreshing(true);
-		slidingActivity.invalidateOptionsMenu();
+		showRefreshMenu();
 		tasksTotal.removeAll(tasksTotal);
 		GetTaskBoxListData task = new GetTaskBoxListData(TAGNORMAL, tasksNormal);
 		task.execute("");
+	}
+	
+	/**
+	 * 显示刷新数据菜单
+	 */
+	@SuppressLint("NewApi")
+	private void showRefreshMenu() {
+		SlidingActivity.setIsRefreshing(true);
+		slidingActivity.invalidateOptionsMenu();
+	}
+	
+	/**
+	 * 隐藏刷新数据菜单
+	 */
+	@SuppressLint("NewApi")
+	private void hideRefreshMenu() {
+		timeEnd = System.currentTimeMillis();
+		SlidingActivity.setIsRefreshing(false);
+		slidingActivity.invalidateOptionsMenu();
 	}
 
 	/**
@@ -297,6 +323,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		}
 		adapter.setData(tasksTotal);
 		adapter.notifyDataSetChanged();
+		this.setClockAlarm();
 	}
 
 	/**
@@ -308,10 +335,16 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private void updateTaskBoxList(String taskJSON, int position) {
 		try {
 			Task task = this.parseSingleTaskJSON(taskJSON);
-			tasksTotal.remove(position);
-			tasksTotal.add(position, task);
+			tasksTotal.removeAll(tasksTotal);
+			tasksNormal.remove(position);
+			tasksNormal.add(position, task);
+			tasksTotal.addAll(tasksNormal);
+			tasksTotal.add(new Task());
+			tasksTotal.addAll(tasksComplete);
+			tasksTotal.add(new Task());
 			adapter.setData(tasksTotal);
 			adapter.notifyDataSetChanged();
+			this.setClockAlarm();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -373,10 +406,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				String json = WebServiceRequest.SendPost(inputStream, data,
 						"GetTaskBoxListResult");
 				tasks = parseJSON(json);
-				// System.out.println(tasks);
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println("网络连接出现问题");
 			}
 			return tasks;
 		}
@@ -385,7 +416,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		protected void onProgressUpdate(Integer... values) {
 		}
 
-		@SuppressLint("NewApi")
 		@Override
 		protected void onPostExecute(LinkedList<Task> tasks) {
 			if (tag.equals(TAGNORMAL)) {
@@ -403,15 +433,45 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					adapter.notifyDataSetChanged();
 				}
 				tasksComplete = tasks;
-				timeEnd = System.currentTimeMillis();
-				SlidingActivity.setIsRefreshing(false);
-				slidingActivity.invalidateOptionsMenu();
+				
+				hideRefreshMenu();
 				showOrDismissCompleteTasks();
+				
+				setClockAlarm();
+				
 			}
 		}
 
 	}
-
+	
+	/**
+	 * 设置提醒
+	 */
+	private void setClockAlarm() {
+		clockTimes.removeAll(clockTimes);
+		for(int i=0; i<tasksNormal.size(); i++) {
+			task = tasksNormal.get(i);
+			if (!task.getRemindnum().equals("") && !task.getRemindtype().equals("")) {
+				Date date = TimeConvertTool.getClockTime(task.getEnddate(), task.getRemindnum(), task.getRemindtype());
+				if(TimeConvertTool.compareDate(date)) {
+					clockTimes.add(date);
+				}
+			}
+		}
+		arrayDates = new Date[clockTimes.size()];
+		for(int i=0; i<clockTimes.size(); i++) {
+			arrayDates[i] = clockTimes.get(i);
+		}
+		Arrays.sort(arrayDates, new ClockTimeComparator());
+		clockTimes.removeAll(clockTimes);
+		for(int i=0; i<arrayDates.length; i++) {
+			clockTimes.add(arrayDates[i]);
+		}
+		if(clockTimes.size() > 0) {
+			ClockAlarmUtil.setClockAlarm(getActivity(), clockTimes.get(0).getTime());
+		}
+	}
+	
 	/**
 	 * 获取程序刷新数据时间
 	 * 
@@ -428,7 +488,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	 * @return 任务列表数据
 	 * @throws Exception
 	 */
-	private static LinkedList<Task> parseJSON(String json) throws Exception {
+	private LinkedList<Task> parseJSON(String json) throws Exception {
 		LinkedList<Task> tasks = new LinkedList<Task>();
 		if (json != null) {
 			JSONObject object = new JSONObject(json);
@@ -453,7 +513,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				System.out.println("没有数据");
 			}
 		} else { // 网络连接出现问题
-			System.out.println("网络连接出现问题");
+			Toast.makeText(getActivity(), "网络连接出现问题", Toast.LENGTH_SHORT)
+					.show();
 		}
 		return tasks;
 	}
@@ -665,9 +726,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 															int which) {
 														// Toast.makeText(context,
 														// "确定", 0).show();
-														updateTaskStatus(list
-																.get(position)
-																.getTaskId(),
+														updateTaskStatus(
+																list.get(
+																		position)
+																		.getTaskId(),
 																CommonUser.USEREMAIL,
 																TASKNORMAL,
 																position,
@@ -711,9 +773,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 															int which) {
 														// Toast.makeText(context,
 														// "确定", 0).show();
-														updateTaskStatus(list
-																.get(position)
-																.getTaskId(),
+														updateTaskStatus(
+																list.get(
+																		position)
+																		.getTaskId(),
 																CommonUser.USEREMAIL,
 																TASKCANCEL,
 																position,
@@ -791,19 +854,12 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			String enddate = task.getEnddate();
 			holder.taskEnddate.setText(TimeConvertTool
 					.convertToSpecialEnddateStr(enddate));
-			switch (TimeConvertTool.compareDate(enddate)) {
-			case 0: {
-				holder.taskEnddate.setTextColor(getResources().getColor(
-						R.color.task_date_overdue_text_color));
-				break;
-			}
-			case 1: {
+			if (TimeConvertTool.compareDate(enddate)) {
 				holder.taskEnddate.setTextColor(getResources().getColor(
 						R.color.task_date_active_text_color));
-				break;
-			}
-			default:
-				break;
+			} else {
+				holder.taskEnddate.setTextColor(getResources().getColor(
+						R.color.task_date_overdue_text_color));
 			}
 		}
 
@@ -1030,7 +1086,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			}
 		});
 	}
-	
+
 	/**
 	 * 显示或隐藏排序选项popupWindow
 	 */
@@ -1051,7 +1107,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					Gravity.TOP, offsetX, offsetY);
 		}
 	}
-	
+
 	/**
 	 * 初始化排序选项popupWindow
 	 */
@@ -1088,21 +1144,26 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			}
 		});
 	}
-	
+
 	/**
 	 * 根据指定的排序规则对指定的任务集合进行排序
-	 * @param tasksNormal 未完成任务列表
-	 * @param tasksComplete 已完成任务列表
-	 * @param sortByWhat 排序规则
+	 * 
+	 * @param tasksNormal
+	 *            未完成任务列表
+	 * @param tasksComplete
+	 *            已完成任务列表
+	 * @param sortByWhat
+	 *            排序规则
 	 */
-	private void sortBySubject(LinkedList<Task> tasksNormal, LinkedList<Task> tasksComplete, int sortByWhat) {
+	private void sortBySubject(LinkedList<Task> tasksNormal,
+			LinkedList<Task> tasksComplete, int sortByWhat) {
 		arrayTasksNormal = new Task[tasksNormal.size()];
 		for (int i = 0; i < tasksNormal.size(); i++) {
 			arrayTasksNormal[i] = tasksNormal.get(i);
 		}
-		if(sortByWhat == SORTBYSUBJECT) {
+		if (sortByWhat == SORTBYSUBJECT) {
 			Arrays.sort(arrayTasksNormal, subjectComparator);
-		} else if(sortByWhat == SORTBYENDDATE) {
+		} else if (sortByWhat == SORTBYENDDATE) {
 			Arrays.sort(arrayTasksNormal, enddateComparator);
 		}
 		tasksNormal.removeAll(tasksNormal);
@@ -1113,9 +1174,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		for (int i = 0; i < tasksComplete.size(); i++) {
 			arrayTasksComplete[i] = tasksComplete.get(i);
 		}
-		if(sortByWhat == SORTBYSUBJECT) {
+		if (sortByWhat == SORTBYSUBJECT) {
 			Arrays.sort(arrayTasksComplete, subjectComparator);
-		} else if(sortByWhat == SORTBYENDDATE){
+		} else if (sortByWhat == SORTBYENDDATE) {
 			Arrays.sort(arrayTasksComplete, enddateComparator);
 		}
 		tasksComplete.removeAll(tasksComplete);

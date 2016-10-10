@@ -183,7 +183,7 @@ public class ClockDialogUtil implements android.view.View.OnClickListener {
 		}
 		case 2: {
 			new AlertDialog.Builder(activity)
-			.setSingleChoiceItems(remindnumArrayMinute, num, new OnClickListener() {
+			.setSingleChoiceItems(remindnumArrayMinute, num-1, new OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					remindnum = which;
 					spinnerRemindnum.setText(""+(which+1));
