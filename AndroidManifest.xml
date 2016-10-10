@@ -75,6 +75,9 @@
             android:name="com.wunderlist.slidingmenu.activity.ReplyActivity" >
         </activity>
         <activity
+            android:name="com.wunderlist.slidingmenu.activity.InboxActivity" >
+        </activity>
+        <activity
             android:name="com.wunderlist.slidingmenu.activity.ReceiversActivity" >
         </activity>
          <activity

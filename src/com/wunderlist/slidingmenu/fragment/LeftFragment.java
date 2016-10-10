@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.wunderlist.R;
 import com.wunderlist.entity.CommonUser;
+import com.wunderlist.slidingmenu.activity.InboxActivity;
 import com.wunderlist.slidingmenu.activity.SettingsActivity;
 import com.wunderlist.slidingmenu.activity.SlidingActivity;
 
@@ -72,7 +73,8 @@ public class LeftFragment extends Fragment implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.user_notification: {
-			//Toast.makeText(getActivity(), "notification", Toast.LENGTH_SHORT).show();
+			Intent intent = new Intent(getActivity(), InboxActivity.class);
+			startActivity(intent);
 			break;
 		}
 		case R.id.sidebar_sync: {

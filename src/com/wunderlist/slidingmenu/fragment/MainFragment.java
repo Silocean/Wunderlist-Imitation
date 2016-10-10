@@ -483,7 +483,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		adapter.setData(tasksTotal);
 		adapter.notifyDataSetChanged();
 	}
-
+	
 	/**
 	 * 解析单个任务json字符串
 	 * 

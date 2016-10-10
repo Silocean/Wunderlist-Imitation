@@ -260,7 +260,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private class GetReply extends
 			AsyncTask<String, Integer, LinkedList<Reply>> {
 		LinkedList<Reply> replys = new LinkedList<Reply>();
-
+		
 		@Override
 		protected LinkedList<Reply> doInBackground(String... arg0) {
 			try {
@@ -1054,5 +1054,5 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				mfrom, "任务信息发生变更");
 		System.out.println(result.getErrcode() + "===" + result.getErrmsg());
 	}
-
+	
 }

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="fill_parent" >
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 	
     <RelativeLayout 
-       	android:layout_width="270dip"
+       	android:layout_width="fill_parent"
        	android:layout_height="60dip"
+       	android:layout_marginRight="50dip"
        	android:id="@+id/sidebar_topbar"
        	android:background="@drawable/wl_sidebar_topbar" >
         <ImageView 
@@ -44,8 +45,9 @@
     </RelativeLayout>
     
     <LinearLayout 
-        android:layout_width="270dip"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_marginRight="150dip"
         android:orientation="vertical"
         android:id="@+id/sidebar_linderlayout"
         android:background="@color/sidebar_bg_color"
@@ -89,8 +91,9 @@
     </LinearLayout>
     
    	<RelativeLayout 
-   	      android:layout_width="270dip"
+   	      android:layout_width="fill_parent"
    	      android:layout_height="50dip"
+   	      android:layout_marginRight="150dip"
    	      android:layout_alignParentBottom="true"
    	      android:background="@drawable/wl_sidebar_bottombar" >
    	      <ImageView 
