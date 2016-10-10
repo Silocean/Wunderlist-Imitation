@@ -159,7 +159,7 @@
 		        android:duplicateParentState="true"
 		        android:textColor="@drawable/groupname_color_selector" />
 		</RelativeLayout> -->
-		<RelativeLayout 
+		<!-- <RelativeLayout 
 		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
 		    android:id="@+id/group_initiate"
@@ -194,7 +194,7 @@
 		        android:layout_centerVertical="true"
 		        android:duplicateParentState="true"
 		        android:textColor="@drawable/groupname_color_selector" />
-		</RelativeLayout>
+		</RelativeLayout> -->
     </LinearLayout>
     
    	<RelativeLayout 

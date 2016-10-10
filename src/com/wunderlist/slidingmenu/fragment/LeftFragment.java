@@ -26,7 +26,7 @@ public class LeftFragment extends Fragment implements OnClickListener {
 	private RelativeLayout groupReceive = null;
 	//private RelativeLayout groupExecute = null;
 	//private RelativeLayout groupFollow = null;
-	private RelativeLayout groupInitiate = null;
+	//private RelativeLayout groupInitiate = null;
 	
 	private MainFragment mainFragment = null;
 	
@@ -40,14 +40,14 @@ public class LeftFragment extends Fragment implements OnClickListener {
 		groupReceive = (RelativeLayout)view.findViewById(R.id.group_receive);
 		//groupExecute = (RelativeLayout)view.findViewById(R.id.group_execute);
 		//groupFollow = (RelativeLayout)view.findViewById(R.id.group_follow);
-		groupInitiate = (RelativeLayout)view.findViewById(R.id.group_initiate);
+		//groupInitiate = (RelativeLayout)view.findViewById(R.id.group_initiate);
 		notifImageView.setOnClickListener(this);
 		syncImageView.setOnClickListener(this);
 		settingsImageView.setOnClickListener(this);
 		groupReceive.setOnClickListener(this);
 		//groupExecute.setOnClickListener(this);
 		//groupFollow.setOnClickListener(this);
-		groupInitiate.setOnClickListener(this);
+		//groupInitiate.setOnClickListener(this);
 		groupReceive.setSelected(true);
 		mainFragment = new MainFragment();
 		return view;
@@ -78,7 +78,7 @@ public class LeftFragment extends Fragment implements OnClickListener {
 			groupReceive.setSelected(true);
 			//groupExecute.setSelected(false);
 			//groupFollow.setSelected(false);
-			groupInitiate.setSelected(false);
+			//groupInitiate.setSelected(false);
 			SlidingActivity.mainFragment.getTaskBoxList();
 			break;
 		}
@@ -98,7 +98,7 @@ public class LeftFragment extends Fragment implements OnClickListener {
 			groupInitiate.setSelected(false);
 			break;
 		}*/
-		case R.id.group_initiate: {
+		/*case R.id.group_initiate: {
 			((SlidingActivity)getActivity()).showLeft();
 			groupReceive.setSelected(false);
 			//groupExecute.setSelected(false);
@@ -106,7 +106,7 @@ public class LeftFragment extends Fragment implements OnClickListener {
 			groupInitiate.setSelected(true);
 			SlidingActivity.mainFragment.getTaskList();
 			break;
-		}
+		}*/
 		default:
 			break;
 		}

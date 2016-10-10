@@ -12,6 +12,8 @@ public class Task implements Serializable {
 	private String priority;
 	private String enddate;
 	private String remindtype;
+	private String remindnum;
+	private String isActive;
 	
 	public String getTaskId() {
 		return taskId;
@@ -61,12 +63,24 @@ public class Task implements Serializable {
 	public void setRemindtype(String remindtype) {
 		this.remindtype = remindtype;
 	}
+	public String getIsActive() {
+		return isActive;
+	}
+	public void setIsActive(String isActive) {
+		this.isActive = isActive;
+	}
+	public String getRemindnum() {
+		return remindnum;
+	}
+	public void setRemindnum(String remindnum) {
+		this.remindnum = remindnum;
+	}
 	@Override
 	public String toString() {
 		return "Task [taskId=" + taskId + ", userId=" + userId + ", taskFrom="
 				+ taskFrom + ", subject=" + subject + ", disc=" + disc
 				+ ", priority=" + priority + ", enddate=" + enddate
-				+ ", remindtype=" + remindtype + "]";
+				+ ", remindtype=" + remindtype + ", remindnum=" + remindnum
+				+ ", isActive=" + isActive + "]";
 	}
-	
 }

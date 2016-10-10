@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Task;
+import com.wunderlist.entity.User;
 import com.wunderlist.slidingmenu.activity.SlidingActivity;
 import com.wunderlist.slidingmenu.activity.TaskDetailsActivity;
 import com.wunderlist.tools.StreamTool;
@@ -37,18 +39,13 @@ import com.wunderlist.tools.WebServiceRequest;
 public class MainFragment extends Fragment {
 	
 	private ListView listView;
-	//private ListView listViewCancel;
-	//private ListView listViewcomplete;
 	
 	private EditText taskEditText = null;
-	
-	private String userId = "ec060fdf-af0e-40a2-a86d-4d11a4cad9ea";
-	
-	private String userEmail = "andy.sun@tr-info.net";
 	
 	private TaskListItemAdapter adapter = null;
 	
 	private LinkedList<Task> tasks = new LinkedList<Task>();
+	private LinkedList<Task> tasksComplete = new LinkedList<Task>();
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,8 +69,6 @@ public class MainFragment extends Fragment {
 			}
 		});
 		listView = (ListView)view.findViewById(R.id.tasklist);
-		//listViewCancel = (ListView)view.findViewById(R.id.taskcancellist);
-		//listViewcomplete = (ListView)view.findViewById(R.id.taskcompletelist);
 		adapter = new TaskListItemAdapter(getActivity(), R.layout.listitem_task);
 		this.getTaskBoxList();
 		return view;
@@ -85,15 +80,14 @@ public class MainFragment extends Fragment {
 	public void addTask(String subject) throws Exception {
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("AddTask.xml");
 		byte[] data = StreamTool.read(inputStream);
-		String string = new String(data).replaceAll("\\&USERID", userId).replaceAll("\\&MFROM", userEmail)
+		String string = new String(data).replaceAll("\\&USERID", User.USERID).replaceAll("\\&MFROM", User.USEREMAIL)
 				.replaceAll("\\&SUBJECT", subject).replaceAll("\\&DISC", "").replaceAll("\\&PRIORITY", "")
 				.replaceAll("\\&ENDDATE", "").replaceAll("\\&REMINDTYPE", "").replaceAll("\\&REMINDNUM", "")
 				.replaceAll("\\&ATTFILES", "");
 		data = string.getBytes();
 		String json = WebServiceRequest.SendPost(inputStream, data, "AddTaskResult");
-		System.out.println("===="+json);
 		
-		getTaskList();
+		getTaskBoxList();
 		
 	}
 	
@@ -104,22 +98,7 @@ public class MainFragment extends Fragment {
 		SlidingActivity.setBarTitle("我的任务");
 		GetTaskBoxListData task = new GetTaskBoxListData();
 		task.execute("");
-		//System.out.println("===================="); 
 		listView.setAdapter(adapter);
-		//listViewCancel.setAdapter(adapter);
-		//listViewcomplete.setAdapter(adapter);
-		
-	}
-	
-	/**
-	 * 获取用户发起的任务列表
-	 */
-	public void getTaskList() {
-		SlidingActivity.setBarTitle("我发起的");
-		GetTaskListData task = new GetTaskListData();
-		task.execute("");
-		listView.setAdapter(adapter);
-		//this.setListViewHeightBasedOnChildren(listView);
 		
 	}
 	
@@ -136,7 +115,7 @@ public class MainFragment extends Fragment {
 			try {
 				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("GetTaskBoxList.xml");
 				byte[] data = StreamTool.read(inputStream);
-				String string = new String(data).replaceAll("\\&strUserID", userId).replaceAll("\\&IsActive", "").replaceAll("\\&IsRead", "").replaceAll("\\&strSubject", "");
+				String string = new String(data).replaceAll("\\&strUserID", User.USERID).replaceAll("\\&IsActive", "").replaceAll("\\&IsRead", "").replaceAll("\\&strSubject", "");
 				data = string.getBytes();
 				String json = WebServiceRequest.SendPost(inputStream, data, "GetTaskBoxListResult");
 				tasks = parseJSON(json);
@@ -152,52 +131,9 @@ public class MainFragment extends Fragment {
 		
 		@Override
 		protected void onPostExecute(LinkedList<Task> tasks) {
-			//System.out.println(tasks);
 			adapter.removeAllData();
 			adapter.setData(tasks);
 			adapter.notifyDataSetChanged();
-			System.out.println("a:"+adapter.getCount());
-			/*setListViewHeightBasedOnChildren(listView);
-			setListViewHeightBasedOnChildren(listViewCancel);
-			setListViewHeightBasedOnChildren(listViewcomplete);*/
-		}
-		
-	}
-	/**
-	 * 异步任务，用于获取用户发起的任务列表
-	 * @author SIYUNFEI
-	 *
-	 */
-	private class GetTaskListData extends AsyncTask<String, Integer, LinkedList<Task>> {
-		
-		@Override
-		protected LinkedList<Task> doInBackground(String... strings) {
-			LinkedList<Task> tasks = new LinkedList<Task>();
-			tasks.removeAll(tasks); // 先清空任务列表
-			try {
-				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("GetTaskList.xml");
-				byte[] data = StreamTool.read(inputStream);
-				String string = new String(data).replaceAll("\\&strUserID", userId).replaceAll("\\&strTaskID", "");
-				data = string.getBytes();
-				String json = WebServiceRequest.SendPost(inputStream, data, "GetTaskListResult");
-				tasks = parseJSON(json);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return tasks;
-		}
-		
-		@Override
-		protected void onProgressUpdate(Integer... values) {
-		}
-		
-		@Override
-		protected void onPostExecute(LinkedList<Task> tasks) {
-			//System.out.println(tasks);
-			adapter.removeAllData();
-			adapter.setData(tasks);
-			adapter.notifyDataSetChanged();
-			System.out.println("b:"+adapter.getCount());
 		}
 		
 	}
@@ -223,6 +159,8 @@ public class MainFragment extends Fragment {
 				task.setSubject(obj.getString("SUBJECT"));
 				task.setDisc(obj.getString("DISC"));
 				task.setEnddate(obj.getString("ENDDATE"));
+				task.setRemindtype(obj.getString("REMINDTYPE"));
+				task.setRemindnum(obj.getString("REMINDNUM"));
 				tasks.add(task);
 			}
 		} else {
@@ -234,28 +172,6 @@ public class MainFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 	}
-	/**
-	 * 动态设置listview的高度
-	 * @param listView
-	 *//*
-	private void setListViewHeightBasedOnChildren(ListView listView) {
-		ListAdapter listAdapter = listView.getAdapter();
-		if(listAdapter == null) {
-			return;
-		} else {
-			int totalHeight = 0;
-			for(int i=0; i<listAdapter.getCount(); i++) {
-				View listItem = listAdapter.getView(i, null, listView);
-				System.out.println(listItem);
-				//listItem.measure(0, 0); // 在还没有构建view之前无法取得view的度宽，在此之前我们必须要measure一下
-				totalHeight += listItem.getMeasuredHeight();
-				System.out.println(i+"==="+listItem.getMeasuredHeight() + "=" + listItem.getHeight());
-			}
-			ViewGroup.LayoutParams params = listView.getLayoutParams();
-			params.height = totalHeight+(listView.getDividerHeight()*(listAdapter.getCount()+1));
-			listView.setLayoutParams(params);
-		}
-	}*/
 	
 	/**
 	 * 任务列表项数据填充器
@@ -265,6 +181,7 @@ public class MainFragment extends Fragment {
 		private static final int TYPE_CANCEL = 0;
 		private static final int TYPE_NORMAL = 1;
 		private static final int TYPE_COMPLETE = 2;
+		private static final int TYPE_COMPLETE_LAYOUT = 3;
 		
 		private Context context;
 		private LinkedList<Task> list;
@@ -305,8 +222,9 @@ public class MainFragment extends Fragment {
 		
 		@Override
 		public int getItemViewType(int position) {
-			System.out.println(getCount());
-			if(position >= getCount()-2) {
+			if(position == (getCount()-3)) {
+				return TYPE_COMPLETE_LAYOUT;
+			} else if (position > getCount()-3){
 				return TYPE_COMPLETE;
 			} else {
 				return TYPE_NORMAL;
@@ -317,47 +235,88 @@ public class MainFragment extends Fragment {
 		public View getView(final int position, View convertView, ViewGroup parent) {
 			holder = new ViewHolder();
 			if(convertView == null) {
-				convertView = inflater.inflate(resId, null);
-				holder.checkBox = (ImageView)convertView.findViewById(R.id.task_left_checkbox);
-				holder.taskMiddle = (RelativeLayout)convertView.findViewById(R.id.task_middle_relativelayout);
-				holder.taskTitle = (TextView)convertView.findViewById(R.id.task_middle_TextView);
-				holder.taskIcon = (ImageView)convertView.findViewById(R.id.task_right_icon);
+				switch (getItemViewType(position)) {
+				case TYPE_COMPLETE_LAYOUT: {
+					convertView = inflater.inflate(R.layout.listitem_task_complete_layout, null);
+					break;
+				}
+				case TYPE_COMPLETE: {
+					convertView = inflater.inflate(resId, null);
+					holder.checkBox = (ImageView)convertView.findViewById(R.id.task_left_checkbox);
+					holder.taskMiddle = (RelativeLayout)convertView.findViewById(R.id.task_middle_relativelayout);
+					holder.taskTitle = (TextView)convertView.findViewById(R.id.task_middle_TextView);
+					holder.taskIcon = (ImageView)convertView.findViewById(R.id.task_right_icon);
+					holder.taskTitle.setTextColor(getResources().getColor(R.color.task_complete_text_color));
+					holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+					holder.checkBox.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
+					holder.checkBox.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Toast.makeText(context, "checkbox" + position, Toast.LENGTH_SHORT).show();
+						}
+					});
+					final String title = this.list.get(position).getSubject();
+					holder.taskTitle.setText(title);
+					holder.taskMiddle.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Intent intent = new Intent(context, TaskDetailsActivity.class);
+							intent.putExtra("task", (Task)getItem(position));
+							intent.putExtra("title", SlidingActivity.getBarTitle());
+							startActivity(intent);
+						}
+					});
+					holder.taskIcon.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Toast.makeText(context, "icon" + position, Toast.LENGTH_SHORT).show();
+						}
+					});
+					break;
+				}
+				case TYPE_NORMAL: {
+					convertView = inflater.inflate(resId, null);
+					holder.checkBox = (ImageView)convertView.findViewById(R.id.task_left_checkbox);
+					holder.taskMiddle = (RelativeLayout)convertView.findViewById(R.id.task_middle_relativelayout);
+					holder.taskTitle = (TextView)convertView.findViewById(R.id.task_middle_TextView);
+					holder.taskIcon = (ImageView)convertView.findViewById(R.id.task_right_icon);
+					holder.checkBox.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Toast.makeText(context, "checkbox" + position, Toast.LENGTH_SHORT).show();
+						}
+					});
+					String userId = this.list.get(position).getUserId();
+					if(userId.equals(User.USERID)) {
+						holder.taskTitle.setTextColor(getResources().getColor(R.color.task_normal_initiate_text_color));
+					}
+					final String title = this.list.get(position).getSubject();
+					holder.taskTitle.setText(title);
+					holder.taskMiddle.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Intent intent = new Intent(context, TaskDetailsActivity.class);
+							intent.putExtra("task", (Task)getItem(position));
+							intent.putExtra("title", SlidingActivity.getBarTitle());
+							startActivity(intent);
+						}
+					});
+					holder.taskIcon.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Toast.makeText(context, "icon" + position, Toast.LENGTH_SHORT).show();
+						}
+					});
+					break;
+				}
+				default: {
+					break;
+				}
+				}
 				convertView.setTag(holder);
 			} else {
 				holder = (ViewHolder)convertView.getTag();
 			}
-			switch (getItemViewType(position)) {
-			case TYPE_COMPLETE:
-				holder.taskTitle.setTextColor(getResources().getColor(R.color.complete_color));
-				break;
-			case TYPE_NORMAL:
-				break;
-			default:
-				break;
-			}
-			holder.checkBox.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Toast.makeText(context, "checkbox" + position, Toast.LENGTH_SHORT).show();
-				}
-			});
-			final String title = this.list.get(position).getSubject();
-			holder.taskTitle.setText(title);
-			holder.taskMiddle.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Intent intent = new Intent(context, TaskDetailsActivity.class);
-					intent.putExtra("task", (Task)getItem(position));
-					intent.putExtra("title", SlidingActivity.getBarTitle());
-					startActivity(intent);
-				}
-			});
-			holder.taskIcon.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Toast.makeText(context, "icon" + position, Toast.LENGTH_SHORT).show();
-				}
-			});
 			return convertView;
 		}
 		

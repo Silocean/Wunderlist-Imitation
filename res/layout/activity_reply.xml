@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sidebar_bg_color" >
+    
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/taskreply_emptylayout"
+        android:layout_centerInParent="true" >
+        <ImageView 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/reply_empty_icon"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/wl_empty_comments_placeholder" />
+        <TextView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/reply_empty_text1"
+            android:layout_below="@id/reply_empty_icon"
+            android:layout_centerHorizontal="true"
+            android:text="No comments yet." />
+        <TextView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/reply_empty_text1"
+            android:layout_centerHorizontal="true"
+            android:text="Start your conversation here." />
+    </RelativeLayout>
+    
+    <ListView
+        android:id="@+id/replylist"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+		android:dividerHeight="10dip"
+        android:listSelector="#00000000"
+        android:fadingEdge="none"
+        android:cacheColorHint="#00000000"
+        android:visibility="gone" />
+    
+    <RelativeLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:id="@+id/taskreply_bottomLayout"
+	    android:layout_alignParentBottom="true" >
+	    <EditText 
+	        android:layout_width="250dip"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/taskreply_comment"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginLeft="5dip"
+	        android:layout_centerVertical="true"
+	        android:hint="Add a comment..."
+	        android:maxLines="3"
+	        android:textSize="14sp"/>
+	    <Button 
+	        android:layout_width="40dip"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/taskreply_reply"
+	        android:layout_alignParentRight="true"
+	        android:layout_centerVertical="true"
+	        android:layout_marginRight="5dip"
+	        android:text="发送"
+	        android:textColor="@color/walkthrough_button_text_color"
+	        android:background="@drawable/walkthrough_loginbutton_icon_selector" />
+	</RelativeLayout>
+	
+</RelativeLayout>
