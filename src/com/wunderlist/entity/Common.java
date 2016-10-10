@@ -16,6 +16,8 @@ public class Common {
 	
 	public static final String EMAILREGEX = "[\\w[.-]]+@[\\w[.-]]+\\.[\\w]+";
 	
+	public static boolean isBack = false;
+	
 	public static final Integer[] BGS = { R.drawable.wl_background0,
 		R.drawable.wl_background1, R.drawable.wl_background2,
 		R.drawable.wl_background3, R.drawable.wl_background4,

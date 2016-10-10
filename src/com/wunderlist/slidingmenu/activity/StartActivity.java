@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.example.wunderlist.R;
-import com.wunderlist.entity.CommonUser;
 import com.wunderlist.entity.User;
 import com.wunderlist.sqlite.SQLiteService;
 import com.wunderlist.tools.MyActivityManager;
@@ -37,9 +36,6 @@ public class StartActivity extends Activity {
 			Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
 			startActivity(intent);
 		} else {
-			CommonUser.USERID = user.getUserSID();
-			CommonUser.USEREMAIL = user.getUserEmail();
-			CommonUser.UERPASSWORD = user.getUserPassword();
 			Intent intent = new Intent(getApplicationContext(), SlidingActivity.class);
 			startActivity(intent);
 		}

@@ -50,7 +50,6 @@ import com.wunderlist.slidingmenu.activity.SlidingActivity;
 import com.wunderlist.slidingmenu.activity.TaskDetailsActivity;
 import com.wunderlist.tools.CheckNetwork;
 import com.wunderlist.tools.ClockAlarmUtil;
-import com.wunderlist.tools.ClockTimeComparator;
 import com.wunderlist.tools.EnddateComparator;
 import com.wunderlist.tools.MySharedPreferences;
 import com.wunderlist.tools.StreamTool;
@@ -107,9 +106,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private static LinkedList<Task> tasksComplete = new LinkedList<Task>();
 	// 临时变量用于保存已完成任务列表
 	private static LinkedList<Task> tempList = new LinkedList<Task>();
-
-	public static ArrayList<Date> clockTimes = new ArrayList<Date>();
-	private Date[] arrayDates = null;
+	
+	public static ArrayList<Task> clockTimes = new ArrayList<Task>();
+	private Task[] arrayDates = null;
 
 	private Task[] arrayTasksNormal = null;
 	private Task[] arrayTasksComplete = null;
@@ -449,26 +448,22 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	 */
 	private void setClockAlarm() {
 		clockTimes.removeAll(clockTimes);
+		arrayDates = new Task[tasksNormal.size()];
 		for(int i=0; i<tasksNormal.size(); i++) {
-			task = tasksNormal.get(i);
+			arrayDates[i] = tasksNormal.get(i);
+		}
+		Arrays.sort(arrayDates, new EnddateComparator());
+		for(int i=0; i<arrayDates.length; i++) {
+			task = arrayDates[i];
 			if (!task.getRemindnum().equals("") && !task.getRemindtype().equals("")) {
 				Date date = TimeConvertTool.getClockTime(task.getEnddate(), task.getRemindnum(), task.getRemindtype());
 				if(TimeConvertTool.compareDate(date)) {
-					clockTimes.add(date);
+					clockTimes.add(task);
 				}
 			}
 		}
-		arrayDates = new Date[clockTimes.size()];
-		for(int i=0; i<clockTimes.size(); i++) {
-			arrayDates[i] = clockTimes.get(i);
-		}
-		Arrays.sort(arrayDates, new ClockTimeComparator());
-		clockTimes.removeAll(clockTimes);
-		for(int i=0; i<arrayDates.length; i++) {
-			clockTimes.add(arrayDates[i]);
-		}
 		if(clockTimes.size() > 0) {
-			ClockAlarmUtil.setClockAlarm(getActivity(), clockTimes.get(0).getTime());
+			ClockAlarmUtil.setClockAlarm(getActivity(), clockTimes.get(0));
 		}
 	}
 	
