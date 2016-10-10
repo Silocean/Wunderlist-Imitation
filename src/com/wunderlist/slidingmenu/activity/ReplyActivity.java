@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -44,6 +45,7 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 	private Button replyButton;
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_reply);
 		emptyLayout =(RelativeLayout)this.findViewById(R.id.taskreply_emptylayout);
@@ -53,6 +55,10 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		listView = (ListView)this.findViewById(R.id.replylist);
 		adapter = new ReplyListItemAdapter(getApplicationContext(), R.layout.listitem_reply);
 		listView.setAdapter(adapter);
+		int width = getWindowManager().getDefaultDisplay().getWidth() - replyButton.getLayoutParams().width - 15;
+		LayoutParams layoutParams = replyContentEditText.getLayoutParams();
+		layoutParams.width = width;
+		replyContentEditText.setLayoutParams(layoutParams);
 		initData();
 		super.onCreate(savedInstanceState);
 	}

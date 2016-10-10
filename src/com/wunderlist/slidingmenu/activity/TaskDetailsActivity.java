@@ -75,6 +75,9 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private String receiversStr = null;
 	private String[] receivers = new String[]{User.USEREMAIL};
 	private boolean isTaskChange = false;
+	private boolean isTaskStatusChange = false;
+	
+	private Bundle bundle = new Bundle();
 	
 	private ArrayList<String> list = new ArrayList<String>();
 	
@@ -647,6 +650,9 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			isTaskChange = true;
 			updateTask();
 		}
+		Intent intent = new Intent();
+		intent.putExtra("bundle", bundle);
+		setResult(1, intent);
 		super.finish();
 	}
 	
@@ -671,11 +677,9 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			//System.out.println("++++"+json);
 			if(parseUpdateJSON(json)) {
 				//Toast.makeText(getApplicationContext(), "更改任务信息成功", Toast.LENGTH_SHORT).show();
-				Intent intent = new Intent();
-				intent.putExtra("isTaskChange", isTaskChange);
-				intent.putExtra("position", position);
-				intent.putExtra("taskJSON", constructTaskJSON());
-				setResult(1, intent);
+				bundle.putBoolean("isTaskChange", isTaskChange);
+				bundle.putInt("position", position);
+				bundle.putString("taskJSON", constructTaskJSON());
 			} else {
 				Toast.makeText(getApplicationContext(), "更改任务信息失败",
 						Toast.LENGTH_SHORT).show();
@@ -736,10 +740,10 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			json = WebServiceRequest.SendPost(inputStream, data, "UpdateTaskStatusResult");
 			if (parseUpdateJSON(json)) {
 				//Toast.makeText(getApplicationContext(), "更改任务状态成功", Toast.LENGTH_SHORT).show();
-				Intent intent = new Intent();
-				intent.putExtra("position", position);
-				intent.putExtra("tag", tag);
-				setResult(2, intent);
+				isTaskStatusChange = true;
+				bundle.putBoolean("isTaskStatusChange", isTaskStatusChange);
+				bundle.putInt("position", position);
+				bundle.putInt("tag", tag);
 			} else {
 				Toast.makeText(getApplicationContext(), "更改任务状态失败", Toast.LENGTH_SHORT).show();
 			}

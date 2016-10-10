@@ -6,11 +6,13 @@ import java.util.LinkedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
@@ -60,6 +62,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private static final int NORMALTOCOMPLETEORCANCEL = 1;
 	private static final int COMPLETEORCANCELTONORMAL = 2;
 	
+	private static boolean showCompleteTasks = true;
+
 	private StringBuilder sb = new StringBuilder();
 	private String[] receivers = new String[] { User.USEREMAIL };
 
@@ -79,7 +83,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private static LinkedList<Task> tasksTotal = new LinkedList<Task>();
 	private static LinkedList<Task> tasksNormal = new LinkedList<Task>();
 	private static LinkedList<Task> tasksComplete = new LinkedList<Task>();
-	
+	// 临时变量用于保存已完成任务列表
+	private static LinkedList<Task> tempList = new LinkedList<Task>();
+
 	private Task task = null;
 
 	private boolean isComplete = false;
@@ -97,13 +103,17 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_SEND) {
 					String subject = taskEditText.getText().toString().trim();
-					Toast.makeText(getActivity(), subject, Toast.LENGTH_SHORT)
-							.show();
-					taskEditText.setText("");
-					try {
-						addTask(subject);
-					} catch (Exception e) {
-						e.printStackTrace();
+					if(!subject.equals("")) {
+						Toast.makeText(getActivity(), subject, Toast.LENGTH_SHORT)
+						.show();
+						taskEditText.setText("");
+						try {
+							addTask(subject);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					} else {
+						Toast.makeText(getActivity(), "主题不能为空", Toast.LENGTH_SHORT).show();
 					}
 				}
 				return false;
@@ -122,6 +132,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		SharedPreferences preferences = MySharedPreferences
 				.getPreferences(getActivity());
 		int bgId = preferences.getInt(MySharedPreferences.BGID, 0);
+		showCompleteTasks = preferences.getBoolean("showCompleteTasks", true);
 		mainfragmentLayout.setBackgroundResource(Common.BGS[bgId]);
 	}
 
@@ -213,13 +224,24 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		Task task = tasksTotal.get(position);
 		switch (tag) {
 		case NORMALTOCOMPLETEORCANCEL:
-			tasksNormal.remove(position);
-			tasksComplete.add(task);
-			tasksTotal.removeAll(tasksTotal);
-			tasksTotal.addAll(tasksNormal);
-			tasksTotal.add(new Task());
-			tasksTotal.addAll(tasksComplete);
-			tasksTotal.add(new Task());
+			if(showCompleteTasks) {
+				tasksNormal.remove(position);
+				tasksComplete.add(task);
+				tasksTotal.removeAll(tasksTotal);
+				tasksTotal.addAll(tasksNormal);
+				tasksTotal.add(new Task());
+				tasksTotal.addAll(tasksComplete);
+				tasksTotal.add(new Task());
+			} else {
+				tasksNormal.remove(position);
+				tempList.add(task);
+				tasksComplete.removeAll(tasksComplete);
+				tasksTotal.removeAll(tasksTotal);
+				tasksTotal.addAll(tasksNormal);
+				tasksTotal.add(new Task());
+				tasksTotal.addAll(tasksComplete);
+				tasksTotal.add(new Task());
+			}
 			break;
 		case COMPLETEORCANCELTONORMAL:
 			tasksComplete.remove(position-tasksNormal.size()-1);
@@ -336,6 +358,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					adapter.notifyDataSetChanged();
 				}
 				tasksComplete = tasks;
+				showOrDismissCompleteTasks();
 				showOrDismissPopupWindow();
 			}
 		}
@@ -379,10 +402,39 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		return tasks;
 	}
 	
+	/**
+	 * 显示或隐藏已完成任务列表
+	 */
+	private void showOrDismissCompleteTasks() {
+		if(showCompleteTasks) {
+			tasksComplete.addAll(tempList);
+			tempList.removeAll(tempList);
+			
+			tasksTotal.removeAll(tasksTotal);
+			tasksTotal.addAll(tasksNormal);
+			tasksTotal.add(new Task());
+			tasksTotal.addAll(tasksComplete);
+			tasksTotal.add(new Task());
+			adapter.setData(tasksTotal);
+			adapter.notifyDataSetChanged();
+		} else {
+			tempList.removeAll(tempList);
+			tempList.addAll(tasksComplete);
+			tasksComplete.removeAll(tasksComplete);
+			
+			tasksTotal.removeAll(tasksTotal);
+			tasksTotal.addAll(tasksNormal);
+			tasksTotal.add(new Task());
+			tasksTotal.addAll(tasksComplete);
+			tasksTotal.add(new Task());
+			adapter.setData(tasksTotal);
+			adapter.notifyDataSetChanged();
+		}
+	}
+
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		this.initHeadimagePopupWindow();
-		//popupHandler.sendEmptyMessageDelayed(0, 500);
 	}
 
 	/**
@@ -459,8 +511,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		}
 
 		@Override
-		public View getView(final int position, View convertView,
-				ViewGroup parent) {
+		public View getView(final int position, View convertView, ViewGroup parent) {
 			holder = new ViewHolder();
 			task = this.list.get(position);
 			switch (getItemViewType(position)) {
@@ -471,16 +522,33 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			case TYPE_COMPLETE_LAYOUT: {
 				convertView = inflater.inflate(
 						R.layout.listitem_task_complete_layout, null);
+				holder.taskCompleteLayout = (RelativeLayout)convertView
+						.findViewById(R.id.task_complete_layout);
 				holder.taskCompleteCountTextView = (TextView) convertView
 						.findViewById(R.id.task_complete_count_text);
 				holder.taskCompleteVisibleIcon = (ImageView) convertView
 						.findViewById(R.id.task_complete_visible_icon);
-				holder.taskCompleteCountTextView.setText(tasksComplete.size()
-						+ "个已完成的任务");
-				holder.taskCompleteVisibleIcon
+				if(showCompleteTasks) {
+					holder.taskCompleteCountTextView.setText(tasksComplete.size() + "个已完成的任务");
+					holder.taskCompleteVisibleIcon.setImageResource(R.drawable.wl_taskview_icon_hide_selected);
+				} else {
+					holder.taskCompleteCountTextView.setText(tempList.size() + "个已完成的任务");
+					holder.taskCompleteVisibleIcon.setImageResource(R.drawable.wl_taskview_icon_hide);
+				}
+				holder.taskCompleteLayout
 						.setOnClickListener(new OnClickListener() {
+							@SuppressLint("CommitPrefEdits")
 							public void onClick(View v) {
-								//Toast.makeText(context, "visibleIcon完成", Toast.LENGTH_SHORT).show();
+								if(showCompleteTasks) {
+									showCompleteTasks = false;
+								} else {
+									showCompleteTasks = true;
+								}
+								SharedPreferences preferences = MySharedPreferences.getPreferences(getActivity());
+								Editor editor = preferences.edit();
+								editor.putBoolean("showCompleteTasks", showCompleteTasks);
+								editor.commit();
+								showOrDismissCompleteTasks();
 							}
 						});
 				break;
@@ -511,8 +579,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				});
 				holder.middleLayout.setOnLongClickListener(new OnLongClickListener() {
 					public boolean onLongClick(View v) {
-						new AlertDialog.Builder(context).setTitle("确认恢复此任务？")
-								.setPositiveButton("确实",
+						new AlertDialog.Builder(context).setTitle("恢复任务")
+							.setMessage("确认恢复此任务，将此任务标记为未完成状态？")
+								.setPositiveButton("确定",
 										new DialogInterface.OnClickListener() {
 											public void onClick(DialogInterface dialog, int which) {
 												//Toast.makeText(context, "确定", 0).show();
@@ -540,8 +609,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				});
 				holder.middleLayout.setOnLongClickListener(new OnLongClickListener() {
 					public boolean onLongClick(View v) {
-						new AlertDialog.Builder(context).setTitle("确认取消此任务？")
-								.setPositiveButton("确实",
+						new AlertDialog.Builder(context).setTitle("取消任务")
+							.setMessage("确认取消此任务，将此任务标记为取消状态？")
+								.setPositiveButton("确定",
 										new DialogInterface.OnClickListener() {
 											public void onClick(DialogInterface dialog, int which) {
 												//Toast.makeText(context, "确定", 0).show();
@@ -628,6 +698,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			private TextView taskTitle;
 			private TextView taskEnddate;
 			private ImageView taskIcon;
+			private RelativeLayout taskCompleteLayout;
 			private TextView taskCompleteCountTextView;
 			private ImageView taskCompleteVisibleIcon;
 			private RelativeLayout leftLayout;
@@ -733,18 +804,19 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (resultCode) {
 		case 1: {
-			boolean isTaskChange = data.getBooleanExtra("isTaskChange", false);
-			int position = data.getIntExtra("position", 0);
-			String taskJSON = data.getStringExtra("taskJSON");
+			Bundle bundle = data.getBundleExtra("bundle");
+			boolean isTaskChange = bundle.getBoolean("isTaskChange");
+			boolean isTaskStatusChange = bundle.getBoolean("isTaskStatusChange");
 			if (isTaskChange) {
+				int position = bundle.getInt("position");
+				String taskJSON = bundle.getString("taskJSON");
 				this.updateTaskBoxList(taskJSON, position);
 			}
-			break;
-		}
-		case 2: {
-			int tag = data.getIntExtra("tag", 0);
-			int position = data.getIntExtra("position", 0);
-			this.updateTaskBoxList(position, tag);
+			if(isTaskStatusChange) {
+				int position = bundle.getInt("position");
+				int tag = bundle.getInt("tag");
+				this.updateTaskBoxList(position, tag);
+			}
 			break;
 		}
 		default:
@@ -791,7 +863,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		//popupWindow.setFocusable(true);
 		// 需要设置一下此参数，点击外边可消失
 		popupWindow.setBackgroundDrawable(new BitmapDrawable());
-        //设置点击窗口外边窗口消失  
+        //设置点击窗口外边窗口消失
 		popupWindow.setOutsideTouchable(true);
 		// 设置窗口动画效果
 		popupWindow.setAnimationStyle(R.style.AnimationPreview);

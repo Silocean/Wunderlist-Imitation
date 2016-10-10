@@ -11,6 +11,7 @@
     <RelativeLayout 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/task_complete_layout"
         android:layout_below="@id/null_relativelayout" >
         <TextView 
 	         android:layout_width="wrap_content"
