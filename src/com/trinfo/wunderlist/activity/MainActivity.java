@@ -67,7 +67,7 @@ public class MainActivity extends SlidingActivity {
 		mainFragment = new MainFragment(this);
 		fragmentTransaction.replace(R.id.main, mainFragment);
 		
-		LeftFragment leftFragment = new LeftFragment();
+		LeftFragment leftFragment = new LeftFragment(mainFragment);
 		fragmentTransaction.replace(R.id.left, leftFragment);
 		
 		fragmentTransaction.commit();
@@ -111,7 +111,6 @@ public class MainActivity extends SlidingActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-		item = menu.add(0, 0, 0, "接收中...");
 		return super.onCreateOptionsMenu(menu);
 	}
 	
@@ -119,10 +118,12 @@ public class MainActivity extends SlidingActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		MainActivity.menu = menu;
 		if (isRefreshing) {
-			item.setTitle("接收中...");
+			if(menu.size() == 0) {
+				item = menu.add(0, 0, 0, "接收中...");
+			}
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		} else {
-			item.setTitle("");
+			menu.removeItem(0);
 		}
 		return super.onPrepareOptionsMenu(menu);
 	}

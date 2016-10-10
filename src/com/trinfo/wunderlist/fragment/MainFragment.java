@@ -432,6 +432,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			break;
 		case COMPLETEORCANCELTONORMAL:
 			tasksTotal.removeAll(tasksTotal);
+			System.out.println("position:" + position + "  tasksNormal:"
+					+ tasksNormal.size());
 			tasksComplete.remove(position - tasksNormal.size() - 1);
 			tasksNormal.add(task);
 			tasksTotal.addAll(tasksNormal);
@@ -540,7 +542,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				String json = WebServiceRequest.SendPost(inputStream, data,
 						"GetTaskBoxListResult");
 				tasks = parseJSON(json);
-System.out.println("="+json);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -1008,8 +1009,10 @@ System.out.println("="+json);
 			holder.taskReveiversIcon.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					//Toast.makeText(mainActivity, "icon", Toast.LENGTH_SHORT).show();
-					Intent intent = new Intent(mainActivity, ReceiversActivity.class);
+					// Toast.makeText(mainActivity, "icon",
+					// Toast.LENGTH_SHORT).show();
+					Intent intent = new Intent(mainActivity,
+							ReceiversActivity.class);
 					intent.putExtra("tag", 1);
 					intent.putExtra("task", task);
 					startActivity(intent);
@@ -1169,9 +1172,11 @@ System.out.println("="+json);
 				this.updateTaskBoxList(taskJSON, position);
 			}
 			if (isTaskStatusChange) {
-				int position = bundle.getInt("position");
-				int tag = bundle.getInt("tag");
-				this.updateTaskBoxList(position, tag);
+				/*
+				 * int position = bundle.getInt("position"); int tag =
+				 * bundle.getInt("tag"); this.updateTaskBoxList(position, tag);
+				 */
+				updateTaskBoxList();
 			}
 			if (isTaskStarChange) {
 				int position = bundle.getInt("position");
@@ -1231,7 +1236,7 @@ System.out.println("="+json);
 		// 设置点击窗口外边窗口消失
 		popupWindowBottomBar.setOutsideTouchable(true);
 		// 设置窗口动画效果
-		popupWindowBottomBar.setAnimationStyle(R.style.AnimationPreview);
+		popupWindowBottomBar.setAnimationStyle(R.style.BottomLayoutAnimation);
 		bottombarLeftlayout = (RelativeLayout) popupViewBottomBar
 				.findViewById(R.id.taskview_bottombar_leftlayout);
 		int width = getActivity().getWindowManager().getDefaultDisplay()
@@ -1302,7 +1307,7 @@ System.out.println("="+json);
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		popupViewSortChoose = inflater.inflate(R.layout.popupwindow_sortchoose,
 				null);
-		popupwindowSortChoose = new PopupWindow(popupViewSortChoose, 140,
+		popupwindowSortChoose = new PopupWindow(popupViewSortChoose, LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT, false);
 		// 设置此参数获得焦点，否则无法点击
 		popupwindowSortChoose.setFocusable(true);
@@ -1311,20 +1316,20 @@ System.out.println("="+json);
 		// 设置点击窗口外边窗口消失
 		popupwindowSortChoose.setOutsideTouchable(true);
 		// 设置窗口动画效果
-		popupwindowSortChoose.setAnimationStyle(R.style.AnimationPreview);
+		popupwindowSortChoose.setAnimationStyle(R.style.SortLayoutAnimation);
 		sortBySubjectLayout = (RelativeLayout) popupViewSortChoose
 				.findViewById(R.id.sort_subject);
 		sortByEnddateLayout = (RelativeLayout) popupViewSortChoose
 				.findViewById(R.id.sort_enddate);
 		sortBySubjectLayout.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				sortBySubject(tasksNormal, tasksComplete, SORTBYSUBJECT);
+				sortByWhat(tasksNormal, tasksComplete, SORTBYSUBJECT);
 				showOrDismissSortChoosePopupWindow();
 			}
 		});
 		sortByEnddateLayout.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				sortBySubject(tasksNormal, tasksComplete, SORTBYENDDATE);
+				sortByWhat(tasksNormal, tasksComplete, SORTBYENDDATE);
 				showOrDismissSortChoosePopupWindow();
 			}
 		});
@@ -1340,7 +1345,7 @@ System.out.println("="+json);
 	 * @param sortByWhat
 	 *            排序规则
 	 */
-	private void sortBySubject(LinkedList<Task> tasksNormal,
+	private void sortByWhat(LinkedList<Task> tasksNormal,
 			LinkedList<Task> tasksComplete, int sortByWhat) {
 		arrayTasks = new Task[tasksNormal.size()];
 		for (int i = 0; i < tasksNormal.size(); i++) {

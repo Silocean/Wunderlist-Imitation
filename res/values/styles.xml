@@ -4,7 +4,7 @@
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
+    <style name="AppBaseTheme" parent="@style/Theme.Sherlock.Light.DarkActionBar">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
@@ -14,7 +14,15 @@
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
+        <item name="android:windowAnimationStyle">@style/MyActivitySwitchAnimation</item>
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+    
+    <style name="MyActivitySwitchAnimation">
+        <item name="android:activityOpenEnterAnimation">@anim/main_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/main_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/back_enter</item>
+        <!-- <item name="android:activityCloseExitAnimation">@anim/push_right_out</item> -->
     </style>
     
     <style name="settings_seperator_style">
@@ -25,7 +33,12 @@
         <item name="android:textSize">20sp</item>
     </style>
     
-    <style name="AnimationPreview">
+    <style name="SortLayoutAnimation">
+        <item name="android:windowEnterAnimation">@anim/main_enter</item>
+        <item name="android:windowExitAnimation">@anim/back_exit</item>
+    </style>
+    
+    <style name="BottomLayoutAnimation">
         <item name="android:windowEnterAnimation">@anim/translate_in</item>
         <item name="android:windowExitAnimation">@anim/translate_out</item>
     </style>

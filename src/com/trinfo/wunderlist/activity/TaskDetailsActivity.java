@@ -60,7 +60,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private TextView enddateTextView;
 	private ImageView clockiImageView;
 	private TextView clockTextView;
-	
+
 	private ListView listView;
 	private LinkedList<Reply> replys;
 	private ChatListViewAdapter adapter;
@@ -123,7 +123,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		LayoutParams layoutParams = replyContentEditText.getLayoutParams();
 		layoutParams.width = width;
 		replyContentEditText.setLayoutParams(layoutParams);
-		listView = (ListView)findViewById(R.id.chat_listview);
+		listView = (ListView) findViewById(R.id.chat_listview);
 		replys = new LinkedList<Reply>();
 		adapter = new ChatListViewAdapter(getApplicationContext(), replys);
 		listView.setAdapter(adapter);
@@ -244,7 +244,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 */
 	private class GetReply extends
 			AsyncTask<String, Integer, LinkedList<Reply>> {
-		
+
 		@Override
 		protected LinkedList<Reply> doInBackground(String... arg0) {
 			try {
@@ -432,14 +432,18 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private ArrayList<String> parseReceiverJSON(String json) throws Exception {
 		ArrayList<String> receivers = new ArrayList<String>();
 		if (json != null) {
-			JSONObject object = new JSONObject(json);
-			int rows = Integer.parseInt(object.getString("rows"));
-			if (rows > 0) {
-				JSONArray array = new JSONArray(object.getString("Items"));
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject obj = array.getJSONObject(i);
-					receivers.add(obj.getString("TOMAILADDR"));
+			if(!json.equals("")) {
+				JSONObject object = new JSONObject(json);
+				int rows = Integer.parseInt(object.getString("rows"));
+				if (rows > 0) {
+					JSONArray array = new JSONArray(object.getString("Items"));
+					for (int i = 0; i < array.length(); i++) {
+						JSONObject obj = array.getJSONObject(i);
+						receivers.add(obj.getString("TOMAILADDR"));
+					}
 				}
+			} else {
+				Common.ToastIfNetworkProblem(getApplicationContext());
 			}
 		} else {
 			Common.ToastIfNetworkProblem(getApplicationContext());
@@ -456,14 +460,18 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private ArrayList<String> parseReceiverIdJSON(String json) throws Exception {
 		ArrayList<String> receiversId = new ArrayList<String>();
 		if (json != null) {
-			JSONObject object = new JSONObject(json);
-			int rows = Integer.parseInt(object.getString("rows"));
-			if (rows > 0) {
-				JSONArray array = new JSONArray(object.getString("Items"));
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject obj = array.getJSONObject(i);
-					receiversId.add(obj.getString("TOUSERID"));
+			if(!json.equals("")) {
+				JSONObject object = new JSONObject(json);
+				int rows = Integer.parseInt(object.getString("rows"));
+				if (rows > 0) {
+					JSONArray array = new JSONArray(object.getString("Items"));
+					for (int i = 0; i < array.length(); i++) {
+						JSONObject obj = array.getJSONObject(i);
+						receiversId.add(obj.getString("TOUSERID"));
+					}
 				}
+			} else {
+				Common.ToastIfNetworkProblem(getApplicationContext());
 			}
 		} else {
 			Common.ToastIfNetworkProblem(getApplicationContext());
@@ -504,6 +512,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			intent.putStringArrayListExtra("receivers", receivers);
 			intent.putStringArrayListExtra("receiversId", receiversId);
 			startActivityForResult(intent, 3);
+			overridePendingTransition(R.anim.main_enter, R.anim.main_exit);
 			break;
 		}
 		case R.id.taskdetais_deadline: {
@@ -637,7 +646,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		}
 
 	}
-	
+
 	/**
 	 * 格式化笔记字符串
 	 * 
@@ -645,11 +654,11 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * @return
 	 */
 	private String formatNoteAndReplyContent(String str) {
-		if(str == null) {
+		if (str == null) {
 			return "";
 		} else {
-			return str.replaceAll("<[a-zA-Z]+>", "").replaceAll("</[a-zA-Z]+>", "")
-					.replaceAll("&nbsp;", " ");
+			return str.replaceAll("<[a-zA-Z]+>", "")
+					.replaceAll("</[a-zA-Z]+>", "").replaceAll("&nbsp;", " ");
 		}
 	}
 
@@ -991,23 +1000,24 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				mfrom, "任务信息发生变更");
 		System.out.println(result.getErrcode() + "===" + result.getErrmsg());
 	}
-	
+
 	private class ChatListViewAdapter extends BaseAdapter {
-		
+
 		LinkedList<Reply> list;
 		LayoutInflater inflater;
-		
+
 		ViewHolder holder;
-		
-		private final int type_left=0;
-		private final int type_right=1;
-		private final int type_count=2;
-		
+
+		private final int type_left = 0;
+		private final int type_right = 1;
+		private final int type_count = 2;
+
 		public ChatListViewAdapter(Context context, LinkedList<Reply> list) {
 			this.list = list;
-			inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			inflater = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
-		
+
 		public void setData(LinkedList<Reply> list) {
 			this.list = list;
 			notifyDataSetChanged();
@@ -1027,63 +1037,72 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		public long getItemId(int position) {
 			return position;
 		}
-		
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			int type=getItemViewType(position);
-			if(null==convertView){
+			int type = getItemViewType(position);
+			if (null == convertView) {
 				holder = new ViewHolder();
-				switch(type){
+				switch (type) {
 				case type_right:
-					convertView = inflater.inflate( R.layout.chat_item_msg_text_right, null);
-					//holder.headImage = (ImageView)convertView.findViewById(R.id.chat_item_headimage);
-					holder.sendTimeTextView = (TextView)convertView.findViewById(R.id.chat_item_sendtime);
-					holder.replyTextView = (TextView)convertView.findViewById(R.id.chat_item_chatcontent);
+					convertView = inflater.inflate(
+							R.layout.chat_item_msg_text_right, null);
+					// holder.headImage =
+					// (ImageView)convertView.findViewById(R.id.chat_item_headimage);
+					holder.sendTimeTextView = (TextView) convertView
+							.findViewById(R.id.chat_item_sendtime);
+					holder.replyTextView = (TextView) convertView
+							.findViewById(R.id.chat_item_chatcontent);
 					break;
 				case type_left:
-					convertView = inflater.inflate( R.layout.chat_item_msg_text_left, null);
-					//holder.headImage = (ImageView)convertView.findViewById(R.id.chat_item_headimage);
-					holder.sendTimeTextView = (TextView)convertView.findViewById(R.id.chat_item_sendtime);
-					holder.replyTextView = (TextView)convertView.findViewById(R.id.chat_item_chatcontent);
+					convertView = inflater.inflate(
+							R.layout.chat_item_msg_text_left, null);
+					// holder.headImage =
+					// (ImageView)convertView.findViewById(R.id.chat_item_headimage);
+					holder.sendTimeTextView = (TextView) convertView
+							.findViewById(R.id.chat_item_sendtime);
+					holder.replyTextView = (TextView) convertView
+							.findViewById(R.id.chat_item_chatcontent);
 					break;
 				}
 				convertView.setTag(holder);
-			}else{
-				holder=(ViewHolder)convertView.getTag();
+			} else {
+				holder = (ViewHolder) convertView.getTag();
 			}
-			
+
 			Reply reply = list.get(position);
-			
+
 			// useremail
-			//String userEmail = reply.getUserEmail();
-			
+			// String userEmail = reply.getUserEmail();
+
 			// 时间
 			String sendTime = reply.getCreateDate();
 			holder.sendTimeTextView.setText(sendTime);
-			
+
 			// 内容
 			String replyContent = reply.getReplyContent();
 			holder.replyTextView.setText(replyContent);
-			
+
 			return convertView;
 		}
 
 		@Override
 		public int getItemViewType(int position) {
-			return (list.get(position).getUserId().equals(CommonUser.USERID)) ? type_right : type_left;
+			return (list.get(position).getUserId().equals(CommonUser.USERID)) ? type_right
+					: type_left;
 		}
-		
+
 		@Override
 		public int getViewTypeCount() {
 			return type_count;
 		}
 
 		private class ViewHolder {
-			//private ImageView headImage;
+			// private ImageView headImage;
 			private TextView sendTimeTextView;
 			private TextView replyTextView;
 		}
-		
+
 	}
-	
+
 }

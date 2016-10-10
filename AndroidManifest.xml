@@ -39,7 +39,7 @@
         android:name="com.trinfo.wunderlist.application.StartApplication"
         android:icon="@drawable/my_icon_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >
+        android:theme="@style/AppTheme" >
         <activity
             android:name="com.trinfo.wunderlist.activity.MainActivity"
             android:launchMode="singleTask"
