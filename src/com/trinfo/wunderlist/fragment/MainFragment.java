@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,7 +23,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.app.Fragment;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -32,11 +32,13 @@ import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -79,6 +81,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private EnddateComparator enddateComparator = new EnddateComparator();
 
 	private static boolean showCompleteTasks = true;
+	private RelativeLayout completeLayout;
+	private TextView completeCountTxt;
+	private ImageView completeVisibleIcon;
 
 	private String[] receivers = new String[] { CommonUser.USEREMAIL };
 
@@ -96,15 +101,16 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private RelativeLayout sortBySubjectLayout;
 	private RelativeLayout sortByEnddateLayout;
 
-	private ListView listView;
+	private ListView listView_taskNormal;
+	private ListView listView_taskComplete;
+
+	private TaskNormalListAdapter normalAdapter = null;
+	private TaskCompleteListAdapter completeAdapter = null;
 
 	private String priority = null;
 
 	private EditText taskEditText = null;
 
-	private TaskListItemAdapter adapter = null;
-
-	private static LinkedList<Task> tasksTotal = new LinkedList<Task>();
 	private static LinkedList<Task> tasksNormal = new LinkedList<Task>();
 	private static LinkedList<Task> tasksComplete = new LinkedList<Task>();
 
@@ -115,8 +121,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private Task[] arrayTasks = null;
 
 	private Task task = null;
-
-	private boolean isComplete = false;
 
 	public static long duration = 0L;
 	public static long timeStart = 0L;
@@ -150,7 +154,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.main_frame, null);
 		mainfragmentLayout = (RelativeLayout) view
-				.findViewById(R.id.head_layout);
+				.findViewById(R.id.mainfragment_layout);
 		taskEditText = (EditText) view.findViewById(R.id.taskEdit);
 		taskEditText.setOnKeyListener(new OnKeyListener() {
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -171,16 +175,99 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		MainActivity.setBarTitle("我的任务");
 		clockTimes.removeAll(clockTimes);
 		this.getPreferences();
-		listView = (ListView) view.findViewById(R.id.tasklist);
-		listView.setOnScrollListener(this);
-		adapter = new TaskListItemAdapter(getActivity(), R.layout.listitem_task);
-		listView.setAdapter(adapter);
+		inflater = (LayoutInflater) getActivity().getSystemService(
+				Context.LAYOUT_INFLATER_SERVICE);
+		View footerView = inflater.inflate(R.layout.footerview, null);
+		completeLayout = (RelativeLayout) footerView
+				.findViewById(R.id.task_complete_layout);
+		completeCountTxt = (TextView) footerView
+				.findViewById(R.id.task_complete_count_text);
+		completeVisibleIcon = (ImageView) footerView
+				.findViewById(R.id.task_complete_visible_icon);
+		completeLayout.setOnClickListener(new OnClickListener() {
+			@SuppressLint("CommitPrefEdits")
+			public void onClick(View v) {
+				if (showCompleteTasks) {
+					showCompleteTasks = false;
+					completeVisibleIcon
+							.setImageResource(R.drawable.wl_taskview_icon_hide);
+				} else {
+					showCompleteTasks = true;
+					completeVisibleIcon
+							.setImageResource(R.drawable.wl_taskview_icon_hide_selected);
+				}
+				SharedPreferences preferences = MySharedPreferences
+						.getPreferences(getActivity());
+				Editor editor = preferences.edit();
+				editor.putBoolean("showCompleteTasks", showCompleteTasks);
+				editor.commit();
+				showOrDismissCompleteTasks();
+			}
+		});
+		listView_taskNormal = (ListView) view
+				.findViewById(R.id.tasknormal_listview);
+		listView_taskNormal.setOnScrollListener(this);
+		listView_taskNormal.addFooterView(footerView);
+		listView_taskComplete = (ListView) footerView
+				.findViewById(R.id.taskcomplete_listview);
+		normalAdapter = new TaskNormalListAdapter(getActivity(), tasksNormal);
+		completeAdapter = new TaskCompleteListAdapter(getActivity(),
+				tasksComplete);
+		listView_taskNormal.setAdapter(normalAdapter);
+		listView_taskComplete.setAdapter(completeAdapter);
+		setListViewHeightBasedOnChildren(listView_taskComplete);
 		if (CheckNetwork.isNetworkAvailable(getActivity())) {
 			this.getTaskBoxList();
 		} else {
 			Common.ToastIfNetworkIsNotAvailable(getActivity());
 		}
 		return view;
+	}
+
+	/**
+	 * 显示或隐藏已完成任务列表
+	 */
+	private void showOrDismissCompleteTasks() {
+		if (showCompleteTasks) {
+			tasksComplete.addAll(tempCompleteList);
+			tempCompleteList.removeAll(tempCompleteList);
+			normalAdapter.setData(tasksNormal);
+			completeAdapter.setData(tasksComplete);
+			setListViewHeightBasedOnChildren(listView_taskComplete);
+		} else {
+			tempCompleteList.removeAll(tempCompleteList);
+			tempCompleteList.addAll(tasksComplete);
+			tasksComplete.removeAll(tasksComplete);
+			normalAdapter.setData(tasksNormal);
+			completeAdapter.setData(tasksComplete);
+		}
+	}
+
+	/**
+	 * 动态设置listview的高度
+	 * 
+	 * @param listView
+	 */
+	public void setListViewHeightBasedOnChildren(ListView listView) {
+		ListAdapter adapter = listView.getAdapter();
+		if (adapter != null) {
+			int totalHeight = 0;
+			for (int i = 0; i < adapter.getCount(); i++) {
+				View listItem = adapter.getView(i, null, listView);
+				if (listItem == null) {
+					System.out.println("nullllllll");
+				}
+				listItem.setLayoutParams(new LayoutParams(
+						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+				listItem.measure(0, 0);
+				totalHeight += listItem.getMeasuredHeight();
+			}
+			ViewGroup.LayoutParams params = listView.getLayoutParams();
+			params.height = totalHeight
+					+ (listView.getDividerHeight() * (adapter.getCount() - 1));
+			((MarginLayoutParams) params).setMargins(0, 0, 0, 0);
+			listView.setLayoutParams(params);
+		}
 	}
 
 	/**
@@ -279,8 +366,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	 * @param taskId
 	 * @param status
 	 */
-	private void setStar(String taskId, String status, int position) {
-		new SetStarTask(taskId, status, position).execute("");
+	private void setStar(String taskId, String status) {
+		new SetStarTask(taskId, status).execute("");
 	}
 
 	/**
@@ -293,12 +380,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 
 		private String taskId;
 		private String status;
-		private int position;
 
-		public SetStarTask(String taskId, String status, int position) {
+		public SetStarTask(String taskId, String status) {
 			this.taskId = taskId;
 			this.status = status;
-			this.position = position;
 		}
 
 		@Override
@@ -323,7 +408,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		protected void onPostExecute(String result) {
 			try {
 				if (parseUpdateJSON(result)) {
-					updateTaskBoxList(position, status);
+					updateTaskBoxList();
 				} else {
 					Toast.makeText(getActivity(), "设置星标任务失败",
 							Toast.LENGTH_SHORT).show();
@@ -370,7 +455,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	@SuppressLint("NewApi")
 	private void getTaskBoxList() {
 		showRefreshMenu();
-		tasksTotal.removeAll(tasksTotal);
 		GetTaskBoxListData task = new GetTaskBoxListData(TAGNORMAL, tasksNormal);
 		task.execute("");
 	}
@@ -399,113 +483,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	 */
 	public void updateTaskBoxList() {
 		this.getTaskBoxList();
-	}
-
-	/**
-	 * 更新任务列表（不从网络获取数据，用于任务完成状态更改后的刷新）
-	 * 
-	 * @param position
-	 * @param tag
-	 */
-	private void updateTaskBoxList(int position, int tag) {
-		Task task = tasksTotal.get(position);
-		switch (tag) {
-		case NORMALTOCOMPLETEORCANCEL:
-			if (showCompleteTasks) {
-				tasksTotal.removeAll(tasksTotal);
-				tasksNormal.remove(position);
-				tasksComplete.addFirst(task);
-				tasksTotal.addAll(tasksNormal);
-				tasksTotal.add(new Task());
-				tasksTotal.addAll(tasksComplete);
-				tasksTotal.add(new Task());
-			} else {
-				tasksTotal.removeAll(tasksTotal);
-				tasksNormal.remove(position);
-				tempCompleteList.add(task);
-				tasksComplete.removeAll(tasksComplete);
-				tasksTotal.addAll(tasksNormal);
-				tasksTotal.add(new Task());
-				tasksTotal.addAll(tasksComplete);
-				tasksTotal.add(new Task());
-			}
-			break;
-		case COMPLETEORCANCELTONORMAL:
-			tasksTotal.removeAll(tasksTotal);
-			System.out.println("position:" + position + "  tasksNormal:"
-					+ tasksNormal.size());
-			tasksComplete.remove(position - tasksNormal.size() - 1);
-			tasksNormal.add(task);
-			tasksTotal.addAll(tasksNormal);
-			tasksTotal.add(new Task());
-			tasksTotal.addAll(tasksComplete);
-			tasksTotal.add(new Task());
-			break;
-		default:
-			break;
-		}
-		adapter.setData(tasksTotal);
-		adapter.notifyDataSetChanged();
-		this.setClockAlarm();
-	}
-
-	/**
-	 * 更新任务列表（不从网络获取数据，用于任务详细信息更改后的刷新）
-	 * 
-	 * @param taskJSON
-	 * @param position
-	 */
-	private void updateTaskBoxList(String taskJSON, int position) {
-		try {
-			Task task = this.parseSingleTaskJSON(taskJSON);
-			tasksTotal.removeAll(tasksTotal);
-			tasksNormal.remove(position);
-			tasksNormal.add(position, task);
-			tasksTotal.addAll(tasksNormal);
-			tasksTotal.add(new Task());
-			tasksTotal.addAll(tasksComplete);
-			tasksTotal.add(new Task());
-			adapter.setData(tasksTotal);
-			adapter.notifyDataSetChanged();
-			this.setClockAlarm();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * 更新任务列表（不从网络获取数据，用于任务星标状态更改后的刷新）
-	 * 
-	 * @param position
-	 * @param status
-	 */
-	private void updateTaskBoxList(int position, String status) {
-		Task task = tasksTotal.get(position);
-		task.setPriority(status);
-		adapter.setData(tasksTotal);
-		adapter.notifyDataSetChanged();
-	}
-
-	/**
-	 * 解析单个任务json字符串
-	 * 
-	 * @param taskJSON
-	 * @return
-	 * @throws Exception
-	 */
-	private Task parseSingleTaskJSON(String taskJSON) throws Exception {
-		Task task = new Task();
-		JSONObject obj = new JSONObject(taskJSON);
-		task.setTaskId(obj.getString("SID"));
-		task.setUserId(obj.getString("USERID"));
-		task.setTaskFrom(obj.getString("MFROM"));
-		task.setSubject(obj.getString("SUBJECT"));
-		task.setPriority(obj.getString("PRIORITY"));
-		task.setEnddate(obj.getString("ENDDATE"));
-		task.setRemindtype(obj.getString("REMINDTYPE"));
-		task.setRemindnum(obj.getString("REMINDNUM"));
-		task.setCreateDate(obj.getString("CREATEDATE"));
-		return task;
 	}
 
 	/**
@@ -555,24 +532,28 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		@Override
 		protected void onPostExecute(LinkedList<Task> tasks) {
 			if (tag.equals(TAGNORMAL)) {
-				tasksTotal.addAll(tasks);
-				tasksTotal.add(new Task());
+				tasksNormal.addAll(tasks);
 				GetTaskBoxListData task = new GetTaskBoxListData(TAGCOMPLETE,
 						tasksComplete);
 				task.execute("");
-				tasksNormal = tasks;
 			} else if (tag.equals(TAGCOMPLETE)) {
-				tasksTotal.addAll(tasks);
-				tasksTotal.add(new Task());
-				if (tasksTotal.size() != 0) {
-					adapter.setData(tasksTotal);
-					adapter.notifyDataSetChanged();
-				}
-				tasksComplete = tasks;
+				tasksComplete.addAll(tasks);
 
-				hideRefreshMenu();
+				normalAdapter.setData(tasksNormal);
+				completeAdapter.setData(tasksComplete);
+
+				completeCountTxt.setText(tasksComplete.size() + "个已完成的任务");
+				if (showCompleteTasks) {
+					completeVisibleIcon
+							.setImageResource(R.drawable.wl_taskview_icon_hide_selected);
+				} else {
+					completeVisibleIcon
+							.setImageResource(R.drawable.wl_taskview_icon_hide);
+				}
 				showOrDismissCompleteTasks();
 
+				setListViewHeightBasedOnChildren(listView_taskComplete);
+				hideRefreshMenu();
 				setClockAlarm();
 
 			}
@@ -656,98 +637,47 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	}
 
 	/**
-	 * 显示或隐藏已完成任务列表
+	 * 不带截止日期的listAdapter
+	 * 
+	 * @author Silocean
+	 * 
 	 */
-	private void showOrDismissCompleteTasks() {
-		if (showCompleteTasks) {
-			tasksComplete.addAll(tempCompleteList);
-			tempCompleteList.removeAll(tempCompleteList);
+	private class TaskNormalListAdapter extends BaseAdapter {
 
-			tasksTotal.removeAll(tasksTotal);
-			tasksTotal.addAll(tasksNormal);
-			tasksTotal.add(new Task());
-			tasksTotal.addAll(tasksComplete);
-			tasksTotal.add(new Task());
-			adapter.setData(tasksTotal);
-			adapter.notifyDataSetChanged();
-		} else {
-			tempCompleteList.removeAll(tempCompleteList);
-			tempCompleteList.addAll(tasksComplete);
-			tasksComplete.removeAll(tasksComplete);
-
-			tasksTotal.removeAll(tasksTotal);
-			tasksTotal.addAll(tasksNormal);
-			tasksTotal.add(new Task());
-			tasksTotal.addAll(tasksComplete);
-			tasksTotal.add(new Task());
-			adapter.setData(tasksTotal);
-			adapter.notifyDataSetChanged();
-		}
-	}
-
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		this.initBottomPopupWindow();
-		this.initSortChoosePopupWindow();
-	}
-
-	/**
-	 * 任务列表数据填充器
-	 */
-	private class TaskListItemAdapter extends BaseAdapter {
-
-		private static final int TYPE_NORMAL = 1;
-		private static final int TYPE_COMPLETE = 2;
-		private static final int TYPE_COMPLETE_LAYOUT = 3;
-		private static final int TYPE_BOTTOMLAYOUT = 4;
-
-		private Context context;
 		private LinkedList<Task> list;
-		private int resId;
 		private LayoutInflater inflater;
 
 		private ViewHolder holder;
 
-		public TaskListItemAdapter(Context context, int resId) {
-			this.context = context;
-			this.list = new LinkedList<Task>();
-			this.resId = resId;
+		public TaskNormalListAdapter(Context context, LinkedList<Task> list) {
+			this.list = list;
 			this.inflater = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
 
+		/**
+		 * 加载数据
+		 * 
+		 * @param tasks
+		 */
 		public void setData(LinkedList<Task> tasks) {
 			this.list = tasks;
+			this.notifyDataSetChanged();
 		}
 
 		@Override
 		public int getCount() {
-			return this.list.size();
+			return list.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return this.list.get(position);
+			return list.get(position);
 		}
 
 		@Override
 		public long getItemId(int position) {
 			return position;
-		}
-
-		@Override
-		public int getItemViewType(int position) {
-			if (position == getCount() - 1) {
-				return TYPE_BOTTOMLAYOUT;
-			} else {
-				if (position == (getCount() - tasksComplete.size() - 2)) {
-					return TYPE_COMPLETE_LAYOUT;
-				} else if (position > (getCount() - tasksComplete.size() - 2)) {
-					return TYPE_COMPLETE;
-				} else {
-					return TYPE_NORMAL;
-				}
-			}
 		}
 
 		/**
@@ -767,203 +697,210 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		@Override
 		public View getView(final int position, View convertView,
 				ViewGroup parent) {
+			task = (Task) getItem(position);
 			holder = new ViewHolder();
-			task = this.list.get(position);
-			switch (getItemViewType(position)) {
-			case TYPE_BOTTOMLAYOUT: {
-				convertView = inflater.inflate(
-						R.layout.listitem_task_bottom_layout, null);
-				break;
-			}
-			case TYPE_COMPLETE_LAYOUT: {
-				convertView = inflater.inflate(
-						R.layout.listitem_task_complete_layout, null);
-				holder.taskCompleteLayout = (RelativeLayout) convertView
-						.findViewById(R.id.task_complete_layout);
-				holder.taskCompleteCountTextView = (TextView) convertView
-						.findViewById(R.id.task_complete_count_text);
-				holder.taskCompleteVisibleIcon = (ImageView) convertView
-						.findViewById(R.id.task_complete_visible_icon);
-				if (showCompleteTasks) {
-					holder.taskCompleteCountTextView.setText(tasksComplete
-							.size() + "个已完成的任务");
-					holder.taskCompleteVisibleIcon
-							.setImageResource(R.drawable.wl_taskview_icon_hide_selected);
+			if (isHaveOthers(position)) {
+				convertView = inflater.inflate(R.layout.listitem_task_ohter,
+						null);
+				holder.taskEnddate = (TextView) convertView
+						.findViewById(R.id.task_middle_enddate);
+				String enddate = task.getEnddate();
+				holder.taskEnddate.setText(TimeConvertTool
+						.convertToSpecialEnddateStr(enddate));
+				if (TimeConvertTool.compareDate(enddate)) {
+					holder.taskEnddate.setTextColor(getResources().getColor(
+							R.color.task_date_active_text_color));
 				} else {
-					holder.taskCompleteCountTextView.setText(tempCompleteList
-							.size() + "个已完成的任务");
-					holder.taskCompleteVisibleIcon
-							.setImageResource(R.drawable.wl_taskview_icon_hide);
+					holder.taskEnddate.setTextColor(getResources().getColor(
+							R.color.task_date_overdue_text_color));
 				}
-				holder.taskCompleteLayout
-						.setOnClickListener(new OnClickListener() {
-							@SuppressLint("CommitPrefEdits")
-							public void onClick(View v) {
-								if (showCompleteTasks) {
-									showCompleteTasks = false;
-								} else {
-									showCompleteTasks = true;
-								}
-								SharedPreferences preferences = MySharedPreferences
-										.getPreferences(getActivity());
-								Editor editor = preferences.edit();
-								editor.putBoolean("showCompleteTasks",
-										showCompleteTasks);
-								editor.commit();
-								showOrDismissCompleteTasks();
-							}
-						});
-				break;
+			} else {
+				convertView = inflater.inflate(R.layout.listitem_task, null);
 			}
-			case TYPE_COMPLETE: {
-				if (isHaveOthers(position)) {
-					convertView = inflater.inflate(
-							R.layout.listitem_task_ohter, null);
-					this.initListItemOthers(position, convertView, task);
-				} else {
-					convertView = inflater.inflate(resId, null);
-					this.initListItemView(position, convertView, task);
-				}
-				holder.leftLayout
-						.setBackgroundResource(R.drawable.wl_task_background_left_disabled);
-				holder.middleLayout
-						.setBackgroundResource(R.drawable.wl_task_background_middle_disabled);
-				holder.rightLayout
-						.setBackgroundResource(R.drawable.wl_task_background_right_disabled);
-				holder.taskTitle.setTextColor(getResources().getColor(
-						R.color.listitem_text_complete_color));
-				holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags()
-						| Paint.STRIKE_THRU_TEXT_FLAG);
-				holder.taskReveiversIcon.setEnabled(false);
-				if (task.getPriority() != null
-						&& !task.getPriority().equals("")
-						&& task.getPriority().equals("1")) { // 该任务是星标任务
-					holder.taskIcon
-							.setImageResource(R.drawable.wl_task_ribbon_disabled_selected);
-				}
-				holder.checkBox
-						.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
-				holder.checkBox.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						// 解除任务完成状态
-						updateTaskStatus(list.get(position).getTaskId(),
-								CommonUser.USEREMAIL, TASKNORMAL, position,
-								COMPLETEORCANCELTONORMAL);
-					}
-				});
-				holder.middleLayout
-						.setOnLongClickListener(new OnLongClickListener() {
-							public boolean onLongClick(View v) {
-								recoverCancelTask(position);
-								return false;
-							}
-						});
-				break;
+			holder.middleLayout = (RelativeLayout) convertView
+					.findViewById(R.id.task_middle_relativelayout);
+			holder.checkBox = (ImageView) convertView
+					.findViewById(R.id.task_left_checkbox);
+			holder.taskTitle = (TextView) convertView
+					.findViewById(R.id.task_middle_subject);
+			holder.taskStarIcon = (ImageView) convertView
+					.findViewById(R.id.task_right_icon);
+			holder.taskReveiversIcon = (ImageView) convertView
+					.findViewById(R.id.task_receivers_icon);
+			if (task.getPriority() != null && !task.getPriority().equals("")
+					&& task.getPriority().equals("1")) { // 该任务是星标任务
+				holder.taskStarIcon
+						.setImageResource(R.drawable.wl_task_ribbon_selected);
+			} else {
+				holder.taskStarIcon.setImageResource(R.drawable.wl_task_ribbon);
 			}
-			case TYPE_NORMAL: {
-				if (isHaveOthers(position)) {
-					convertView = inflater.inflate(
-							R.layout.listitem_task_ohter, null);
-					this.initListItemOthers(position, convertView, task);
-				} else {
-					convertView = inflater.inflate(resId, null);
-					this.initListItemView(position, convertView, task);
+			String title = task.getSubject();
+			holder.taskTitle.setText(title);
+			priority = list.get(position).getPriority();
+			holder.checkBox.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					RawFilesUtil.ring(getActivity(), 2);
+					updateTaskStatus(list.get(position).getTaskId(),
+							CommonUser.USEREMAIL, TASKCOMPLETE, position,
+							NORMALTOCOMPLETEORCANCEL);
 				}
-				priority = list.get(position).getPriority();
-				holder.checkBox.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						RawFilesUtil.ring(getActivity(), 2);
-						updateTaskStatus(list.get(position).getTaskId(),
-								CommonUser.USEREMAIL, TASKCOMPLETE, position,
-								NORMALTOCOMPLETEORCANCEL);
-					}
-				});
-				holder.middleLayout
-						.setOnLongClickListener(new OnLongClickListener() {
-							public boolean onLongClick(View v) {
-								cancleTask(position);
-								return false;
-							}
-						});
-				holder.taskIcon.setOnClickListener(new OnClickListener() {
-					public void onClick(View v) {
-						priority = list.get(position).getPriority();
-						if (priority != null) {
-							if (priority.equals("") || priority.equals("0")) {
-								// holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon);
-								setStar(list.get(position).getTaskId(), "1",
-										position);
-							} else {
-								// holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon_selected);
-								setStar(list.get(position).getTaskId(), "0",
-										position);
-							}
+			});
+			holder.middleLayout
+					.setOnLongClickListener(new OnLongClickListener() {
+						public boolean onLongClick(View v) {
+							cancleTask(position);
+							return false;
+						}
+					});
+			holder.taskStarIcon.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					priority = list.get(position).getPriority();
+					if (priority != null) {
+						if (priority.equals("") || priority.equals("0")) {
+							// holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon);
+							setStar(list.get(position).getTaskId(), "1");
+						} else {
+							// holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon_selected);
+							setStar(list.get(position).getTaskId(), "0");
 						}
 					}
-				});
-				break;
-			}
-			default: {
-				break;
-			}
-			}
-			convertView.setTag(holder);
+				}
+			});
+			holder.middleLayout.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(getActivity(),
+							TaskDetailsActivity.class);
+					intent.putExtra("task", (Task) getItem(position));
+					intent.putExtra("title", MainActivity.getBarTitle());
+					intent.putExtra("position", position);
+					intent.putExtra("isComplete", false);
+					startActivityForResult(intent, 1);
+				}
+			});
+			holder.taskReveiversIcon.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(getActivity(),
+							ReceiversActivity.class);
+					intent.putExtra("tag", 1);
+					intent.putExtra("task", task);
+					startActivity(intent);
+				}
+			});
 			return convertView;
 		}
 
-		/**
-		 * 取消任务
-		 * 
-		 * @param position
-		 */
-		private void cancleTask(final int position) {
-			new AlertDialog.Builder(context)
-					.setTitle("取消任务")
-					.setMessage("确认取消此任务，将此任务标记为取消状态？")
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int which) {
-									updateTaskStatus(list.get(position)
-											.getTaskId(), CommonUser.USEREMAIL,
-											TASKCANCEL, position,
-											NORMALTOCOMPLETEORCANCEL);
-								}
-							}).setNegativeButton("取消", null).show();
+		private class ViewHolder {
+			private ImageView checkBox;
+			private TextView taskTitle;
+			private TextView taskEnddate;
+			private ImageView taskStarIcon;
+			private ImageView taskReveiversIcon;
+			private RelativeLayout middleLayout;
+		}
+
+	}
+
+	/**
+	 * 取消任务
+	 * 
+	 * @param position
+	 */
+	private void cancleTask(final int position) {
+		new AlertDialog.Builder(getActivity()).setTitle("取消任务")
+				.setMessage("确认取消此任务，将此任务标记为取消状态？")
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						updateTaskStatus(tasksNormal.get(position).getTaskId(),
+								CommonUser.USEREMAIL, TASKCANCEL, position,
+								NORMALTOCOMPLETEORCANCEL);
+					}
+				}).setNegativeButton("取消", null).show();
+	}
+
+	/**
+	 * 带截止日期的listAdapter
+	 * 
+	 * @author Silocean
+	 * 
+	 */
+	private class TaskCompleteListAdapter extends BaseAdapter {
+
+		private LinkedList<Task> list;
+		private LayoutInflater inflater;
+
+		private ViewHolder holder;
+
+		public TaskCompleteListAdapter(Context context, LinkedList<Task> list) {
+			this.list = list;
+			this.inflater = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
 
 		/**
-		 * 恢复取消任务
+		 * 加载数据
 		 * 
-		 * @param position
+		 * @param tasks
 		 */
-		private void recoverCancelTask(final int position) {
-			new AlertDialog.Builder(context)
-					.setTitle("恢复任务")
-					.setMessage("确认恢复此任务，将此任务标记为未完成状态？")
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int which) {
-									updateTaskStatus(list.get(position)
-											.getTaskId(), CommonUser.USEREMAIL,
-											TASKNORMAL, position,
-											COMPLETEORCANCELTONORMAL);
-								}
-							}).setNegativeButton("取消", null).show();
+		public void setData(LinkedList<Task> tasks) {
+			this.list = tasks;
+			this.notifyDataSetChanged();
+		}
+
+		@Override
+		public int getCount() {
+			return list.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return list.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
 		}
 
 		/**
-		 * 初始化一般ListItem布局
+		 * 判断该任务是否包含截止日期等其他信息
 		 * 
 		 * @param position
-		 * @param convertView
-		 * @param task
+		 * @return
 		 */
-		private void initListItemView(final int position, View convertView,
-				final Task task) {
+		private boolean isHaveOthers(int position) {
+			if (!((Task) getItem(position)).getEnddate().equals("")) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public View getView(final int position, View convertView,
+				ViewGroup parent) {
+			task = (Task) getItem(position);
+			holder = new ViewHolder();
+			if (isHaveOthers(position)) {
+				convertView = inflater.inflate(R.layout.listitem_task_ohter,
+						null);
+				holder.taskEnddate = (TextView) convertView
+						.findViewById(R.id.task_middle_enddate);
+				String enddate = task.getEnddate();
+				holder.taskEnddate.setText(TimeConvertTool
+						.convertToSpecialEnddateStr(enddate));
+				if (TimeConvertTool.compareDate(enddate)) {
+					holder.taskEnddate.setTextColor(getResources().getColor(
+							R.color.task_date_active_text_color));
+				} else {
+					holder.taskEnddate.setTextColor(getResources().getColor(
+							R.color.task_date_overdue_text_color));
+				}
+			} else {
+				convertView = inflater.inflate(R.layout.listitem_task, null);
+			}
 			holder.leftLayout = (RelativeLayout) convertView
 					.findViewById(R.id.task_left_relativelayout);
 			holder.middleLayout = (RelativeLayout) convertView
@@ -972,92 +909,114 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					.findViewById(R.id.task_right_relativelayout);
 			holder.checkBox = (ImageView) convertView
 					.findViewById(R.id.task_left_checkbox);
-			holder.taskEnddate = (TextView) convertView
-					.findViewById(R.id.task_middle_enddate);
 			holder.taskTitle = (TextView) convertView
 					.findViewById(R.id.task_middle_subject);
-			holder.taskIcon = (ImageView) convertView
+			holder.taskStarIcon = (ImageView) convertView
 					.findViewById(R.id.task_right_icon);
 			holder.taskReveiversIcon = (ImageView) convertView
 					.findViewById(R.id.task_receivers_icon);
 			if (task.getPriority() != null && !task.getPriority().equals("")
 					&& task.getPriority().equals("1")) { // 该任务是星标任务
-				holder.taskIcon
+				holder.taskStarIcon
 						.setImageResource(R.drawable.wl_task_ribbon_selected);
 			} else {
-				holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon);
+				holder.taskStarIcon.setImageResource(R.drawable.wl_task_ribbon);
 			}
-			final String title = task.getSubject();
+			String title = task.getSubject();
 			holder.taskTitle.setText(title);
+			holder.leftLayout
+					.setBackgroundResource(R.drawable.wl_task_background_left_disabled);
+			holder.middleLayout
+					.setBackgroundResource(R.drawable.wl_task_background_middle_disabled);
+			holder.rightLayout
+					.setBackgroundResource(R.drawable.wl_task_background_right_disabled);
+			holder.taskTitle.setTextColor(getResources().getColor(
+					R.color.listitem_text_complete_color));
+			holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags()
+					| Paint.STRIKE_THRU_TEXT_FLAG);
+			holder.taskReveiversIcon.setEnabled(false);
+			if (task.getPriority() != null && !task.getPriority().equals("")
+					&& task.getPriority().equals("1")) { // 该任务是星标任务
+				holder.taskStarIcon
+						.setImageResource(R.drawable.wl_task_ribbon_disabled_selected);
+			}
+			holder.checkBox
+					.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
+			holder.checkBox.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					// 解除任务完成状态
+					updateTaskStatus(list.get(position).getTaskId(),
+							CommonUser.USEREMAIL, TASKNORMAL, position,
+							COMPLETEORCANCELTONORMAL);
+				}
+			});
+			holder.middleLayout
+					.setOnLongClickListener(new OnLongClickListener() {
+						public boolean onLongClick(View v) {
+							recoverCancelTask(position);
+							return false;
+						}
+					});
 			holder.middleLayout.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Intent intent = new Intent(context,
+					Intent intent = new Intent(getActivity(),
 							TaskDetailsActivity.class);
 					intent.putExtra("task", (Task) getItem(position));
 					intent.putExtra("title", MainActivity.getBarTitle());
 					intent.putExtra("position", position);
-					if (position > (getCount() - tasksComplete.size() - 2)) {
-						isComplete = true;
-					} else {
-						isComplete = false;
-					}
-					intent.putExtra("isComplete", isComplete);
+					intent.putExtra("isComplete", true);
 					startActivityForResult(intent, 1);
 				}
 			});
 			holder.taskReveiversIcon.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					// Toast.makeText(mainActivity, "icon",
-					// Toast.LENGTH_SHORT).show();
-					Intent intent = new Intent(mainActivity,
+					Intent intent = new Intent(getActivity(),
 							ReceiversActivity.class);
 					intent.putExtra("tag", 1);
 					intent.putExtra("task", task);
 					startActivity(intent);
 				}
 			});
-		}
-
-		/**
-		 * 初始化含有other控件的ListItem布局
-		 * 
-		 * @param position
-		 * @param convertView
-		 * @param task
-		 */
-		private void initListItemOthers(int position, View convertView,
-				Task task) {
-			this.initListItemView(position, convertView, task);
-			holder.taskEnddate = (TextView) convertView
-					.findViewById(R.id.task_middle_enddate);
-			String enddate = task.getEnddate();
-			holder.taskEnddate.setText(TimeConvertTool
-					.convertToSpecialEnddateStr(enddate));
-			if (TimeConvertTool.compareDate(enddate)) {
-				holder.taskEnddate.setTextColor(getResources().getColor(
-						R.color.task_date_active_text_color));
-			} else {
-				holder.taskEnddate.setTextColor(getResources().getColor(
-						R.color.task_date_overdue_text_color));
-			}
+			return convertView;
 		}
 
 		private class ViewHolder {
 			private ImageView checkBox;
 			private TextView taskTitle;
 			private TextView taskEnddate;
-			private ImageView taskIcon;
+			private ImageView taskStarIcon;
 			private ImageView taskReveiversIcon;
-			private RelativeLayout taskCompleteLayout;
-			private TextView taskCompleteCountTextView;
-			private ImageView taskCompleteVisibleIcon;
 			private RelativeLayout leftLayout;
 			private RelativeLayout middleLayout;
 			private RelativeLayout rightLayout;
 		}
 
+	}
+
+	/**
+	 * 恢复取消任务
+	 * 
+	 * @param position
+	 */
+	private void recoverCancelTask(final int position) {
+		new AlertDialog.Builder(getActivity()).setTitle("恢复任务")
+				.setMessage("确认恢复此任务，将此任务标记为未完成状态？")
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						updateTaskStatus(tasksComplete.get(position)
+								.getTaskId(), CommonUser.USEREMAIL, TASKNORMAL,
+								position, COMPLETEORCANCELTONORMAL);
+					}
+				}).setNegativeButton("取消", null).show();
+	}
+
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		this.initBottomPopupWindow();
+		this.initSortChoosePopupWindow();
 	}
 
 	/**
@@ -1087,16 +1046,12 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		private String taskId;
 		private String useremail;
 		private String status;
-		private int position;
-		private int tag;
 
 		public UpdateTaskStatus(String taskId, String useremail, String status,
 				int position, int tag) {
 			this.taskId = taskId;
 			this.useremail = useremail;
 			this.status = status;
-			this.position = position;
-			this.tag = tag;
 		}
 
 		@Override
@@ -1123,7 +1078,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		protected void onPostExecute(String result) {
 			try {
 				if (parseUpdateJSON(result)) {
-					updateTaskBoxList(position, tag);
+					updateTaskBoxList();
 				} else {
 					Toast.makeText(getActivity(), "更改任务状态失败",
 							Toast.LENGTH_SHORT).show();
@@ -1167,21 +1122,13 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					.getBoolean("isTaskStatusChange");
 			boolean isTaskStarChange = bundle.getBoolean("isTaskStarChange");
 			if (isTaskChange) {
-				int position = bundle.getInt("position");
-				String taskJSON = bundle.getString("taskJSON");
-				this.updateTaskBoxList(taskJSON, position);
+				this.updateTaskBoxList();
 			}
 			if (isTaskStatusChange) {
-				/*
-				 * int position = bundle.getInt("position"); int tag =
-				 * bundle.getInt("tag"); this.updateTaskBoxList(position, tag);
-				 */
 				updateTaskBoxList();
 			}
 			if (isTaskStarChange) {
-				int position = bundle.getInt("position");
-				String status = bundle.getString("taskStar");
-				this.updateTaskBoxList(position, status);
+				this.updateTaskBoxList();
 			}
 			break;
 		}
@@ -1307,8 +1254,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		popupViewSortChoose = inflater.inflate(R.layout.popupwindow_sortchoose,
 				null);
-		popupwindowSortChoose = new PopupWindow(popupViewSortChoose, LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT, false);
+		popupwindowSortChoose = new PopupWindow(popupViewSortChoose,
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, false);
 		// 设置此参数获得焦点，否则无法点击
 		popupwindowSortChoose.setFocusable(true);
 		// 需要设置一下此参数，点击外边可消失
@@ -1373,13 +1320,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		for (int i = 0; i < arrayTasks.length; i++) {
 			tasksComplete.add(arrayTasks[i]);
 		}
-		tasksTotal.removeAll(tasksTotal);
-		tasksTotal.addAll(tasksNormal);
-		tasksTotal.add(new Task());
-		tasksTotal.addAll(tasksComplete);
-		tasksTotal.add(new Task());
-		adapter.setData(tasksTotal);
-		adapter.notifyDataSetChanged();
+
+		normalAdapter.setData(tasksNormal);
+		completeAdapter.setData(tasksComplete);
+
 	}
 
 }

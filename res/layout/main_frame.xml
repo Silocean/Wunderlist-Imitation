@@ -1,127 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainfragment_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fff" >
+    android:background="#fff"
+    android:focusable="true"
+    android:focusableInTouchMode="true" >
+
+    <!-- 去掉EditText的焦点 -->
 
     <RelativeLayout
+        android:id="@+id/taskEdit_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/head_layout"
-        android:focusable="true"
-   		android:focusableInTouchMode="true" >
-        <RelativeLayout 
+        android:layout_marginLeft="7dip"
+        android:layout_marginRight="7dip"
+        android:layout_marginTop="7dip"
+        android:background="@drawable/wl_taskview_addtask_input" >
+
+        <EditText
+            android:id="@+id/taskEdit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/taskEdit_layout"
-            android:layout_marginTop="7dip"
-	        android:layout_marginLeft="7dip"
-	        android:layout_marginRight="7dip"
-            android:background="@drawable/wl_taskview_addtask_input" >
-            <EditText 
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:id="@+id/taskEdit"
-	            android:singleLine="true"
-	            android:layout_marginLeft="5dip"
-	            android:layout_centerVertical="true"
-	            android:hint="添加一个任务..."
-	            android:textSize="16sp"
-	            android:textColorHint="@color/task_text_hint_color"
-	            android:textColor="@color/task_text_color"
-	            android:background="@null"
-	            android:textCursorDrawable="@null"
-	            android:imeOptions="actionSend" />
-        </RelativeLayout>
-       	
-	    <ListView
-            android:id="@+id/tasklist"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_below="@id/taskEdit_layout"
-            android:layout_marginTop="5dip"
-            android:divider="@null"
-            android:listSelector="#00000000"
-            android:fadingEdge="none" 
-            android:cacheColorHint="#00000000" />
-	    
-	    <!-- <RelativeLayout 
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:id="@+id/task_cancel_relativelayout"
-	        android:layout_below="@id/tasklist"
-	        android:layout_marginTop="10dip"
-	        android:layout_marginLeft="7dip"
-	        android:layout_marginRight="7dip" >
-	        <TextView 
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:id="@+id/task_cancel_count_text"
-	            android:layout_alignParentLeft="true"
-	            android:layout_centerVertical="true"
-	            android:layout_marginLeft="2dip"
-	            android:textColor="@color/task_complete_count_text_color"
-	            android:text="0个已取消的任务" />
-	        <ImageView 
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:id="@+id/task_cancel_visible_icon"
-	            android:layout_alignParentRight="true"
-	            android:layout_centerVertical="true"
-	            android:layout_marginRight="5dip"
-	            android:src="@drawable/wl_taskview_icon_hide_selected" />
-	    </RelativeLayout>
-	    
-	    <ListView
-            android:id="@+id/taskcancellist"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/task_cancel_relativelayout"
-            android:layout_marginTop="5dip"
-            android:divider="@null"
-            android:listSelector="#00000000"
-            android:fadingEdge="none"
-            android:cacheColorHint="#00000000" />
-	    
-	    <RelativeLayout 
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:id="@+id/task_complete_relativelayout"
-	        android:layout_below="@id/task_cancel_relativelayout"
-	        android:layout_marginTop="10dip"
-	        android:layout_marginLeft="7dip"
-	        android:layout_marginRight="7dip" >
-	        <TextView 
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:id="@+id/task_complete_count_text"
-	            android:layout_alignParentLeft="true"
-	            android:layout_centerVertical="true"
-	            android:layout_marginLeft="2dip"
-	            android:textColor="@color/task_complete_count_text_color"
-	            android:text="0个已完成的任务" />
-	        <ImageView 
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:id="@+id/task_complete_visible_icon"
-	            android:layout_alignParentRight="true"
-	            android:layout_centerVertical="true"
-	            android:layout_marginRight="5dip"
-	            android:src="@drawable/wl_taskview_icon_hide_selected" />
-	    </RelativeLayout>
-	    
-	    <ListView
-            android:id="@+id/taskcompletelist"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_below="@id/task_complete_relativelayout"
-            android:layout_marginTop="5dip"
-            android:divider="@null"
-            android:listSelector="#00000000"
-            android:fadingEdge="none" 
-            android:cacheColorHint="#00000000" /> -->
-	    
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:background="@null"
+            android:hint="添加一个任务..."
+            android:imeOptions="actionSend"
+            android:singleLine="true"
+            android:textColor="@color/task_text_color"
+            android:textColorHint="@color/task_text_hint_color"
+            android:textCursorDrawable="@null"
+            android:textSize="16sp" />
     </RelativeLayout>
 
+    <ListView
+        android:id="@+id/tasknormal_listview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/taskEdit_layout"
+        android:layout_marginTop="5dip"
+        android:cacheColorHint="#00000000"
+        android:divider="@null"
+        android:fadingEdge="none"
+        android:listSelector="#00000000" />
 
 </RelativeLayout>

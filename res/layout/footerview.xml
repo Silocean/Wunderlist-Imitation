@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RelativeLayout
+        android:id="@+id/null_relativelayout"
+        android:layout_width="fill_parent"
+        android:layout_height="20dip"
+        android:layout_alignParentTop="true" >
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/task_complete_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/null_relativelayout" >
+
+        <TextView
+            android:id="@+id/task_complete_count_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:text="0个完成的任务"
+            android:textColor="@color/task_complete_count_text_color" />
+
+        <ImageView
+            android:id="@+id/task_complete_visible_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="15dip"
+            android:src="@drawable/wl_taskview_icon_hide_selected" />
+    </RelativeLayout>
+    
+    <ListView
+        android:id="@+id/taskcomplete_listview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/task_complete_layout"
+        android:layout_marginTop="5dip"
+        android:cacheColorHint="#00000000"
+        android:divider="@null"
+        android:fadingEdge="none"
+        android:listSelector="#00000000" />
+
+</RelativeLayout>

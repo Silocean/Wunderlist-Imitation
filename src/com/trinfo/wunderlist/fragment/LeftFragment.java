@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.trinfo.wunderlist.R;
 import com.trinfo.wunderlist.activity.InboxActivity;
+import com.trinfo.wunderlist.activity.MainActivity;
 import com.trinfo.wunderlist.activity.SettingsActivity;
 import com.trinfo.wunderlist.entity.CommonUser;
 
@@ -96,7 +97,7 @@ public class LeftFragment extends Fragment implements OnClickListener {
 			break;
 		}
 		case R.id.group_receive: {
-			//((SlidingActivity)getActivity()).showLeft();
+			((MainActivity)getActivity()).showContent();
 			break;
 		}
 		default:
