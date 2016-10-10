@@ -40,7 +40,6 @@ public class SlidingActivity extends SherlockFragmentActivity {
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
-		this.finishAllActivities();
 		MyActivityManager.addActivity("SlidingActivity", this);
 		this.initCommonData();
 		actionBar = getSupportActionBar();
@@ -160,9 +159,8 @@ public class SlidingActivity extends SherlockFragmentActivity {
 			Toast.makeText(getApplicationContext(), "再按一次返回键退出", Toast.LENGTH_SHORT).show();
 			touchTime = currentTime;
 		} else {
-			this.finishAllActivities();
-			/*// 返回桌面，并不是真正的退出
-			Intent i = new Intent(Intent.ACTION_MAIN);
+			// 返回桌面，并不是真正的退出
+			/*Intent i = new Intent(Intent.ACTION_MAIN);
 			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			i.addCategory(Intent.CATEGORY_HOME);
 			startActivity(i);*/
@@ -170,15 +168,4 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		}
 	}
 	
-	/**
-	 * 结束所有activity
-	 */
-	private void finishAllActivities() {
-		for (String name : MyActivityManager.activities.keySet()) {
-			if(MyActivityManager.getActivity(name) != null) {
-				MyActivityManager.getActivity(name).finish();
-			}
-		}
-	}
-
 }

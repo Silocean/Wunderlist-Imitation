@@ -8,6 +8,19 @@ public class Receiver {
 	private String receiverAge;
 	private String receiverHobby;
 	private String receiverMobile;
+	
+	public Receiver() {
+	}
+	public Receiver(String receiverEmail, String receiverName,
+			String receiverSex, String receiverAge, String receiverHobby,
+			String receiverMobile) {
+		this.receiverEmail = receiverEmail;
+		this.receiverName = receiverName;
+		this.receiverSex = receiverSex;
+		this.receiverAge = receiverAge;
+		this.receiverHobby = receiverHobby;
+		this.receiverMobile = receiverMobile;
+	}
 	public String getReceiverEmail() {
 		return receiverEmail;
 	}

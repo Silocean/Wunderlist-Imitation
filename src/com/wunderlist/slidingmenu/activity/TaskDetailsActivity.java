@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
+import com.wunderlist.entity.Common;
 import com.wunderlist.entity.CommonUser;
 import com.wunderlist.entity.Reply;
 import com.wunderlist.entity.Task;
@@ -131,13 +132,23 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		super.setTitle(barTitle);
 		titleEditText.setText(task.getSubject());
 		subject = task.getSubject();
-		note = task.getDisc();
+		note = this.formatNote(task.getDisc());
 		noteEditText.setText(note);
 		this.updateDateView(enddate);
 		this.updateClockTextView(task.getRemindnum(), task.getRemindtype());
 		if (!task.getUserId().equals(CommonUser.USERID) || isComplete) { // 如果该任务不是用户自己发起的或者该任务已完成
 			this.disableView();
 		}
+	}
+	
+	/**
+	 * 格式化笔记字符串
+	 * @param note
+	 * @return
+	 */
+	private String formatNote(String note) {
+		return note.replaceAll("<[a-zA-Z]+>", "").replaceAll("</[a-zA-Z]+>", "")
+				.replaceAll("&nbsp;", " ");
 	}
 	
 	/**
@@ -264,7 +275,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				System.out.println("没有数据");
 			}
 		} else {
-			System.out.println("网络连接出现问题");
+			//Common.ToastIfNetworkProblem(getApplicationContext());
 		}
 		return replys;
 	}
@@ -403,7 +414,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				}
 			}
 		} else {
-			System.out.println("网络连接出现问题");
+			//Common.ToastIfNetworkProblem(getApplicationContext());
 		}
 		return receivers;
 	}
@@ -586,10 +597,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 					.replaceAll("\\&PRIORITY", "").replaceAll("\\&ENDDATE", enddate)
 					.replaceAll("\\&REMINDTYPE", remindtype).replaceAll("\\&REMINDNUM", remindnum)
 					.replaceAll("\\&ATTFILES", "").replaceAll("<string>\\&string</string>", constructReceiversString(receivers).toString());
-			//System.out.println("===" + string);
 			data = string.getBytes();
 			json = WebServiceRequest.SendPost(inputStream, data, "UpdateTaskResult");
-			//System.out.println("++++"+json);
 			if(parseUpdateJSON(json)) {
 				//Toast.makeText(getApplicationContext(), "更改任务信息成功", Toast.LENGTH_SHORT).show();
 				bundle.putBoolean("isTaskChange", isTaskChange);

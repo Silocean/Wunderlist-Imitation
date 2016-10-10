@@ -245,7 +245,7 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 				System.out.println("没有数据");
 			}
 		} else {
-			System.out.println("网络连接出现问题");
+			//Common.ToastIfNetworkProblem(getApplicationContext());
 		}
 		return contracts;
 	}
@@ -260,14 +260,17 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 
 	@Override
 	public void onClick(View v) {
-		Receiver receiver = new Receiver();
-		receiver.setReceiverEmail(emailEditText.getText().toString().trim());
-		receiver.setReceiverName("");
-		receiver.setReceiverAge("");
-		receiver.setReceiverHobby("");
-		receiver.setReceiverMobile("");
-		receiver.setReceiverSex("");
-		contracts.addFirst(receiver);
+		if(contracts.size() > 0) {
+			if(!contracts.get(0).getReceiverEmail().equals(emailEditText.getText().toString().trim())) {
+				Receiver receiver = new Receiver("", "", "", "", "", "");
+				receiver.setReceiverEmail(emailEditText.getText().toString().trim());
+				contracts.addFirst(receiver);
+			}
+		} else {
+			Receiver receiver = new Receiver("", "", "", "", "", "");
+			receiver.setReceiverEmail(emailEditText.getText().toString().trim());
+			contracts.addFirst(receiver);
+		}
 		adapter.setData(contracts);
 		adapter.notifyDataSetChanged();
 	}

@@ -30,7 +30,7 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 	
 	private Button addButton;
 	
-	private ArrayList<String> orignalReceivers = new ArrayList<String>();
+	private ArrayList<String> orignialReceivers = new ArrayList<String>();
 	private ArrayList<String> receivers;
 	private ArrayList<String> newAddReceivers;
 	
@@ -74,7 +74,7 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 		setTitle("成员列表");
 		//taskId = getIntent().getStringExtra("taskId");
 		receivers = getIntent().getStringArrayListExtra("receivers");
-		orignalReceivers.addAll(receivers);
+		orignialReceivers.addAll(receivers);
 		adapter.setData(receivers);
 		adapter.notifyDataSetChanged();
 	}
@@ -154,14 +154,9 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 	public void finish() {
 		Intent intent = new Intent();
 		boolean isReceiversChange = true;
-		if(receivers.containsAll(orignalReceivers) && orignalReceivers.containsAll(receivers)) {
+		if(receivers.containsAll(orignialReceivers) && orignialReceivers.containsAll(receivers)) {
 			isReceiversChange = false; // 表示接收人没有改变
 		}
-		/*StringBuilder sb = new StringBuilder();
-		for(int i=0; i<receivers.size(); i++) {
-			sb.append(receivers.get(i)+":");
-		}
-		sb.deleteCharAt(sb.length()-1);*/
 		intent.putStringArrayListExtra("receivers", receivers);
 		intent.putExtra("isReceiversChange", isReceiversChange);
 		intent.putExtra("receiversNum", receivers.size());

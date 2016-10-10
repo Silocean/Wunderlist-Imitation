@@ -20,6 +20,25 @@ public class Task implements Serializable {
 	private String createDate;
 	private String isActive;
 	
+	public Task() {
+	}
+	
+	public Task(String taskId, String userId, String taskFrom, String subject,
+			String disc, String priority, String enddate, String remindtype,
+			String remindnum, String createDate, String isActive) {
+		this.taskId = taskId;
+		this.userId = userId;
+		this.taskFrom = taskFrom;
+		this.subject = subject;
+		this.disc = disc;
+		this.priority = priority;
+		this.enddate = enddate;
+		this.remindtype = remindtype;
+		this.remindnum = remindnum;
+		this.createDate = createDate;
+		this.isActive = isActive;
+	}
+	
 	public String getTaskId() {
 		return taskId;
 	}

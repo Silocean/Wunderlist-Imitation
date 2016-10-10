@@ -12,7 +12,7 @@ import com.example.wunderlist.R;
  */
 public class Common {
 	
-	public static final String WEBSERVICEPATH = "http://10.0.2.2/XMALWEBSERVICE/TaskService.asmx";
+	public static final String WEBSERVICEPATH = "http://xmailserver/XMAILWEBSERVICE/TaskService.asmx";
 	
 	public static final String EMAILREGEX = "[\\w[.-]]+@[\\w[.-]]+\\.[\\w]+";
 	
@@ -29,10 +29,14 @@ public class Common {
 		R.drawable.wl_background15, R.drawable.wl_background16,
 		R.drawable.wl_background17, R.drawable.wl_background18,
 		R.drawable.wl_background19, R.drawable.wl_background20,
-		R.drawable.wl_background21, R.drawable.wl_background22, };
+		R.drawable.wl_background21, R.drawable.wl_background22 };
 	
 	public static void ToastIfNetworkIsNotAvailable(Context context) {
 		Toast.makeText(context, "当前网络不可用，请检查你的网络设置", Toast.LENGTH_SHORT).show();
+	}
+	
+	public static void ToastIfNetworkProblem(Context context) {
+		Toast.makeText(context, "网络连接出现问题", Toast.LENGTH_SHORT).show();
 	}
 	
 }

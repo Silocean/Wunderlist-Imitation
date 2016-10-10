@@ -53,6 +53,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 			} else if(msg.arg1 == 1){
 				Intent intent = new Intent(getApplicationContext(), SlidingActivity.class);
 				startActivity(intent);
+				finish();
 			} else if(msg.arg1 == 2){
 				Toast.makeText(getApplicationContext(), "密码不对!", Toast.LENGTH_SHORT).show();
 			} else if(msg.arg1 == 3){

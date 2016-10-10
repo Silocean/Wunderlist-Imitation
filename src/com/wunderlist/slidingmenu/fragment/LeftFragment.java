@@ -10,16 +10,21 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.example.wunderlist.R;
+import com.wunderlist.entity.User;
 import com.wunderlist.slidingmenu.activity.SettingsActivity;
 import com.wunderlist.slidingmenu.activity.SlidingActivity;
+import com.wunderlist.sqlite.SQLiteService;
 
 @SuppressLint("ValidFragment")
 public class LeftFragment extends Fragment implements OnClickListener {
 	
-	private ImageView notifImageView = null;
+	private TextView userNameTextView = null;
+	private TextView userEmailTextView = null;
+	
+	private ImageView notifyImageView = null;
 	private ImageView syncImageView = null;
 	private ImageView settingsImageView = null;
 	
@@ -37,11 +42,13 @@ public class LeftFragment extends Fragment implements OnClickListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.left, null);
-		notifImageView = (ImageView)view.findViewById(R.id.user_notification);
+		userNameTextView = (TextView)view.findViewById(R.id.user_name);
+		userEmailTextView = (TextView)view.findViewById(R.id.user_email);
+		notifyImageView = (ImageView)view.findViewById(R.id.user_notification);
 		syncImageView = (ImageView)view.findViewById(R.id.sidebar_sync);
 		settingsImageView = (ImageView)view.findViewById(R.id.siderbar_settings);
 		groupReceive = (RelativeLayout)view.findViewById(R.id.group_receive);
-		notifImageView.setOnClickListener(this);
+		notifyImageView.setOnClickListener(this);
 		syncImageView.setOnClickListener(this);
 		settingsImageView.setOnClickListener(this);
 		groupReceive.setOnClickListener(this);
@@ -50,14 +57,22 @@ public class LeftFragment extends Fragment implements OnClickListener {
 	}
 
 	public void onActivityCreated(Bundle savedInstanceState) {
+		this.initData();
 		super.onActivityCreated(savedInstanceState);
+	}
+
+	private void initData() {
+		SQLiteService service = new SQLiteService(getActivity());
+		User user = service.getUserInfo();
+		userNameTextView.setText(user.getUserName());
+		userEmailTextView.setText(user.getUserEmail());
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.user_notification: {
-			Toast.makeText(getActivity(), "notification", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(getActivity(), "notification", Toast.LENGTH_SHORT).show();
 			break;
 		}
 		case R.id.sidebar_sync: {

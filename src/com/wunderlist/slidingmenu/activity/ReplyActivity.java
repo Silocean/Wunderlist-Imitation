@@ -13,8 +13,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,8 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
-import com.wunderlist.entity.Reply;
+import com.wunderlist.entity.Common;
 import com.wunderlist.entity.CommonUser;
+import com.wunderlist.entity.Reply;
 import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.TimeConvertTool;
@@ -159,7 +160,7 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 				System.out.println("没有数据");
 			}
 		} else {
-			System.out.println("网络连接出现问题");
+			//Common.ToastIfNetworkProblem(getApplicationContext());
 		}
 		return replys;
 	}

@@ -59,7 +59,7 @@ import com.wunderlist.tools.WebServiceRequest;
 
 @SuppressLint("ValidFragment")
 public class MainFragment extends Fragment implements OnScrollListener {
-
+	
 	private static final String TAGNORMAL = "1";
 	private static final String TAGCOMPLETE = "0,2";
 
@@ -106,12 +106,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private static LinkedList<Task> tasksComplete = new LinkedList<Task>();
 	// 临时变量用于保存已完成任务列表
 	private static LinkedList<Task> tempList = new LinkedList<Task>();
-	
-	public static ArrayList<Task> clockTimes = new ArrayList<Task>();
-	private Task[] arrayDates = null;
 
-	private Task[] arrayTasksNormal = null;
-	private Task[] arrayTasksComplete = null;
+	public static ArrayList<Task> clockTimes = new ArrayList<Task>();
+
+	private Task[] arrayTasks = null;
 
 	private Task task = null;
 
@@ -141,8 +139,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				if (actionId == EditorInfo.IME_ACTION_SEND) {
 					String subject = taskEditText.getText().toString().trim();
 					if (!subject.equals("")) {
-						Toast.makeText(getActivity(), subject,
-								Toast.LENGTH_SHORT).show();
 						taskEditText.setText("");
 						try {
 							addTask(subject);
@@ -171,7 +167,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		}
 		return view;
 	}
-
+	
+	/**
+	 * 取得sharedPreference
+	 */
 	private void getPreferences() {
 		SharedPreferences preferences = MySharedPreferences
 				.getPreferences(getActivity());
@@ -252,7 +251,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		GetTaskBoxListData task = new GetTaskBoxListData(TAGNORMAL, tasksNormal);
 		task.execute("");
 	}
-	
+
 	/**
 	 * 显示刷新数据菜单
 	 */
@@ -261,7 +260,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		SlidingActivity.setIsRefreshing(true);
 		slidingActivity.invalidateOptionsMenu();
 	}
-	
+
 	/**
 	 * 隐藏刷新数据菜单
 	 */
@@ -280,6 +279,21 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	}
 
 	/**
+	 * 添加任务后更新任务列表（不从网络获取数据）
+	 * 
+	 * @param subject
+	 */
+	/*
+	 * private void updateTaskBoxList(String subject) { Task task = new Task("",
+	 * "", "", "", "", "", "", "", "", "", ""); task.setSubject(subject);
+	 * tasksTotal.removeAll(tasksTotal); tasksNormal.addFirst(task);
+	 * tasksTotal.addAll(tasksNormal); tasksTotal.add(new Task());
+	 * tasksTotal.addAll(tasksComplete); tasksTotal.add(new Task());
+	 * adapter.setData(tasksTotal); adapter.notifyDataSetChanged();
+	 * this.setClockAlarm(); }
+	 */
+
+	/**
 	 * 更新任务列表（不从网络获取数据）
 	 * 
 	 * @param position
@@ -290,18 +304,18 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		switch (tag) {
 		case NORMALTOCOMPLETEORCANCEL:
 			if (showCompleteTasks) {
+				tasksTotal.removeAll(tasksTotal);
 				tasksNormal.remove(position);
 				tasksComplete.addFirst(task);
-				tasksTotal.removeAll(tasksTotal);
 				tasksTotal.addAll(tasksNormal);
 				tasksTotal.add(new Task());
 				tasksTotal.addAll(tasksComplete);
 				tasksTotal.add(new Task());
 			} else {
+				tasksTotal.removeAll(tasksTotal);
 				tasksNormal.remove(position);
 				tempList.add(task);
 				tasksComplete.removeAll(tasksComplete);
-				tasksTotal.removeAll(tasksTotal);
 				tasksTotal.addAll(tasksNormal);
 				tasksTotal.add(new Task());
 				tasksTotal.addAll(tasksComplete);
@@ -309,9 +323,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			}
 			break;
 		case COMPLETEORCANCELTONORMAL:
+			tasksTotal.removeAll(tasksTotal);
 			tasksComplete.remove(position - tasksNormal.size() - 1);
 			tasksNormal.add(task);
-			tasksTotal.removeAll(tasksTotal);
 			tasksTotal.addAll(tasksNormal);
 			tasksTotal.add(new Task());
 			tasksTotal.addAll(tasksComplete);
@@ -432,41 +446,43 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					adapter.notifyDataSetChanged();
 				}
 				tasksComplete = tasks;
-				
+
 				hideRefreshMenu();
 				showOrDismissCompleteTasks();
-				
+
 				setClockAlarm();
-				
+
 			}
 		}
 
 	}
-	
+
 	/**
 	 * 设置提醒
 	 */
 	private void setClockAlarm() {
 		clockTimes.removeAll(clockTimes);
-		arrayDates = new Task[tasksNormal.size()];
-		for(int i=0; i<tasksNormal.size(); i++) {
-			arrayDates[i] = tasksNormal.get(i);
+		arrayTasks = new Task[tasksNormal.size()];
+		for (int i = 0; i < tasksNormal.size(); i++) {
+			arrayTasks[i] = tasksNormal.get(i);
 		}
-		Arrays.sort(arrayDates, new EnddateComparator());
-		for(int i=0; i<arrayDates.length; i++) {
-			task = arrayDates[i];
-			if (!task.getRemindnum().equals("") && !task.getRemindtype().equals("")) {
-				Date date = TimeConvertTool.getClockTime(task.getEnddate(), task.getRemindnum(), task.getRemindtype());
-				if(TimeConvertTool.compareDate(date)) {
+		Arrays.sort(arrayTasks, new EnddateComparator());
+		for (int i = 0; i < arrayTasks.length; i++) {
+			task = arrayTasks[i];
+			if (!task.getRemindnum().equals("")
+					&& !task.getRemindtype().equals("")) {
+				Date date = TimeConvertTool.getClockTime(task.getEnddate(),
+						task.getRemindnum(), task.getRemindtype());
+				if (TimeConvertTool.compareDate(date)) {
 					clockTimes.add(task);
 				}
 			}
 		}
-		if(clockTimes.size() > 0) {
+		if (clockTimes.size() > 0) {
 			ClockAlarmUtil.setClockAlarm(getActivity(), clockTimes.get(0));
 		}
 	}
-	
+
 	/**
 	 * 获取程序刷新数据时间
 	 * 
@@ -508,8 +524,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				System.out.println("没有数据");
 			}
 		} else { // 网络连接出现问题
-			Toast.makeText(getActivity(), "网络连接出现问题", Toast.LENGTH_SHORT)
-					.show();
+			//Common.ToastIfNetworkProblem(getActivity());
 		}
 		return tasks;
 	}
@@ -596,7 +611,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 
 		@Override
 		public int getItemViewType(int position) {
-			// System.out.println("完成的个数:"+tasksComplete.size());
 			if (position == getCount() - 1) {
 				return TYPE_BOTTOMLAYOUT;
 			} else {
@@ -766,8 +780,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 													public void onClick(
 															DialogInterface dialog,
 															int which) {
-														// Toast.makeText(context,
-														// "确定", 0).show();
 														updateTaskStatus(
 																list.get(
 																		position)
@@ -791,7 +803,13 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			convertView.setTag(holder);
 			return convertView;
 		}
-
+		
+		/**
+		 * 初始化一般ListItem布局
+		 * @param position
+		 * @param convertView
+		 * @param task
+		 */
 		private void initListItemView(final int position, View convertView,
 				Task task) {
 			holder.leftLayout = (RelativeLayout) convertView
@@ -810,7 +828,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					.findViewById(R.id.task_right_icon);
 			String userId = task.getUserId();
 			if (userId.equals(CommonUser.USERID)) { // 该任务是用户自己发起的
-				// holder.taskTitle.setTextColor(getResources().getColor(R.color.task_normal_initiate_text_color));
 				holder.taskIcon
 						.setImageResource(R.drawable.wl_task_ismeinitiate);
 			}
@@ -841,7 +858,12 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				}
 			});
 		}
-
+		
+		/**
+		 * 初始化含有other控件的ListItem布局
+		 * @param position
+		 * @param convertView
+		 */
 		private void initListItemOthers(int position, View convertView) {
 			this.initListItemView(position, convertView, task);
 			holder.taskEnddate = (TextView) convertView
@@ -955,8 +977,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	/**
 	 * 解析更新任务状态返回的json字符串
 	 * 
-	 * @param json
-	 *            要解析的json字符串
+	 * @param json 要解析的json字符串
 	 * @return 0表示出现异常，1表示保存成功
 	 * @throws Exception
 	 */
@@ -1152,31 +1173,31 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	 */
 	private void sortBySubject(LinkedList<Task> tasksNormal,
 			LinkedList<Task> tasksComplete, int sortByWhat) {
-		arrayTasksNormal = new Task[tasksNormal.size()];
+		arrayTasks = new Task[tasksNormal.size()];
 		for (int i = 0; i < tasksNormal.size(); i++) {
-			arrayTasksNormal[i] = tasksNormal.get(i);
+			arrayTasks[i] = tasksNormal.get(i);
 		}
 		if (sortByWhat == SORTBYSUBJECT) {
-			Arrays.sort(arrayTasksNormal, subjectComparator);
+			Arrays.sort(arrayTasks, subjectComparator);
 		} else if (sortByWhat == SORTBYENDDATE) {
-			Arrays.sort(arrayTasksNormal, enddateComparator);
+			Arrays.sort(arrayTasks, enddateComparator);
 		}
 		tasksNormal.removeAll(tasksNormal);
-		for (int i = 0; i < arrayTasksNormal.length; i++) {
-			tasksNormal.add(arrayTasksNormal[i]);
+		for (int i = 0; i < arrayTasks.length; i++) {
+			tasksNormal.add(arrayTasks[i]);
 		}
-		arrayTasksComplete = new Task[tasksComplete.size()];
+		arrayTasks = new Task[tasksComplete.size()];
 		for (int i = 0; i < tasksComplete.size(); i++) {
-			arrayTasksComplete[i] = tasksComplete.get(i);
+			arrayTasks[i] = tasksComplete.get(i);
 		}
 		if (sortByWhat == SORTBYSUBJECT) {
-			Arrays.sort(arrayTasksComplete, subjectComparator);
+			Arrays.sort(arrayTasks, subjectComparator);
 		} else if (sortByWhat == SORTBYENDDATE) {
-			Arrays.sort(arrayTasksComplete, enddateComparator);
+			Arrays.sort(arrayTasks, enddateComparator);
 		}
 		tasksComplete.removeAll(tasksComplete);
-		for (int i = 0; i < arrayTasksComplete.length; i++) {
-			tasksComplete.add(arrayTasksComplete[i]);
+		for (int i = 0; i < arrayTasks.length; i++) {
+			tasksComplete.add(arrayTasks[i]);
 		}
 		tasksTotal.removeAll(tasksTotal);
 		tasksTotal.addAll(tasksNormal);

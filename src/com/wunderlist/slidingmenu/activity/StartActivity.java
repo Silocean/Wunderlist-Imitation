@@ -39,6 +39,7 @@ public class StartActivity extends Activity {
 			Intent intent = new Intent(getApplicationContext(), SlidingActivity.class);
 			startActivity(intent);
 		}
+		finish();
 	}
 	
 	@SuppressLint("HandlerLeak")
