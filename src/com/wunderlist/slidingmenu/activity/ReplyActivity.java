@@ -24,7 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
-import com.wunderlist.entity.Common;
 import com.wunderlist.entity.CommonUser;
 import com.wunderlist.entity.Reply;
 import com.wunderlist.tools.MyActivityManager;

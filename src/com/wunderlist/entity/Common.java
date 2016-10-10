@@ -12,7 +12,7 @@ import com.example.wunderlist.R;
  */
 public class Common {
 	
-	public static final String WEBSERVICEPATH = "http://xmailserver/XMAILWEBSERVICE/TaskService.asmx";
+	public static final String WEBSERVICEPATH = "http://10.0.2.2/XMALWEBSERVICE/TaskService.asmx";
 	
 	public static final String EMAILREGEX = "[\\w[.-]]+@[\\w[.-]]+\\.[\\w]+";
 	
