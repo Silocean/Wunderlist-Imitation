@@ -2,6 +2,7 @@ package com.wunderlist.slidingmenu.activity;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 
 import org.json.JSONArray;
@@ -12,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,10 +35,10 @@ import com.wunderlist.tools.WebServiceRequest;
 
 public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		OnClickListener {
-	
+
 	private static final String TASKNORMAL = "1";
 	private static final String TASKCOMPLETE = "2";
-	
+
 	private static final int NORMALTOCOMPLETEORCANCEL = 1;
 	private static final int COMPLETEORCANCELTONORMAL = 2;
 
@@ -57,10 +59,11 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private TextView replyTimeTextView;
 	private TextView receiversTextView;
 
+	private EditText replyContentEditText;
 	private Button replyButton;
-	
+
 	private boolean isComplete = false;
-	
+
 	private int position = 0;
 
 	private Task task = null;
@@ -78,14 +81,13 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private boolean isTaskChange = false;
 	private boolean isTaskStatusChange = false;
 	private boolean isTaskStarChange = false;
-	
+
 	private Bundle bundle = new Bundle();
-	
-	private StringBuilder sb = new StringBuilder();
 
 	private String replyJSON = "";
 	private String receiverJSON = "";
-	
+
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_task_details);
@@ -108,9 +110,17 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		enddateTextView = (TextView) findViewById(R.id.taskdetails_deadline_text);
 		clockiImageView = (ImageView) findViewById(R.id.taskdetails_clock_icon);
 		clockTextView = (TextView) findViewById(R.id.taskdetails_clock_text);
-		replyButton = (Button) findViewById(R.id.taskdetails_reply);
+		replyContentEditText = (EditText) this
+				.findViewById(R.id.taskreply_comment);
+		replyButton = (Button) this.findViewById(R.id.taskreply_reply);
 		replyButton.setOnClickListener(this);
+		int width = getWindowManager().getDefaultDisplay().getWidth()
+				- replyButton.getLayoutParams().width - 15;
+		LayoutParams layoutParams = replyContentEditText.getLayoutParams();
+		layoutParams.width = width;
+		replyContentEditText.setLayoutParams(layoutParams);
 		taskReplyRelativeLayout = (RelativeLayout) findViewById(R.id.task_reply_layout);
+		taskReplyRelativeLayout.setOnClickListener(this);
 		replyEmailTextView = (TextView) findViewById(R.id.task_reply_email);
 		replyContentTextView = (TextView) findViewById(R.id.task_reply_content);
 		replyTimeTextView = (TextView) findViewById(R.id.task_reply_time);
@@ -143,18 +153,19 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		if (!task.getUserId().equals(CommonUser.USERID) || isComplete) { // 如果该任务不是用户自己发起的或者该任务已完成
 			this.disableView();
 		}
-		if(isComplete) {
-			checkboxImageView.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
-			if(priority != null) {
-				if(priority.equals("") || priority.equals("0")) {
+		if (isComplete) {
+			checkboxImageView
+					.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
+			if (priority != null) {
+				if (priority.equals("") || priority.equals("0")) {
 					starIcon.setImageResource(R.drawable.wl_task_ribbon);
 				} else {
 					starIcon.setImageResource(R.drawable.wl_detail_ribbon_selected_disabled);
 				}
 			}
 		} else {
-			if(priority != null) {
-				if(priority.equals("") || priority.equals("0")) {
+			if (priority != null) {
+				if (priority.equals("") || priority.equals("0")) {
 					starIcon.setImageResource(R.drawable.wl_task_ribbon);
 				} else {
 					starIcon.setImageResource(R.drawable.wl_detail_ribbon_selected);
@@ -162,9 +173,10 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			}
 		}
 	}
-	
+
 	/**
 	 * 格式化笔记字符串
+	 * 
 	 * @param note
 	 * @return
 	 */
@@ -172,7 +184,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		return str.replaceAll("<[a-zA-Z]+>", "").replaceAll("</[a-zA-Z]+>", "")
 				.replaceAll("&nbsp;", " ");
 	}
-	
+
 	/**
 	 * 把某些控件设置为不可用
 	 */
@@ -183,24 +195,32 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		this.clockRelativeLayout.setEnabled(false);
 		this.noteEditText.setEnabled(false);
 		this.starIcon.setEnabled(false);
-		this.enddateTextView.setTextColor(getResources().getColor(R.color.listitem_text_complete_color));
-		this.clockTextView.setTextColor(getResources().getColor(R.color.groupname_color_normal));
-		this.enddateiImageView.setImageResource(R.drawable.wl_taskdetails_icon_deadline);
-		this.clockiImageView.setImageResource(R.drawable.wl_taskdetails_icon_clock);
+		this.enddateTextView.setTextColor(getResources().getColor(
+				R.color.listitem_text_complete_color));
+		this.clockTextView.setTextColor(getResources().getColor(
+				R.color.groupname_color_normal));
+		this.enddateiImageView
+				.setImageResource(R.drawable.wl_taskdetails_icon_deadline);
+		this.clockiImageView
+				.setImageResource(R.drawable.wl_taskdetails_icon_clock);
 	}
-	
+
 	/**
 	 * 根据截止日期更新dateView
 	 */
 	private void changeDateView() {
-		if(TimeConvertTool.compareDate(enddate)) {
-			enddateiImageView.setImageResource(R.drawable.wl_taskdetails_icon_deadline_active);
-			enddateTextView.setTextColor(getResources().getColor(R.color.task_date_active_text_color));
+		if (TimeConvertTool.compareDate(enddate)) {
+			enddateiImageView
+					.setImageResource(R.drawable.wl_taskdetails_icon_deadline_active);
+			enddateTextView.setTextColor(getResources().getColor(
+					R.color.task_date_active_text_color));
 		} else {
-			enddateiImageView.setImageResource(R.drawable.wl_taskdetails_icon_deadline_overdue);
-			enddateTextView.setTextColor(getResources().getColor(R.color.task_date_overdue_text_color));
+			enddateiImageView
+					.setImageResource(R.drawable.wl_taskdetails_icon_deadline_overdue);
+			enddateTextView.setTextColor(getResources().getColor(
+					R.color.task_date_overdue_text_color));
 		}
-		if(!remindnum.equals("") && !remindtype.equals("")) {
+		if (!remindnum.equals("") && !remindtype.equals("")) {
 			this.changeClockView();
 		}
 	}
@@ -209,12 +229,16 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * 根据提醒时间更新clockView
 	 */
 	private void changeClockView() {
-		if(TimeConvertTool.judgeClock(enddate, remindnum, remindtype)) {
-			clockiImageView.setImageResource(R.drawable.wl_taskdetails_icon_clock_active);
-			clockTextView.setTextColor(getResources().getColor(R.color.task_date_active_text_color));
+		if (TimeConvertTool.judgeClock(enddate, remindnum, remindtype)) {
+			clockiImageView
+					.setImageResource(R.drawable.wl_taskdetails_icon_clock_active);
+			clockTextView.setTextColor(getResources().getColor(
+					R.color.task_date_active_text_color));
 		} else { // 提醒已过期
-			clockiImageView.setImageResource(R.drawable.wl_taskdetails_icon_clock_overdue);
-			clockTextView.setTextColor(getResources().getColor( R.color.task_date_overdue_text_color));
+			clockiImageView
+					.setImageResource(R.drawable.wl_taskdetails_icon_clock_overdue);
+			clockTextView.setTextColor(getResources().getColor(
+					R.color.task_date_overdue_text_color));
 		}
 	}
 
@@ -287,7 +311,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 					reply.setUserId(obj.getString("USERID"));
 					reply.setUserEmail(obj.getString("MAILADDR"));
 					reply.setReplyContent(obj.getString("REPLY"));
-					reply.setCreateDate(obj.getString("CREATEDATE").replaceAll("/", "-"));
+					reply.setCreateDate(obj.getString("CREATEDATE").replaceAll(
+							"/", "-"));
 					replys.add(reply);
 				}
 			} else {
@@ -424,9 +449,9 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		if (json != null) {
 			JSONObject object = new JSONObject(json);
 			int rows = Integer.parseInt(object.getString("rows"));
-			if(rows > 0) {
+			if (rows > 0) {
 				JSONArray array = new JSONArray(object.getString("Items"));
-				for(int i=0; i<array.length(); i++) {
+				for (int i = 0; i < array.length(); i++) {
 					JSONObject obj = array.getJSONObject(i);
 					receivers.add(obj.getString("TOMAILADDR"));
 				}
@@ -441,8 +466,9 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.taskdetails_checkbox: {
-			if(isComplete) { // 如果任务状态为已完成
-				this.updateTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKNORMAL, COMPLETEORCANCELTONORMAL);
+			if (isComplete) { // 如果任务状态为已完成
+				this.updateTaskStatus(task.getTaskId(), task.getTaskFrom(),
+						TASKNORMAL, COMPLETEORCANCELTONORMAL);
 				checkboxImageView.setImageResource(R.drawable.wl_task_checkbox);
 				this.titleEditText.setEnabled(true);
 				this.receiversRelativeLayout.setEnabled(true);
@@ -454,8 +480,10 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				updateClockTextView(remindnum, remindtype);
 				isComplete = false;
 			} else { // 如果任务状态为未完成
-				this.updateTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKCOMPLETE, NORMALTOCOMPLETEORCANCEL);
-				checkboxImageView.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
+				this.updateTaskStatus(task.getTaskId(), task.getTaskFrom(),
+						TASKCOMPLETE, NORMALTOCOMPLETEORCANCEL);
+				checkboxImageView
+						.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
 				this.disableView();
 				isComplete = true;
 			}
@@ -476,8 +504,9 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			break;
 		}
 		case R.id.taskdetais_clock: {
-			if(this.enddate.equals("")) {
-				Toast.makeText(getApplicationContext(), "请先设定截止日期", Toast.LENGTH_SHORT).show();
+			if (this.enddate.equals("")) {
+				Toast.makeText(getApplicationContext(), "请先设定截止日期",
+						Toast.LENGTH_SHORT).show();
 			} else {
 				ClockDialogUtil clockDialog = new ClockDialogUtil(
 						TaskDetailsActivity.this, this.remindnum,
@@ -494,7 +523,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			startActivityForResult(intent, 1);
 			break;
 		}
-		case R.id.taskdetails_reply: {
+		case R.id.task_reply_layout: {
 			Intent intent = new Intent(getApplicationContext(),
 					ReplyActivity.class);
 			intent.putExtra("title", task.getSubject());
@@ -504,9 +533,19 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 					R.anim.translate_out);
 			break;
 		}
+		case R.id.taskreply_reply: {
+			String content = replyContentEditText.getText().toString().trim();
+			if(content.equals("")) {
+				Toast.makeText(getApplicationContext(), "回复不能为空", Toast.LENGTH_SHORT).show();
+			} else {
+				addReply(task.getTaskId(), CommonUser.USERID, CommonUser.USEREMAIL, content);
+			}
+			replyContentEditText.setText("");
+			break;
+		}
 		case R.id.taskdetails_icon: {
-			if(priority != null) {
-				if(priority.equals("") || priority.equals("0")) {
+			if (priority != null) {
+				if (priority.equals("") || priority.equals("0")) {
 					this.updateTaskStar(task.getTaskId(), "1");
 					starIcon.setImageResource(R.drawable.wl_detail_ribbon_selected);
 					priority = "1";
@@ -524,7 +563,86 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	}
 	
 	/**
+	 * 添加回复
+	 * @param taskId
+	 * @param userid
+	 * @param useremail
+	 * @param content
+	 */
+	private void addReply(String taskId, String userid, String useremail,
+			String content) {
+		new AddReply(taskId, userid, useremail, content).execute("");
+	}
+
+	/**
+	 * 异步任务，用户添加回复
+	 * 
+	 * @author Silocean
+	 * 
+	 */
+	private class AddReply extends AsyncTask<String, Integer, String> {
+
+		private String taskId;
+		private String userId;
+		private String userEmail;
+		private String content;
+
+		public AddReply(String taskId, String userId, String userEmail,
+				String content) {
+			this.taskId = taskId;
+			this.userId = userId;
+			this.userEmail = userEmail;
+			this.content = content;
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			String json = "";
+			try {
+				InputStream inputStream = this.getClass().getClassLoader()
+						.getResourceAsStream("AddReply.xml");
+				byte[] data = StreamTool.read(inputStream);
+				String string = new String(data)
+						.replaceAll("\\&strTaskID", taskId)
+						.replaceAll("\\&strUserID", userId)
+						.replaceAll("\\&strMAILADDR", userEmail)
+						.replaceAll("\\&strATTFILES", "")
+						.replaceAll("\\&strREPLY", content);
+				data = string.getBytes();
+				json = WebServiceRequest.SendPost(inputStream, data,
+						"AddReplyResult");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return json;
+		}
+
+		@Override
+		protected void onPostExecute(String json) {
+			try {
+				if (parseUpdateJSON(json)) {
+					Reply reply = new Reply();
+					reply.setTaskId(taskId);
+					reply.setUserId(userId);
+					reply.setUserEmail(userEmail);
+					reply.setReplyContent(content);
+					reply.setCreateDate(TimeConvertTool.convertToString(new Date()));
+					updateReplyView(reply);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+		}
+
+	}
+
+	/**
 	 * 更新任务星标状态
+	 * 
 	 * @param taskId
 	 * @param status
 	 */
@@ -538,8 +656,9 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 
 	/**
 	 * 异步任务，用于给任务设置星标
+	 * 
 	 * @author Silocean
-	 *
+	 * 
 	 */
 	private class SetStarTask extends AsyncTask<String, Integer, String> {
 
@@ -558,9 +677,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				InputStream inputStream = this.getClass().getClassLoader()
 						.getResourceAsStream("SetStar.xml");
 				byte[] data = StreamTool.read(inputStream);
-				String string = new String(data)
-					.replaceAll("\\&strTaskID", taskId)
-					.replaceAll("\\&strStatus", status);
+				String string = new String(data).replaceAll("\\&strTaskID",
+						taskId).replaceAll("\\&strStatus", status);
 				data = string.getBytes();
 				json = WebServiceRequest.SendPost(inputStream, data,
 						"SetStarResult");
@@ -574,10 +692,10 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		protected void onPostExecute(String result) {
 			try {
 				if (parseUpdateJSON(result)) {
-					
+
 				} else {
-					Toast.makeText(getApplicationContext(), "设置星标任务失败", Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(getApplicationContext(), "设置星标任务失败",
+							Toast.LENGTH_SHORT).show();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -600,7 +718,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			this.updateNoteEditText(data.getStringExtra("note"));
 			break;
 		case 3: // 更新接收人
-			isReceiversChange = data.getBooleanExtra("isReceiversChange", false);
+			isReceiversChange = data
+					.getBooleanExtra("isReceiversChange", false);
 			receivers = data.getStringArrayListExtra("receivers");
 			this.updateReceiverView(data.getIntExtra("receiversNum", 0));
 			break;
@@ -608,19 +727,21 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			break;
 		}
 	}
-	
+
 	/**
 	 * 构建接收人字符串
+	 * 
 	 * @param receivers
 	 * @return
 	 */
 	private StringBuilder constructReceiversString(ArrayList<String> receivers) {
-		if(receivers.size() != 0) {
-			for(int i=0; i<receivers.size(); i++) {
+		StringBuilder sb = new StringBuilder();
+		if (receivers.size() != 0) {
+			for (int i = 0; i < receivers.size(); i++) {
 				sb.append("<string>");
 				sb.append(receivers.get(i));
 				sb.append("</string>");
-				if(i != receivers.size()-1) {
+				if (i != receivers.size() - 1) {
 					sb.append("\n");
 				}
 			}
@@ -651,7 +772,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		this.note = note;
 		this.noteEditText.setText(note);
 	}
-	
+
 	/**
 	 * 更新下部回复界面视图
 	 * 
@@ -662,13 +783,14 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		taskReplyRelativeLayout.setVisibility(View.VISIBLE);
 		replyEmailTextView.setText(reply.getUserEmail());
 		replyContentTextView.setText(replyContent);
-		replyTimeTextView.setText(TimeConvertTool.calDateTime(reply.getCreateDate()));
+		replyTimeTextView.setText(TimeConvertTool.calDateTime(reply
+				.getCreateDate()));
 	}
 
 	@Override
 	public void finish() {
 		subject = this.titleEditText.getText().toString().trim();
-		if(!subject.equals("")) {
+		if (!subject.equals("")) {
 			note = this.noteEditText.getText().toString().trim();
 			if (!this.subject.equals(task.getSubject())
 					|| !this.enddate.equals(task.getEnddate())
@@ -683,10 +805,11 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			setResult(1, intent);
 			super.finish();
 		} else {
-			Toast.makeText(getApplicationContext(), "标题不能为空", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), "标题不能为空",
+					Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 	/**
 	 * 更新任务详细信息
 	 */
@@ -696,11 +819,12 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		bundle.putInt("position", position);
 		bundle.putString("taskJSON", constructTaskJSON());
 	}
-	
+
 	/**
 	 * 异步任务，用户更新任务详细信息
+	 * 
 	 * @author Silocean
-	 *
+	 * 
 	 */
 	private class UpdateTask extends AsyncTask<String, Integer, String> {
 
@@ -708,117 +832,25 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		protected String doInBackground(String... params) {
 			String json = null;
 			try {
-				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("UpdateTask.xml");
-				byte[] data = StreamTool.read(inputStream);
-				String string = new String(data).replaceAll("\\&strTaskID", task.getTaskId())
-						.replaceAll("\\&USERID", task.getUserId())
-						.replaceAll("\\&MFROM", task.getTaskFrom())
-						.replaceAll("\\&SUBJECT", subject).replaceAll("\\&DISC", note)
-						.replaceAll("\\&PRIORITY", "").replaceAll("\\&ENDDATE", enddate)
-						.replaceAll("\\&REMINDTYPE", remindtype).replaceAll("\\&REMINDNUM", remindnum)
-						.replaceAll("\\&ATTFILES", "").replaceAll("<string>\\&string</string>", constructReceiversString(receivers).toString());
-				data = string.getBytes();
-				json = WebServiceRequest.SendPost(inputStream, data, "UpdateTaskResult");
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-			return json;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			try {
-				if(parseUpdateJSON(result)) {
-					//Toast.makeText(getApplicationContext(), "更改任务信息成功", Toast.LENGTH_SHORT).show();
-				} else {
-					Toast.makeText(getApplicationContext(), "更改任务信息失败", Toast.LENGTH_SHORT).show();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		protected void onProgressUpdate(Integer... values) {
-		}
-		
-	}
-	
-	/**
-	 * 构造任务json字符串
-	 * @return
-	 */
-	private String constructTaskJSON() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{\"SID\":");
-		sb.append("\""+task.getTaskId()+"\",");
-		sb.append("\"USERID\":");
-		sb.append("\""+task.getUserId()+"\",");
-		sb.append("\"MFROM\":");
-		sb.append("\""+task.getTaskFrom()+"\",");
-		sb.append("\"SUBJECT\":");
-		sb.append("\""+this.subject+"\",");
-		sb.append("\"DISC\":");
-		sb.append("\""+this.note+"\",");
-		sb.append("\"PRIORITY\":");
-		sb.append("\""+this.priority+"\",");
-		sb.append("\"ENDDATE\":");
-		sb.append("\""+this.enddate+"\",");
-		sb.append("\"REMINDTYPE\":");
-		sb.append("\""+this.remindtype+"\",");
-		sb.append("\"REMINDNUM\":");
-		sb.append("\""+this.remindnum+"\",");
-		sb.append("\"ATTFILES\":");
-		sb.append("\"\",");
-		sb.append("\"CREATEDATE\":");
-		sb.append("\""+task.getCreateDate()+"\"}");
-		return sb.toString();
-	}
-	
-	/**
-	 * 更新任务执行状态
-	 * @param taskId
-	 * @param useremail
-	 * @param status
-	 * @param tag
-	 */
-	private void updateTaskStatus(String taskId, String useremail, String status, int tag) {
-		new UpdateTaskStatus(taskId, useremail, status).execute("");
-		isTaskStatusChange = true;
-		bundle.putBoolean("isTaskStatusChange", isTaskStatusChange);
-		bundle.putInt("position", position);
-		bundle.putInt("tag", tag);
-	}
-	
-	/**
-	 * 异步任务，用于更新任务执行状态
-	 * @author Silocean
-	 *
-	 */
-	private class UpdateTaskStatus extends AsyncTask<String, Integer, String> {
-		
-		private String taskId = null;
-		private String useremail = null;
-		private String status = null;
-		
-		public UpdateTaskStatus(String taskId, String useremail, String status) {
-			this.taskId = taskId;
-			this.useremail = useremail;
-			this.status = status;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-			String json = "";
-			try {
-				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("UpdateTaskStatus.xml");
+				InputStream inputStream = this.getClass().getClassLoader()
+						.getResourceAsStream("UpdateTask.xml");
 				byte[] data = StreamTool.read(inputStream);
 				String string = new String(data)
-						.replaceAll("\\&strTaskID", taskId)
-						.replaceAll("\\&strEmail", useremail)
-						.replaceAll("\\&strStatus", status);
+						.replaceAll("\\&strTaskID", task.getTaskId())
+						.replaceAll("\\&USERID", task.getUserId())
+						.replaceAll("\\&MFROM", task.getTaskFrom())
+						.replaceAll("\\&SUBJECT", subject)
+						.replaceAll("\\&DISC", note)
+						.replaceAll("\\&PRIORITY", "")
+						.replaceAll("\\&ENDDATE", enddate)
+						.replaceAll("\\&REMINDTYPE", remindtype)
+						.replaceAll("\\&REMINDNUM", remindnum)
+						.replaceAll("\\&ATTFILES", "")
+						.replaceAll("<string>\\&string</string>",
+								constructReceiversString(receivers).toString());
 				data = string.getBytes();
-				json = WebServiceRequest.SendPost(inputStream, data, "UpdateTaskStatusResult");
+				json = WebServiceRequest.SendPost(inputStream, data,
+						"UpdateTaskResult");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -829,9 +861,11 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		protected void onPostExecute(String result) {
 			try {
 				if (parseUpdateJSON(result)) {
-					//Toast.makeText(getApplicationContext(), "更改任务状态成功", Toast.LENGTH_SHORT).show();
+					// Toast.makeText(getApplicationContext(), "更改任务信息成功",
+					// Toast.LENGTH_SHORT).show();
 				} else {
-					Toast.makeText(getApplicationContext(), "更改任务状态失败", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(), "更改任务信息失败",
+							Toast.LENGTH_SHORT).show();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -841,9 +875,117 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		@Override
 		protected void onProgressUpdate(Integer... values) {
 		}
-		
+
 	}
-	
+
+	/**
+	 * 构造任务json字符串
+	 * 
+	 * @return
+	 */
+	private String constructTaskJSON() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{\"SID\":");
+		sb.append("\"" + task.getTaskId() + "\",");
+		sb.append("\"USERID\":");
+		sb.append("\"" + task.getUserId() + "\",");
+		sb.append("\"MFROM\":");
+		sb.append("\"" + task.getTaskFrom() + "\",");
+		sb.append("\"SUBJECT\":");
+		sb.append("\"" + this.subject + "\",");
+		sb.append("\"DISC\":");
+		sb.append("\"" + this.note + "\",");
+		sb.append("\"PRIORITY\":");
+		sb.append("\"" + this.priority + "\",");
+		sb.append("\"ENDDATE\":");
+		sb.append("\"" + this.enddate + "\",");
+		sb.append("\"REMINDTYPE\":");
+		sb.append("\"" + this.remindtype + "\",");
+		sb.append("\"REMINDNUM\":");
+		sb.append("\"" + this.remindnum + "\",");
+		sb.append("\"ATTFILES\":");
+		sb.append("\"\",");
+		sb.append("\"CREATEDATE\":");
+		sb.append("\"" + task.getCreateDate() + "\"}");
+		return sb.toString();
+	}
+
+	/**
+	 * 更新任务执行状态
+	 * 
+	 * @param taskId
+	 * @param useremail
+	 * @param status
+	 * @param tag
+	 */
+	private void updateTaskStatus(String taskId, String useremail,
+			String status, int tag) {
+		new UpdateTaskStatus(taskId, useremail, status).execute("");
+		isTaskStatusChange = true;
+		bundle.putBoolean("isTaskStatusChange", isTaskStatusChange);
+		bundle.putInt("position", position);
+		bundle.putInt("tag", tag);
+	}
+
+	/**
+	 * 异步任务，用于更新任务执行状态
+	 * 
+	 * @author Silocean
+	 * 
+	 */
+	private class UpdateTaskStatus extends AsyncTask<String, Integer, String> {
+
+		private String taskId = null;
+		private String useremail = null;
+		private String status = null;
+
+		public UpdateTaskStatus(String taskId, String useremail, String status) {
+			this.taskId = taskId;
+			this.useremail = useremail;
+			this.status = status;
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			String json = "";
+			try {
+				InputStream inputStream = this.getClass().getClassLoader()
+						.getResourceAsStream("UpdateTaskStatus.xml");
+				byte[] data = StreamTool.read(inputStream);
+				String string = new String(data)
+						.replaceAll("\\&strTaskID", taskId)
+						.replaceAll("\\&strEmail", useremail)
+						.replaceAll("\\&strStatus", status);
+				data = string.getBytes();
+				json = WebServiceRequest.SendPost(inputStream, data,
+						"UpdateTaskStatusResult");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return json;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			try {
+				if (parseUpdateJSON(result)) {
+					// Toast.makeText(getApplicationContext(), "更改任务状态成功",
+					// Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(getApplicationContext(), "更改任务状态失败",
+							Toast.LENGTH_SHORT).show();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+		}
+
+	}
+
 	/**
 	 * 解析更新任务返回的json字符串
 	 * 

@@ -1,6 +1,7 @@
 package com.wunderlist.slidingmenu.activity;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.LinkedList;
 
 import org.json.JSONArray;
@@ -34,45 +35,51 @@ import com.wunderlist.tools.WebServiceRequest;
 
 /**
  * 回复界面
+ * 
  * @author Silocean
- *
+ * 
  */
-public class ReplyActivity extends ActionbarBaseActivity implements OnClickListener {
-	
+public class ReplyActivity extends ActionbarBaseActivity implements
+		OnClickListener {
+
 	private String barTitle = null;
 	private String replyJSON = null;
 	private String taskId = null;
-	
+
 	private RelativeLayout emptyLayout = null;
 	private ListView listView = null;
 	private ReplyListItemAdapter adapter = null;
 	private LinkedList<Reply> mReplys = null;
-	
+
 	private EditText replyContentEditText;
 	private Button replyButton;
-	
+
 	private String replyContent = null;
-	
+
 	@Override
 	@SuppressWarnings("deprecation")
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_reply);
 		MyActivityManager.addActivity("ReplyActivity", this);
-		emptyLayout =(RelativeLayout)this.findViewById(R.id.taskreply_emptylayout);
-		replyContentEditText = (EditText)this.findViewById(R.id.taskreply_comment);
-		replyButton = (Button)this.findViewById(R.id.taskreply_reply);
+		emptyLayout = (RelativeLayout) this
+				.findViewById(R.id.taskreply_emptylayout);
+		replyContentEditText = (EditText) this
+				.findViewById(R.id.taskreply_comment);
+		replyButton = (Button) this.findViewById(R.id.taskreply_reply);
 		replyButton.setOnClickListener(this);
-		listView = (ListView)this.findViewById(R.id.replylist);
-		adapter = new ReplyListItemAdapter(getApplicationContext(), R.layout.listitem_reply);
+		listView = (ListView) this.findViewById(R.id.replylist);
+		adapter = new ReplyListItemAdapter(getApplicationContext(),
+				R.layout.listitem_reply);
 		listView.setAdapter(adapter);
-		int width = getWindowManager().getDefaultDisplay().getWidth() - replyButton.getLayoutParams().width - 15;
+		int width = getWindowManager().getDefaultDisplay().getWidth()
+				- replyButton.getLayoutParams().width - 15;
 		LayoutParams layoutParams = replyContentEditText.getLayoutParams();
 		layoutParams.width = width;
 		replyContentEditText.setLayoutParams(layoutParams);
 		initData();
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	/**
 	 * 初始化界面数据
 	 */
@@ -82,7 +89,7 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		taskId = getIntent().getStringExtra("taskId");
 		this.getReply();
 	}
-	
+
 	/**
 	 * 更新回复列表
 	 */
@@ -91,7 +98,7 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		adapter.setData(mReplys);
 		adapter.notifyDataSetChanged();
 	}
-	
+
 	/**
 	 * 获取回复
 	 */
@@ -99,20 +106,25 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		GetReply task = new GetReply();
 		task.execute("");
 	}
-	
+
 	/**
 	 * 异步任务，用户该任务下的全部回复
 	 */
-	private class GetReply extends AsyncTask<String, Integer, LinkedList<Reply>> {
+	private class GetReply extends
+			AsyncTask<String, Integer, LinkedList<Reply>> {
 		LinkedList<Reply> replys = new LinkedList<Reply>();
+
 		@Override
 		protected LinkedList<Reply> doInBackground(String... arg0) {
 			try {
-				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("GetReply.xml");
+				InputStream inputStream = this.getClass().getClassLoader()
+						.getResourceAsStream("GetReply.xml");
 				byte[] data = StreamTool.read(inputStream);
-				String string = new String(data).replaceAll("\\&strTaskID", taskId);
+				String string = new String(data).replaceAll("\\&strTaskID",
+						taskId);
 				data = string.getBytes();
-				replyJSON = WebServiceRequest.SendPost(inputStream, data, "GetReplyResult");
+				replyJSON = WebServiceRequest.SendPost(inputStream, data,
+						"GetReplyResult");
 				replys = parseJSON(replyJSON);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -123,39 +135,35 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		@Override
 		protected void onPostExecute(LinkedList<Reply> replys) {
 			mReplys = replys;
-			if(replys.size() != 0) {
+			if (replys.size() != 0) {
 				emptyLayout.setVisibility(View.GONE);
 				listView.setVisibility(View.VISIBLE);
 				adapter.setData(replys);
 				adapter.notifyDataSetChanged();
-				
-				Reply reply = mReplys.getLast();
-				Intent intent = new Intent();
-				intent.putExtra("reply", reply);
-				setResult(1, intent);
 			}
 		}
 
 		@Override
 		protected void onProgressUpdate(Integer... values) {
 		}
-		
+
 	}
-	
+
 	/**
 	 * 解析json字符串
+	 * 
 	 * @param json
 	 * @return
 	 * @throws Exception
 	 */
 	private LinkedList<Reply> parseJSON(String json) throws Exception {
 		LinkedList<Reply> replys = new LinkedList<Reply>();
-		if(json != null) {
+		if (json != null) {
 			JSONObject object = new JSONObject(json);
 			int rows = Integer.parseInt(object.getString("rows"));
-			if(rows > 0) {
+			if (rows > 0) {
 				JSONArray array = new JSONArray(object.getString("Items"));
-				for(int i=0; i<array.length(); i++) {
+				for (int i = 0; i < array.length(); i++) {
 					JSONObject obj = array.getJSONObject(i);
 					Reply reply = new Reply();
 					reply.setReplyId(obj.getString("SID"));
@@ -163,7 +171,8 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 					reply.setUserId(obj.getString("USERID"));
 					reply.setUserEmail(obj.getString("MAILADDR"));
 					reply.setReplyContent(obj.getString("REPLY"));
-					reply.setCreateDate(obj.getString("CREATEDATE").replaceAll("/", "-"));
+					reply.setCreateDate(obj.getString("CREATEDATE").replaceAll(
+							"/", "-"));
 					replys.add(reply);
 				}
 			} else {
@@ -174,40 +183,43 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		}
 		return replys;
 	}
-	
+
 	/**
 	 * 格式化回复字符串
+	 * 
 	 * @param note
 	 * @return
 	 */
 	private String formatReplyContent(String replyContent) {
-		return replyContent.replaceAll("<[a-zA-Z]+>", "").replaceAll("</[a-zA-Z]+>", "")
-				.replaceAll("&nbsp;", " ");
+		return replyContent.replaceAll("<[a-zA-Z]+>", "")
+				.replaceAll("</[a-zA-Z]+>", "").replaceAll("&nbsp;", " ");
 	}
-	
+
 	/**
 	 * 回复列表数据填充器
+	 * 
 	 * @author Silocean
-	 *
+	 * 
 	 */
 	private class ReplyListItemAdapter extends BaseAdapter {
-		
+
 		private LinkedList<Reply> list;
 		private int resId;
 		private LayoutInflater inflater;
-		
+
 		private ViewHolder holder;
-		
+
 		public ReplyListItemAdapter(Context context, int resId) {
 			this.resId = resId;
 			this.list = new LinkedList<Reply>();
-			this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			this.inflater = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
-		
+
 		public void setData(LinkedList<Reply> replys) {
 			this.list = replys;
 		}
-		
+
 		@Override
 		public int getCount() {
 			return list.size();
@@ -226,29 +238,33 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			holder = new ViewHolder();
-			if(convertView == null) {
+			if (convertView == null) {
 				convertView = inflater.inflate(resId, null);
-				holder.replyEmailTextView = (TextView)convertView.findViewById(R.id.reply_email);
-				holder.replyContentTextView = (TextView)convertView.findViewById(R.id.reply_content);
-				holder.replyTimeTextView = (TextView)convertView.findViewById(R.id.reply_time);
+				holder.replyEmailTextView = (TextView) convertView
+						.findViewById(R.id.reply_email);
+				holder.replyContentTextView = (TextView) convertView
+						.findViewById(R.id.reply_content);
+				holder.replyTimeTextView = (TextView) convertView
+						.findViewById(R.id.reply_time);
 				convertView.setTag(holder);
 			} else {
-				holder = (ViewHolder)convertView.getTag();
+				holder = (ViewHolder) convertView.getTag();
 			}
 			Reply reply = this.list.get(position);
 			replyContent = formatReplyContent(reply.getReplyContent());
 			holder.replyEmailTextView.setText(reply.getUserEmail());
 			holder.replyContentTextView.setText(replyContent);
-			holder.replyTimeTextView.setText(TimeConvertTool.calDateTime(reply.getCreateDate()));
+			holder.replyTimeTextView.setText(TimeConvertTool.calDateTime(reply
+					.getCreateDate()));
 			return convertView;
 		}
-		
+
 		private class ViewHolder {
 			private TextView replyEmailTextView;
 			private TextView replyContentTextView;
 			private TextView replyTimeTextView;
 		}
-		
+
 	}
 
 	@Override
@@ -256,10 +272,12 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		switch (v.getId()) {
 		case R.id.taskreply_reply:
 			String content = replyContentEditText.getText().toString().trim();
-			if(content.equals("")) {
-				Toast.makeText(getApplicationContext(), "回复不能为空", Toast.LENGTH_SHORT).show();
+			if (content.equals("")) {
+				Toast.makeText(getApplicationContext(), "回复不能为空",
+						Toast.LENGTH_SHORT).show();
 			} else {
-				addReply(taskId, CommonUser.USERID, CommonUser.USEREMAIL, content);
+				addReply(taskId, CommonUser.USERID, CommonUser.USEREMAIL,
+						content);
 			}
 			replyContentEditText.setText("");
 			break;
@@ -267,9 +285,10 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 			break;
 		}
 	}
-	
+
 	/**
 	 * 添加回复
+	 * 
 	 * @param taskId
 	 * @param userid
 	 * @param useremail
@@ -279,23 +298,25 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 			String content) {
 		new AddReply(taskId, userid, useremail, content).execute("");
 	}
-	
+
 	/**
 	 * 异步任务，用户添加回复
+	 * 
 	 * @author Silocean
-	 *
+	 * 
 	 */
 	private class AddReply extends AsyncTask<String, Integer, String> {
-		
+
 		private String taskId;
-		private String userid;
-		private String useremail;
+		private String userId;
+		private String userEmail;
 		private String content;
 
-		public AddReply(String taskId, String userid, String useremail, String content) {
+		public AddReply(String taskId, String userId, String userEmail,
+				String content) {
 			this.taskId = taskId;
-			this.userid = userid;
-			this.useremail = useremail;
+			this.userId = userId;
+			this.userEmail = userEmail;
 			this.content = content;
 		}
 
@@ -303,12 +324,18 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		protected String doInBackground(String... params) {
 			String json = "";
 			try {
-				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("AddReply.xml");
+				InputStream inputStream = this.getClass().getClassLoader()
+						.getResourceAsStream("AddReply.xml");
 				byte[] data = StreamTool.read(inputStream);
-				String string = new String(data).replaceAll("\\&strTaskID", taskId).replaceAll("\\&strUserID", userid).replaceAll("\\&strMAILADDR", useremail)
-						.replaceAll("\\&strATTFILES", "").replaceAll("\\&strREPLY", content);
+				String string = new String(data)
+						.replaceAll("\\&strTaskID", taskId)
+						.replaceAll("\\&strUserID", userId)
+						.replaceAll("\\&strMAILADDR", userEmail)
+						.replaceAll("\\&strATTFILES", "")
+						.replaceAll("\\&strREPLY", content);
 				data = string.getBytes();
-				json = WebServiceRequest.SendPost(inputStream, data, "AddReplyResult");
+				json = WebServiceRequest.SendPost(inputStream, data,
+						"AddReplyResult");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -318,8 +345,18 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		@Override
 		protected void onPostExecute(String json) {
 			try {
-				if(parseSaveJSON(json)) {
+				if (parseUpdateJSON(json)) {
 					updateReplyList();
+
+					Reply reply = new Reply();
+					reply.setTaskId(taskId);
+					reply.setUserId(userId);
+					reply.setUserEmail(userEmail);
+					reply.setReplyContent(content);
+					reply.setCreateDate(TimeConvertTool.convertToString(new Date()));
+					Intent intent = new Intent();
+					intent.putExtra("reply", reply);
+					setResult(1, intent);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -329,17 +366,21 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		@Override
 		protected void onProgressUpdate(Integer... values) {
 		}
-		
+
 	}
+
 	/**
-	 * 解析json字符串（用户解析添加回复后返回的json数据）
+	 * 解析更新任务返回的json字符串
+	 * 
 	 * @param json
-	 * @return
+	 *            要解析的json字符串
+	 * @return 0表示出现异常，1表示保存成功
+	 * @throws Exception
 	 */
-	private boolean parseSaveJSON(String json) throws Exception {
-		if(json != null) {
+	private boolean parseUpdateJSON(String json) throws Exception {
+		if (json != null) {
 			JSONObject object = new JSONObject(json);
-			if(object.getString("msg").equals("保存成功!")) {
+			if (object.getString("status").equals("1")) {
 				return true;
 			}
 		}

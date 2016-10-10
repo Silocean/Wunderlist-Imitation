@@ -185,15 +185,25 @@
 	    android:id="@+id/taskdetails_bottomLayout"
 	    android:layout_alignParentBottom="true"
 	    android:layout_marginBottom="5dip" >
-	    <Button 
-	        android:layout_width="fill_parent"
+	    <EditText 
+	        android:layout_width="240dip"
 	        android:layout_height="wrap_content"
-	        android:id="@+id/taskdetails_reply"
+	        android:id="@+id/taskreply_comment"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginLeft="5dip"
+	        android:layout_centerVertical="true"
+	        android:hint="@string/activity_reply_addcomment"
+	        android:background="@drawable/wl_add_message_edit_text"
+	        android:maxLines="3"
+	        android:textSize="14sp"/>
+	    <Button 
+	        android:layout_width="50dip"
+	        android:layout_height="40dip"
+	        android:id="@+id/taskreply_reply"
 	        android:layout_alignParentRight="true"
 	        android:layout_centerVertical="true"
-	        android:layout_marginLeft="5dip"
 	        android:layout_marginRight="5dip"
-	        android:text="添加回复"
+	        android:text="@string/activity_reply_sendbutton"
 	        android:textColor="@color/walkthrough_button_text_color"
 	        android:background="@drawable/walkthrough_loginbutton_icon_selector" />
 	</RelativeLayout>

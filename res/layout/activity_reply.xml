@@ -60,7 +60,7 @@
 	        android:textSize="14sp"/>
 	    <Button 
 	        android:layout_width="50dip"
-	        android:layout_height="wrap_content"
+	        android:layout_height="40dip"
 	        android:id="@+id/taskreply_reply"
 	        android:layout_alignParentRight="true"
 	        android:layout_centerVertical="true"
