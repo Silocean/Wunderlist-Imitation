@@ -161,7 +161,7 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 					reply.setUserId(obj.getString("USERID"));
 					reply.setUserEmail(obj.getString("MAILADDR"));
 					reply.setReplyContent(obj.getString("REPLY"));
-					reply.setCreateDate(obj.getString("CREATEDATE"));
+					reply.setCreateDate(obj.getString("CREATEDATE").replaceAll("/", "-"));
 					replys.add(reply);
 				}
 			} else {

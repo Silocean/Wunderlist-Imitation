@@ -42,6 +42,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 
 	private ImageView checkboxImageView;
 	private EditText titleEditText;
+	private ImageView starIcon;
 	private RelativeLayout receiversRelativeLayout;
 	private RelativeLayout deadlineRelativeLayout;
 	private RelativeLayout clockRelativeLayout;
@@ -70,10 +71,12 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private String note = null;
 	private String remindnum = null;
 	private String remindtype = null;
+	private String priority = null;
 	private boolean isReceiversChange = false;
 	private ArrayList<String> receivers = new ArrayList<String>();
 	private boolean isTaskChange = false;
 	private boolean isTaskStatusChange = false;
+	private boolean isTaskStarChange = false;
 	
 	private Bundle bundle = new Bundle();
 	
@@ -90,6 +93,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		checkboxImageView.setOnClickListener(this);
 		titleEditText = (EditText) findViewById(R.id.taskdetails_title);
 		titleEditText.setOnClickListener(this);
+		starIcon = (ImageView) findViewById(R.id.taskdetails_icon);
+		starIcon.setOnClickListener(this);
 		receiversRelativeLayout = (RelativeLayout) findViewById(R.id.taskdetails_receivers);
 		receiversRelativeLayout.setOnClickListener(this);
 		deadlineRelativeLayout = (RelativeLayout) findViewById(R.id.taskdetais_deadline);
@@ -121,14 +126,12 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private void initData() {
 		position = getIntent().getIntExtra("position", 0);
 		isComplete = getIntent().getBooleanExtra("isComplete", false);
-		if(isComplete) {
-			checkboxImageView.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
-		}
 		task = (Task) getIntent().getSerializableExtra("task");
 		barTitle = getIntent().getStringExtra("title");
 		enddate = task.getEnddate();
 		remindnum = task.getRemindnum();
 		remindtype = task.getRemindtype();
+		priority = task.getPriority();
 		super.setTitle(barTitle);
 		titleEditText.setText(task.getSubject());
 		subject = task.getSubject();
@@ -138,6 +141,24 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		this.updateClockTextView(task.getRemindnum(), task.getRemindtype());
 		if (!task.getUserId().equals(CommonUser.USERID) || isComplete) { // 如果该任务不是用户自己发起的或者该任务已完成
 			this.disableView();
+		}
+		if(isComplete) {
+			checkboxImageView.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
+			if(priority != null) {
+				if(priority.equals("") || priority.equals("0")) {
+					starIcon.setImageResource(R.drawable.wl_task_ribbon);
+				} else {
+					starIcon.setImageResource(R.drawable.wl_detail_ribbon_selected_disabled);
+				}
+			}
+		} else {
+			if(priority != null) {
+				if(priority.equals("") || priority.equals("0")) {
+					starIcon.setImageResource(R.drawable.wl_task_ribbon);
+				} else {
+					starIcon.setImageResource(R.drawable.wl_detail_ribbon_selected);
+				}
+			}
 		}
 	}
 	
@@ -160,6 +181,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		this.deadlineRelativeLayout.setEnabled(false);
 		this.clockRelativeLayout.setEnabled(false);
 		this.noteEditText.setEnabled(false);
+		this.starIcon.setEnabled(false);
 		this.enddateTextView.setTextColor(getResources().getColor(R.color.listitem_text_complete_color));
 		this.clockTextView.setTextColor(getResources().getColor(R.color.groupname_color_normal));
 		this.enddateiImageView.setImageResource(R.drawable.wl_taskdetails_icon_deadline);
@@ -268,7 +290,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 					reply.setUserId(obj.getString("USERID"));
 					reply.setUserEmail(obj.getString("MAILADDR"));
 					reply.setReplyContent(obj.getString("REPLY"));
-					reply.setCreateDate(obj.getString("CREATEDATE"));
+					reply.setCreateDate(obj.getString("CREATEDATE").replaceAll("/", "-"));
 					replys.add(reply);
 				}
 			} else {
@@ -287,19 +309,18 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 */
 	public void updateDateView(String dateTime) {
 		this.enddate = dateTime;
-		if(enddate.equals("1900/1/1 0:00:00")) {
-			enddateTextView.setText("");
+		if (!dateTime.equals("")) {
+			String enddateStr = "截止至 ";
+			enddateStr += TimeConvertTool.convertToSpecialEnddateStr(enddate);
+			enddateTextView.setText(enddateStr);
+			this.changeDateView();
 		} else {
-			if (!dateTime.equals("")) {
-				String enddateStr = "截止至 ";
-				enddateStr += TimeConvertTool.convertToSpecialEnddateStr(enddate);
-				enddateTextView.setText(enddateStr);
-				this.changeDateView();
-			} else {
-				enddateTextView.setText(dateTime);
-				enddateiImageView
-						.setImageResource(R.drawable.wl_taskdetails_icon_deadline);
-			}
+			enddateTextView.setText(dateTime);
+			enddateiImageView
+					.setImageResource(R.drawable.wl_taskdetails_icon_deadline);
+			this.remindnum = "";
+			this.remindtype = "";
+			this.updateClockTextView(remindnum, remindtype);
 		}
 	}
 
@@ -423,7 +444,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.taskdetails_checkbox: {
-			//Toast.makeText(getApplicationContext(), "标记", Toast.LENGTH_SHORT).show();
 			if(isComplete) { // 如果任务状态为已完成
 				this.updateTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKNORMAL, COMPLETEORCANCELTONORMAL);
 				checkboxImageView.setImageResource(R.drawable.wl_task_checkbox);
@@ -432,6 +452,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				this.deadlineRelativeLayout.setEnabled(true);
 				this.clockRelativeLayout.setEnabled(true);
 				this.noteEditText.setEnabled(true);
+				this.starIcon.setEnabled(true);
 				updateDateView(enddate);
 				updateClockTextView(remindnum, remindtype);
 				isComplete = false;
@@ -482,9 +503,90 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 					R.anim.translate_out);
 			break;
 		}
+		case R.id.taskdetails_icon: {
+			if(priority != null) {
+				if(priority.equals("") || priority.equals("0")) {
+					this.updateTaskStar(task.getTaskId(), "1");
+					starIcon.setImageResource(R.drawable.wl_detail_ribbon_selected);
+					priority = "1";
+				} else {
+					this.updateTaskStar(task.getTaskId(), "0");
+					starIcon.setImageResource(R.drawable.wl_task_ribbon);
+					priority = "0";
+				}
+			}
+			break;
+		}
 		default:
 			break;
 		}
+	}
+	
+	/**
+	 * 更新任务星标状态
+	 * @param taskId
+	 * @param status
+	 */
+	private void updateTaskStar(String taskId, String status) {
+		new SetStarTask(taskId, status).execute("");
+		isTaskStarChange = true;
+		bundle.putBoolean("isTaskStarChange", isTaskStarChange);
+		bundle.putString("taskStar", status);
+		bundle.putInt("position", position);
+	}
+
+	/**
+	 * 异步任务，用于给任务设置星标
+	 * @author Silocean
+	 *
+	 */
+	private class SetStarTask extends AsyncTask<String, Integer, String> {
+
+		private String taskId;
+		private String status;
+
+		public SetStarTask(String taskId, String status) {
+			this.taskId = taskId;
+			this.status = status;
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			String json = "";
+			try {
+				InputStream inputStream = this.getClass().getClassLoader()
+						.getResourceAsStream("SetStar.xml");
+				byte[] data = StreamTool.read(inputStream);
+				String string = new String(data)
+					.replaceAll("\\&strTaskID", taskId)
+					.replaceAll("\\&strStatus", status);
+				data = string.getBytes();
+				json = WebServiceRequest.SendPost(inputStream, data,
+						"SetStarResult");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return json;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			try {
+				if (parseUpdateJSON(result)) {
+					
+				} else {
+					Toast.makeText(getApplicationContext(), "设置星标任务失败", Toast.LENGTH_SHORT)
+							.show();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+		}
+
 	}
 
 	@Override
@@ -548,7 +650,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		this.note = note;
 		this.noteEditText.setText(note);
 	}
-
+	
 	/**
 	 * 更新下部回复界面视图
 	 * 

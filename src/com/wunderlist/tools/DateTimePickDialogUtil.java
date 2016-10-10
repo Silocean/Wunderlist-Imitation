@@ -45,7 +45,7 @@ public class DateTimePickDialogUtil implements OnDateChangedListener, OnTimeChan
 
 	public void init(DatePicker datePicker, TimePicker timePicker) {
 		Calendar calendar = Calendar.getInstance();
-		if (!(null == initDateTime || "".equals(initDateTime) || "1900/1/1 0:00:00".equals(initDateTime))) {
+		if (!(null == initDateTime || "".equals(initDateTime))) {
 			calendar = this.getCalendarByInintData(initDateTime);
 		} else {
 			initDateTime = calendar.get(Calendar.YEAR) + "-"
