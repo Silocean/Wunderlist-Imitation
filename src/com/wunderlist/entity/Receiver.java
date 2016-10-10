@@ -7,6 +7,7 @@ package com.wunderlist.entity;
  */
 public class Receiver {
 	
+	private String receiverId;
 	private String receiverEmail;
 	private String receiverName;
 	private String receiverSex;
@@ -16,9 +17,10 @@ public class Receiver {
 	
 	public Receiver() {
 	}
-	public Receiver(String receiverEmail, String receiverName,
+	public Receiver(String receiverId, String receiverEmail, String receiverName,
 			String receiverSex, String receiverAge, String receiverHobby,
 			String receiverMobile) {
+		this.receiverId = receiverId;
 		this.receiverEmail = receiverEmail;
 		this.receiverName = receiverName;
 		this.receiverSex = receiverSex;
@@ -62,12 +64,20 @@ public class Receiver {
 	public void setReceiverMobile(String receiverMobile) {
 		this.receiverMobile = receiverMobile;
 	}
+	public String getReceiverId() {
+		return receiverId;
+	}
+	public void setReceiverId(String receiverId) {
+		this.receiverId = receiverId;
+	}
+	
 	@Override
 	public String toString() {
-		return "Receiver [receiverEmail=" + receiverEmail + ", receiverName="
-				+ receiverName + ", receiverSex=" + receiverSex
-				+ ", receiverAge=" + receiverAge + ", receiverHobby="
-				+ receiverHobby + ", receiverMobile=" + receiverMobile + "]";
+		return "Receiver [receiverId=" + receiverId + ", receiverEmail="
+				+ receiverEmail + ", receiverName=" + receiverName
+				+ ", receiverSex=" + receiverSex + ", receiverAge="
+				+ receiverAge + ", receiverHobby=" + receiverHobby
+				+ ", receiverMobile=" + receiverMobile + "]";
 	}
 	
 }

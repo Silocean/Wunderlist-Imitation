@@ -34,7 +34,9 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 	
 	private ArrayList<String> orignialReceivers = new ArrayList<String>();
 	private ArrayList<String> receivers;
+	private ArrayList<String> receiversId;
 	private ArrayList<String> newAddReceivers;
+	private ArrayList<String> newAddReceiversId;
 	
 	
 	@Override
@@ -77,6 +79,7 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 	private void initData() {
 		setTitle("成员列表");
 		receivers = getIntent().getStringArrayListExtra("receivers");
+		receiversId = getIntent().getStringArrayListExtra("receiversId");
 		orignialReceivers.addAll(receivers);
 		adapter.setData(receivers);
 		adapter.notifyDataSetChanged();
@@ -141,6 +144,7 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 				holder.deleteImageView.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
 						receivers.remove(position);
+						receiversId.remove(position);
 						updateReceiverList();
 					}
 				});
@@ -166,6 +170,7 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 			isReceiversChange = false; // 表示接收人没有改变
 		}
 		intent.putStringArrayListExtra("receivers", receivers);
+		intent.putStringArrayListExtra("receiversId", receiversId);
 		intent.putExtra("isReceiversChange", isReceiversChange);
 		intent.putExtra("receiversNum", receivers.size());
 		setResult(3, intent);
@@ -184,7 +189,9 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 		switch (resultCode) {
 		case 1:
 			newAddReceivers = data.getStringArrayListExtra("selectedContracts");
+			newAddReceiversId = data.getStringArrayListExtra("selectedContractsId");
 			receivers.addAll(newAddReceivers);
+			receiversId.addAll(newAddReceiversId);
 			adapter.setData(receivers);
 			adapter.notifyDataSetChanged();
 			break;

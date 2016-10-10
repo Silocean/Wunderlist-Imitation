@@ -1,5 +1,7 @@
 package com.wunderlist.slidingmenu.activity;
 
+import cn.jpush.android.api.JPushInterface;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -29,6 +31,18 @@ public class ActionbarBaseActivity extends SherlockActivity {
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		JPushInterface.onResume(this);
+	};
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		JPushInterface.onPause(this);
 	}
 
 }

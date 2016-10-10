@@ -1,9 +1,16 @@
 package com.wunderlist.slidingmenu.activity;
 
+import java.util.Map;
+import java.util.Set;
+
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.widget.Toast;
+import cn.jpush.android.api.JPushInterface;
+import cn.jpush.android.api.TagAliasCallback;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -21,26 +28,29 @@ import com.wunderlist.tools.MyActivityManager;
 
 /**
  * 主窗体，包含三个fragment
+ * 
  * @author Silocean
- *
+ * 
  */
 public class SlidingActivity extends SherlockFragmentActivity {
-	
+
 	private SlidingMenu mSlidingMenu;
 	private LeftFragment leftFragment;
 	private RightFragment rightFragment;
 	public static MainFragment mainFragment;
 	private static ActionBar actionBar = null;
-	
+
 	public static Menu menu = null;
 	private MenuItem item = null;
-	
+
 	public static boolean isRefreshing = true;
-	
+
 	private long waitTime = 2000;
-	private long touchTime = 0 ;
+	private long touchTime = 0;
 	private long currentTime = 0;
 	
+	public static boolean isForeground = false;
+
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
@@ -53,6 +63,12 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		init();
 	}
 	
+	@Override
+	protected void onNewIntent(Intent intent) {
+		mainFragment.updateTaskBoxList();
+		super.onNewIntent(intent);
+	}
+
 	/**
 	 * 初始化Common类中的静态变量
 	 */
@@ -63,18 +79,25 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		CommonUser.USEREMAIL = user.getUserEmail();
 		CommonUser.USERNAME = user.getUserName();
 		CommonUser.UERPASSWORD = user.getUserPassword();
+		JPushInterface.setAlias(getApplicationContext(), CommonUser.USERID.replaceAll("-", "_"),
+				new TagAliasCallback() {
+					public void gotResult(int responseCode, String alias,
+							Set<String> tags) {
+						System.out.println(responseCode+"=="+alias+"="+tags);
+					}
+				});
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		item = menu.add(0, 0, 0, "接收中...");
 		return super.onCreateOptionsMenu(menu);
 	}
-	
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		SlidingActivity.menu = menu;
-		if(isRefreshing) {
+		if (isRefreshing) {
 			item.setTitle("接收中...");
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		} else {
@@ -82,15 +105,15 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		}
 		return super.onPrepareOptionsMenu(menu);
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == KeyEvent.KEYCODE_MENU) { // 屏蔽菜单键
+		if (keyCode == KeyEvent.KEYCODE_MENU) { // 屏蔽菜单键
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -102,44 +125,51 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	/**
 	 * 设置是否处于正在刷新数据状态
+	 * 
 	 * @param isRefreshing
 	 */
 	public static void setIsRefreshing(boolean isRefreshing) {
 		SlidingActivity.isRefreshing = isRefreshing;
 	}
-	
+
 	/**
 	 * 设置标题栏标题
+	 * 
 	 * @param title
 	 */
 	public static void setBarTitle(String title) {
 		actionBar.setTitle(title);
 	}
-	
+
 	/**
 	 * 获取标题栏标题
+	 * 
 	 * @return
 	 */
 	public static String getBarTitle() {
 		return actionBar.getTitle().toString();
 	}
-	
+
 	/**
 	 * 初始化三个fragment
 	 */
 	private void init() {
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.slidingMenu);
-		mSlidingMenu.setLeftView(getLayoutInflater().inflate(R.layout.left_frame, null));
-		mSlidingMenu.setRightView(getLayoutInflater().inflate(R.layout.right_frame, null));
-		mSlidingMenu.setCenterView(getLayoutInflater().inflate(R.layout.center_frame, null));
+		mSlidingMenu.setLeftView(getLayoutInflater().inflate(
+				R.layout.left_frame, null));
+		mSlidingMenu.setRightView(getLayoutInflater().inflate(
+				R.layout.right_frame, null));
+		mSlidingMenu.setCenterView(getLayoutInflater().inflate(
+				R.layout.center_frame, null));
 
-		FragmentTransaction t = this.getSupportFragmentManager().beginTransaction();
+		FragmentTransaction t = this.getSupportFragmentManager()
+				.beginTransaction();
 		mainFragment = new MainFragment(this);
 		t.replace(R.id.center_frame, mainFragment);
-		
+
 		leftFragment = new LeftFragment(mainFragment);
 		t.replace(R.id.left_frame, leftFragment);
 
@@ -162,21 +192,43 @@ public class SlidingActivity extends SherlockFragmentActivity {
 	public void showRight() {
 		mSlidingMenu.showRightView();
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		currentTime = System.currentTimeMillis();
-		if(currentTime-touchTime >= waitTime) {
-			Toast.makeText(getApplicationContext(), "再按一次返回键退出", Toast.LENGTH_SHORT).show();
+		if (currentTime - touchTime >= waitTime) {
+			Toast.makeText(getApplicationContext(), "再按一次返回键退出",
+					Toast.LENGTH_SHORT).show();
 			touchTime = currentTime;
 		} else {
 			// 返回桌面，并不是真正的退出
-			/*Intent i = new Intent(Intent.ACTION_MAIN);
-			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			i.addCategory(Intent.CATEGORY_HOME);
-			startActivity(i);*/
+			/*
+			 * Intent i = new Intent(Intent.ACTION_MAIN);
+			 * i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			 * i.addCategory(Intent.CATEGORY_HOME); startActivity(i);
+			 */
+			for (Map.Entry<String, Activity> element : MyActivityManager.activities.entrySet()) {
+				if(element.getValue() != null) {
+					element.getValue().finish();
+				}
+			}
+			MyActivityManager.activities.clear();
 			super.onBackPressed();
 		}
 	}
 	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		isForeground = true;
+		JPushInterface.onResume(this);
+	};
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		isForeground = false;
+		JPushInterface.onPause(this);
+	}
+
 }

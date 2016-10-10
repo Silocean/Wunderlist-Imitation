@@ -1,5 +1,7 @@
 package com.wunderlist.slidingmenu.activity;
 
+import cn.jpush.android.api.JPushInterface;
+
 import com.example.wunderlist.R;
 import com.wunderlist.tools.MyActivityManager;
 
@@ -45,6 +47,18 @@ public class RegisterAndLoginActivity extends Activity implements OnClickListene
 		default:
 			break;
 		}
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		JPushInterface.onResume(this);
+	};
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		JPushInterface.onPause(this);
 	}
 	
 }

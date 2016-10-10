@@ -7,38 +7,9 @@
     <RelativeLayout 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/addreceiver_toplayout"
-        android:layout_alignParentTop="true"
-	    android:layout_marginTop="8dip" >
-	    <EditText 
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:id="@+id/addreceiver_email_edittext"
-	        android:inputType="textEmailAddress"
-	        android:background="@drawable/wl_add_message_edit_text"
-	        android:hint="@string/activity_addreceiver_addemail"
-	        android:textSize="12sp"
-	        android:layout_marginLeft="5dip"
-	        android:layout_marginRight="5dip"
-	        android:layout_centerVertical="true" />
-	    <ImageView 
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:contentDescription="@string/app_name"
-	        android:id="@+id/addreceiver_rightaddicon"
-	        android:visibility="gone"
-	        android:layout_alignParentRight="true"
-	        android:layout_marginRight="10dip"
-	        android:layout_centerVertical="true"
-	        android:src="@drawable/addreceiver_useremail_edittext_rightaddicon" />
-    </RelativeLayout>
-    
-    <RelativeLayout 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:layout_marginTop="10dip"
         android:id="@+id/addreceiver_recenttext_layout"
-        android:layout_below="@id/addreceiver_toplayout" >
+        android:layout_alignParentTop="true" >
 	    <TextView 
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"

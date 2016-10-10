@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import cn.jpush.android.api.JPushInterface;
+
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Common;
 import com.wunderlist.entity.CommonUser;
@@ -220,6 +222,18 @@ public class LoginActivity extends Activity implements OnClickListener {
 			return false;
 		}
 		return true;
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		JPushInterface.onResume(this);
+	};
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		JPushInterface.onPause(this);
 	}
 
 }

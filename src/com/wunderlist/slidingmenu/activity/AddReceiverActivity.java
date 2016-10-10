@@ -11,14 +11,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,13 +34,10 @@ import com.wunderlist.tools.WebServiceRequest;
  * @author Silocean
  *
  */
-public class AddReceiverActivity extends ActionbarBaseActivity implements OnClickListener {
+public class AddReceiverActivity extends ActionbarBaseActivity {
 	
 	private ListView listView;
 	private AddReceiverListItemAdapter adapter;
-	
-	private EditText emailEditText;
-	private ImageView addEmailIcon;
 	
 	private ArrayList<String> receivers;
 	
@@ -52,6 +46,7 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 	private LinkedList<Receiver> tempList = new LinkedList<Receiver>();
 	
 	private ArrayList<String> selectedContracts = new ArrayList<String>();
+	private ArrayList<String> selectedContractsId = new ArrayList<String>();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,59 +55,10 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 		listView = (ListView)this.findViewById(R.id.addreceiverlist);
 		adapter = new AddReceiverListItemAdapter(getApplicationContext(), R.layout.listitem_addreceiver);
 		listView.setAdapter(adapter);
-		emailEditText = (EditText)this.findViewById(R.id.addreceiver_email_edittext);
-		addEmailIcon = (ImageView)this.findViewById(R.id.addreceiver_rightaddicon);
-		emailEditText.addTextChangedListener(new UserEmailEditTextWatcher());
-		addEmailIcon.setOnClickListener(this);
 		setTitle("添加接收人");
 		receivers = getIntent().getStringArrayListExtra("receivers");
 		this.getContracts();
 		super.onCreate(savedInstanceState);
-	}
-	
-	/**
-	 * useremail编辑框监视器
-	 * @author Silocean
-	 *
-	 */
-	private class UserEmailEditTextWatcher implements TextWatcher {
-
-		@Override
-		public void afterTextChanged(Editable s) {
-		}
-
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count,
-				int after) {
-		}
-
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before,
-				int count) {
-			if(s.toString().matches(Common.EMAILREGEX)) {
-				addEmailIcon.setVisibility(View.VISIBLE);
-			} else {
-				addEmailIcon.setVisibility(View.GONE);
-			}
-			dynamicMatchEmail(s.toString());
-		}
-		
-	}
-	
-	/**
-	 * 根据输入的邮件地址动态的查询符合的接收人
-	 * @param str
-	 */
-	private void dynamicMatchEmail(String str) {
-		tempList.removeAll(tempList);
-		for(int i=0; i<contracts.size(); i++) {
-			Receiver receiver = contracts.get(i);
-			if(receiver.getReceiverEmail().startsWith(str)) {
-				tempList.add(receiver);
-			}
-		}
-		adapter.setData(tempList);
-		adapter.notifyDataSetChanged();
 	}
 	
 	/**
@@ -183,6 +129,7 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 				public void onClick(View v) {
 					if(!selectedContracts.contains(((Receiver)getItem(position)).getReceiverEmail())) {
 						selectedContracts.add(((Receiver)getItem(position)).getReceiverEmail());
+						selectedContractsId.add(((Receiver)getItem(position)).getReceiverId());
 						contracts.remove(position);
 						adapter.setData(contracts);
 						adapter.notifyDataSetChanged();
@@ -263,6 +210,7 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject obj = array.getJSONObject(i);
 					Receiver receiver = new Receiver();
+					receiver.setReceiverId(obj.getString("SID"));
 					receiver.setReceiverEmail(obj.getString("EMAIL"));
 					receiver.setReceiverName(obj.getString("USERNAME"));
 					receiver.setReceiverSex(obj.getString("SEX"));
@@ -284,30 +232,9 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 	public void finish() {
 		Intent intent = new Intent();
 		intent.putStringArrayListExtra("selectedContracts", selectedContracts);
+		intent.putStringArrayListExtra("selectedContractsId", selectedContractsId);
 		setResult(1, intent);
 		super.finish();
-	}
-
-	@Override
-	public void onClick(View v) {
-		String email = emailEditText.getText().toString().trim();
-		if(!email.equals(CommonUser.USEREMAIL)) {
-			if(contracts.size() > 0) {
-				if(!contracts.get(0).getReceiverEmail().equals(email)) {
-					Receiver receiver = new Receiver("", "", "", "", "", "");
-					receiver.setReceiverEmail(emailEditText.getText().toString().trim());
-					contracts.addFirst(receiver);
-				}
-			} else {
-				Receiver receiver = new Receiver("", "", "", "", "", "");
-				receiver.setReceiverEmail(email);
-				contracts.addFirst(receiver);
-			}
-			adapter.setData(contracts);
-			adapter.notifyDataSetChanged();
-		} else {
-			Toast.makeText(getApplicationContext(), "你不能添加自己为接收人", Toast.LENGTH_SHORT).show();
-		}
 	}
 
 }

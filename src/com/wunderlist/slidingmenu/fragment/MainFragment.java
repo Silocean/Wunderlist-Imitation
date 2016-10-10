@@ -123,7 +123,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	public static long timeEnd = 0L;
 	
 	private UIHandler handler = new UIHandler();
-
+	
 	@SuppressLint("HandlerLeak")
 	private class UIHandler extends Handler {
 		@Override
@@ -144,7 +144,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 
 	public MainFragment() {
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -152,15 +152,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		mainfragmentLayout = (RelativeLayout) view
 				.findViewById(R.id.head_layout);
 		taskEditText = (EditText) view.findViewById(R.id.taskEdit);
-		/*
-		 * taskEditText.setOnEditorActionListener(new OnEditorActionListener() {
-		 * public boolean onEditorAction(TextView v, int actionId, KeyEvent
-		 * event) { if (actionId == EditorInfo.IME_ACTION_SEND) { String subject
-		 * = taskEditText.getText().toString().trim(); if (!subject.equals(""))
-		 * { taskEditText.setText(""); addTask(subject); } else {
-		 * Toast.makeText(getActivity(), "主题不能为空", Toast.LENGTH_SHORT).show(); }
-		 * } return false; } });
-		 */
 		taskEditText.setOnKeyListener(new OnKeyListener() {
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER

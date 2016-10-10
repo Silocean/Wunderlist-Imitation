@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import cn.jpush.android.api.JPushInterface;
+
 import com.example.wunderlist.R;
 import com.wunderlist.entity.User;
 import com.wunderlist.sqlite.SQLiteService;
@@ -62,5 +64,17 @@ public class StartActivity extends Activity {
 		}
 		
 	};
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		JPushInterface.onResume(this);
+	};
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		JPushInterface.onPause(this);
+	}
 	
 }

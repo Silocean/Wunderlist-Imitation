@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import cn.jpush.api.JPushClient;
+import cn.jpush.api.MessageResult;
 
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Common;
@@ -28,6 +30,7 @@ import com.wunderlist.entity.Reply;
 import com.wunderlist.entity.Task;
 import com.wunderlist.tools.ClockDialogUtil;
 import com.wunderlist.tools.DateTimePickDialogUtil;
+import com.wunderlist.tools.JPushUtil;
 import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.TimeConvertTool;
@@ -78,6 +81,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private String replyContent = null;
 	private boolean isReceiversChange = false;
 	private ArrayList<String> receivers = new ArrayList<String>();
+	private ArrayList<String> receiversId = new ArrayList<String>();
 	private boolean isTaskChange = false;
 	private boolean isTaskStatusChange = false;
 	private boolean isTaskStarChange = false;
@@ -424,6 +428,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		protected void onPostExecute(String json) {
 			try {
 				receivers = parseReceiverJSON(json);
+				receiversId = parseReceiverIdJSON(json);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -442,7 +447,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * 解析获取接收人返回的json字符串
 	 * 
 	 * @param json
-	 * @return 返回数据条目数量
+	 * @return
 	 */
 	private ArrayList<String> parseReceiverJSON(String json) throws Exception {
 		ArrayList<String> receivers = new ArrayList<String>();
@@ -460,6 +465,30 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			Common.ToastIfNetworkProblem(getApplicationContext());
 		}
 		return receivers;
+	}
+
+	/**
+	 * 解析获取接收人ID返回的json字符串
+	 * 
+	 * @param json
+	 * @return
+	 */
+	private ArrayList<String> parseReceiverIdJSON(String json) throws Exception {
+		ArrayList<String> receiversId = new ArrayList<String>();
+		if (json != null) {
+			JSONObject object = new JSONObject(json);
+			int rows = Integer.parseInt(object.getString("rows"));
+			if (rows > 0) {
+				JSONArray array = new JSONArray(object.getString("Items"));
+				for (int i = 0; i < array.length(); i++) {
+					JSONObject obj = array.getJSONObject(i);
+					receiversId.add(obj.getString("TOUSERID"));
+				}
+			}
+		} else {
+			Common.ToastIfNetworkProblem(getApplicationContext());
+		}
+		return receiversId;
 	}
 
 	@Override
@@ -494,6 +523,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 					ReceiversActivity.class);
 			intent.putExtra("title", task.getSubject());
 			intent.putStringArrayListExtra("receivers", receivers);
+			intent.putStringArrayListExtra("receiversId", receiversId);
 			startActivityForResult(intent, 3);
 			break;
 		}
@@ -535,10 +565,12 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		}
 		case R.id.taskreply_reply: {
 			String content = replyContentEditText.getText().toString().trim();
-			if(content.equals("")) {
-				Toast.makeText(getApplicationContext(), "回复不能为空", Toast.LENGTH_SHORT).show();
+			if (content.equals("")) {
+				Toast.makeText(getApplicationContext(), "回复不能为空",
+						Toast.LENGTH_SHORT).show();
 			} else {
-				addReply(task.getTaskId(), CommonUser.USERID, CommonUser.USEREMAIL, content);
+				addReply(task.getTaskId(), CommonUser.USERID,
+						CommonUser.USEREMAIL, content);
 			}
 			replyContentEditText.setText("");
 			break;
@@ -561,9 +593,10 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			break;
 		}
 	}
-	
+
 	/**
 	 * 添加回复
+	 * 
 	 * @param taskId
 	 * @param userid
 	 * @param useremail
@@ -626,7 +659,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 					reply.setUserId(userId);
 					reply.setUserEmail(userEmail);
 					reply.setReplyContent(content);
-					reply.setCreateDate(TimeConvertTool.convertToString(new Date()));
+					reply.setCreateDate(TimeConvertTool
+							.convertToString(new Date()));
 					updateReplyView(reply);
 				}
 			} catch (Exception e) {
@@ -692,7 +726,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		protected void onPostExecute(String result) {
 			try {
 				if (parseUpdateJSON(result)) {
-
 				} else {
 					Toast.makeText(getApplicationContext(), "设置星标任务失败",
 							Toast.LENGTH_SHORT).show();
@@ -721,6 +754,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			isReceiversChange = data
 					.getBooleanExtra("isReceiversChange", false);
 			receivers = data.getStringArrayListExtra("receivers");
+			receiversId = data.getStringArrayListExtra("receiversId");
 			this.updateReceiverView(data.getIntExtra("receiversNum", 0));
 			break;
 		default:
@@ -841,7 +875,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 						.replaceAll("\\&MFROM", task.getTaskFrom())
 						.replaceAll("\\&SUBJECT", subject)
 						.replaceAll("\\&DISC", note)
-						.replaceAll("\\&PRIORITY", "")
+						.replaceAll("\\&PRIORITY", task.getPriority())
 						.replaceAll("\\&ENDDATE", enddate)
 						.replaceAll("\\&REMINDTYPE", remindtype)
 						.replaceAll("\\&REMINDNUM", remindnum)
@@ -851,6 +885,13 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				data = string.getBytes();
 				json = WebServiceRequest.SendPost(inputStream, data,
 						"UpdateTaskResult");
+				for (int i = 0; i < receivers.size(); i++) {
+					if (!receivers.get(i).equals(CommonUser.USEREMAIL)) {
+						System.out.println(receiversId.get(i));
+						sendCustomMessageWithAlias(task.getTaskFrom(),
+								receiversId.get(i));
+					}
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -1002,6 +1043,16 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			}
 		}
 		return false;
+	}
+
+	private void sendCustomMessageWithAlias(String mfrom, String receiverId) {
+		JPushClient client = new JPushClient(
+				JPushUtil.getMasterSecret(getApplicationContext()),
+				JPushUtil.getAppKey(getApplicationContext()));
+		MessageResult result = client.sendCustomMessageWithAlias(
+				JPushUtil.getRandomSendNo(), receiverId.replaceAll("-", "_"),
+				mfrom, "任务信息发生变更");
+		System.out.println(result.getErrcode() + "===" + result.getErrmsg());
 	}
 
 }

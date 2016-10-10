@@ -127,5 +127,5 @@ public class ChooseBgActivity extends ActionbarBaseActivity {
 		setResult(1, intent);
 		super.finish();
 	}
-
+	
 }
