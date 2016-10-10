@@ -497,7 +497,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		task.setUserId(obj.getString("USERID"));
 		task.setTaskFrom(obj.getString("MFROM"));
 		task.setSubject(obj.getString("SUBJECT"));
-		task.setDisc(obj.getString("DISC"));
 		task.setPriority(obj.getString("PRIORITY"));
 		task.setEnddate(obj.getString("ENDDATE"));
 		task.setRemindtype(obj.getString("REMINDTYPE"));
@@ -635,7 +634,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					task.setUserId(obj.getString("USERID"));
 					task.setTaskFrom(obj.getString("MFROM"));
 					task.setSubject(obj.getString("SUBJECT"));
-					task.setDisc(obj.getString("DISC"));
 					task.setEnddate(obj.getString("ENDDATE").replaceAll("/",
 							"-"));
 					task.setRemindtype(obj.getString("REMINDTYPE"));

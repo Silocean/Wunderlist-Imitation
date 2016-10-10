@@ -51,7 +51,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private RelativeLayout receiversRelativeLayout;
 	private RelativeLayout deadlineRelativeLayout;
 	private RelativeLayout clockRelativeLayout;
-	private EditText noteEditText;
 	private ImageView enddateiImageView;
 	private TextView enddateTextView;
 	private ImageView clockiImageView;
@@ -74,7 +73,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private String subject = null;
 	private String enddate = null;
 	private String clock = null;
-	private String note = null;
 	private String remindnum = null;
 	private String remindtype = null;
 	private String priority = null;
@@ -108,8 +106,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		deadlineRelativeLayout.setOnClickListener(this);
 		clockRelativeLayout = (RelativeLayout) findViewById(R.id.taskdetais_clock);
 		clockRelativeLayout.setOnClickListener(this);
-		noteEditText = (EditText) findViewById(R.id.taskdetails_note);
-		noteEditText.setOnClickListener(this);
 		enddateiImageView = (ImageView) findViewById(R.id.taskdetails_deadline_icon);
 		enddateTextView = (TextView) findViewById(R.id.taskdetails_deadline_text);
 		clockiImageView = (ImageView) findViewById(R.id.taskdetails_clock_icon);
@@ -150,8 +146,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		super.setTitle(barTitle);
 		titleEditText.setText(task.getSubject());
 		subject = task.getSubject();
-		note = this.formatNoteAndReplyContent(task.getDisc());
-		noteEditText.setText(note);
 		this.updateDateView(enddate);
 		this.updateClockTextView(task.getRemindnum(), task.getRemindtype());
 		if (!task.getUserId().equals(CommonUser.USERID) || isComplete) { // 如果该任务不是用户自己发起的或者该任务已完成
@@ -179,17 +173,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	}
 
 	/**
-	 * 格式化笔记字符串
-	 * 
-	 * @param note
-	 * @return
-	 */
-	private String formatNoteAndReplyContent(String str) {
-		return str.replaceAll("<[a-zA-Z]+>", "").replaceAll("</[a-zA-Z]+>", "")
-				.replaceAll("&nbsp;", " ");
-	}
-
-	/**
 	 * 把某些控件设置为不可用
 	 */
 	private void disableView() {
@@ -197,7 +180,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		this.receiversRelativeLayout.setEnabled(false);
 		this.deadlineRelativeLayout.setEnabled(false);
 		this.clockRelativeLayout.setEnabled(false);
-		this.noteEditText.setEnabled(false);
 		this.starIcon.setEnabled(false);
 		this.enddateTextView.setTextColor(getResources().getColor(
 				R.color.listitem_text_complete_color));
@@ -503,7 +485,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				this.receiversRelativeLayout.setEnabled(true);
 				this.deadlineRelativeLayout.setEnabled(true);
 				this.clockRelativeLayout.setEnabled(true);
-				this.noteEditText.setEnabled(true);
 				this.starIcon.setEnabled(true);
 				updateDateView(enddate);
 				updateClockTextView(remindnum, remindtype);
@@ -543,14 +524,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 						this.remindtype);
 				clockDialog.showClockDialog();
 			}
-			break;
-		}
-		case R.id.taskdetails_note: {
-			Intent intent = new Intent(getApplicationContext(),
-					NoteActivity.class);
-			intent.putExtra("taskDisc", note);
-			intent.putExtra("title", task.getSubject());
-			startActivityForResult(intent, 1);
 			break;
 		}
 		case R.id.task_reply_layout: {
@@ -747,9 +720,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		case 1: // 更新回复
 			this.updateReplyView((Reply) data.getSerializableExtra("reply"));
 			break;
-		case 2: // 更新笔记
-			this.updateNoteEditText(data.getStringExtra("note"));
-			break;
 		case 3: // 更新接收人
 			isReceiversChange = data
 					.getBooleanExtra("isReceiversChange", false);
@@ -798,22 +768,11 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	}
 
 	/**
-	 * 更新笔记视图
-	 * 
-	 * @param note
-	 */
-	private void updateNoteEditText(String note) {
-		this.note = note;
-		this.noteEditText.setText(note);
-	}
-
-	/**
 	 * 更新下部回复界面视图
 	 * 
 	 * @param reply
 	 */
 	private void updateReplyView(Reply reply) {
-		replyContent = this.formatNoteAndReplyContent(reply.getReplyContent());
 		taskReplyRelativeLayout.setVisibility(View.VISIBLE);
 		replyEmailTextView.setText(reply.getUserEmail());
 		replyContentTextView.setText(replyContent);
@@ -825,12 +784,11 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	public void finish() {
 		subject = this.titleEditText.getText().toString().trim();
 		if (!subject.equals("")) {
-			note = this.noteEditText.getText().toString().trim();
 			if (!this.subject.equals(task.getSubject())
 					|| !this.enddate.equals(task.getEnddate())
 					|| !(this.remindnum + "").equals(task.getRemindnum())
 					|| !(this.remindtype + "").equals(task.getRemindtype())
-					|| !this.note.equals(task.getDisc()) || isReceiversChange) {
+					|| isReceiversChange) {
 				isTaskChange = true;
 				this.updateTask();
 			}
@@ -874,7 +832,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 						.replaceAll("\\&USERID", task.getUserId())
 						.replaceAll("\\&MFROM", task.getTaskFrom())
 						.replaceAll("\\&SUBJECT", subject)
-						.replaceAll("\\&DISC", note)
 						.replaceAll("\\&PRIORITY", task.getPriority())
 						.replaceAll("\\&ENDDATE", enddate)
 						.replaceAll("\\&REMINDTYPE", remindtype)
@@ -934,8 +891,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		sb.append("\"" + task.getTaskFrom() + "\",");
 		sb.append("\"SUBJECT\":");
 		sb.append("\"" + this.subject + "\",");
-		sb.append("\"DISC\":");
-		sb.append("\"" + this.note + "\",");
 		sb.append("\"PRIORITY\":");
 		sb.append("\"" + this.priority + "\",");
 		sb.append("\"ENDDATE\":");
