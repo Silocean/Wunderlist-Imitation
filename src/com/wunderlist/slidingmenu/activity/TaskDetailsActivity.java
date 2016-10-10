@@ -632,19 +632,23 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	@Override
 	public void finish() {
 		subject = this.titleEditText.getText().toString().trim();
-		note = this.noteEditText.getText().toString().trim();
-		if (!this.subject.equals(task.getSubject())
-				|| !this.enddate.equals(task.getEnddate())
-				|| !(this.remindnum + "").equals(task.getRemindnum())
-				|| !(this.remindtype + "").equals(task.getRemindtype())
-				|| !this.note.equals(task.getDisc()) || isReceiversChange) {
-			isTaskChange = true;
-			updateTask();
+		if(!subject.equals("")) {
+			note = this.noteEditText.getText().toString().trim();
+			if (!this.subject.equals(task.getSubject())
+					|| !this.enddate.equals(task.getEnddate())
+					|| !(this.remindnum + "").equals(task.getRemindnum())
+					|| !(this.remindtype + "").equals(task.getRemindtype())
+					|| !this.note.equals(task.getDisc()) || isReceiversChange) {
+				isTaskChange = true;
+				updateTask();
+			}
+			Intent intent = new Intent();
+			intent.putExtra("bundle", bundle);
+			setResult(1, intent);
+			super.finish();
+		} else {
+			Toast.makeText(getApplicationContext(), "标题不能为空", Toast.LENGTH_SHORT).show();
 		}
-		Intent intent = new Intent();
-		intent.putExtra("bundle", bundle);
-		setResult(1, intent);
-		super.finish();
 	}
 	
 	/**

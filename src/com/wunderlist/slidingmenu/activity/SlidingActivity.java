@@ -20,7 +20,11 @@ public class SlidingActivity extends SherlockFragmentActivity {
 	private RightFragment rightFragment;
 	public static MainFragment mainFragment;
 	private static ActionBar actionBar = null;
-
+	
+	public static Menu menu = null;
+	
+	public static boolean isRefreshing = true;
+	
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
@@ -30,10 +34,24 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		setContentView(R.layout.main);
 		init();
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		SlidingActivity.menu = menu;
+		MenuItem item = menu.add(0, 0, 0, "接收中...");
+		if(isRefreshing) {
+			item.setTitle("接收中...");
+			//item.setIcon(R.drawable.wl_actionbar_addreceiver);
+			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		} else {
+			item.setTitle("");
+		}
+		return super.onPrepareOptionsMenu(menu);
 	}
 	
 	@Override
@@ -47,6 +65,10 @@ public class SlidingActivity extends SherlockFragmentActivity {
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	public static void setIsRefreshing(boolean isRefreshing) {
+		SlidingActivity.isRefreshing = isRefreshing;
 	}
 	
 	/**
@@ -71,14 +93,15 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		mSlidingMenu.setCenterView(getLayoutInflater().inflate(R.layout.center_frame, null));
 
 		FragmentTransaction t = this.getSupportFragmentManager().beginTransaction();
-		leftFragment = new LeftFragment();
+		mainFragment = new MainFragment(this);
+		t.replace(R.id.center_frame, mainFragment);
+		
+		leftFragment = new LeftFragment(mainFragment);
 		t.replace(R.id.left_frame, leftFragment);
 
 		rightFragment = new RightFragment();
 		t.replace(R.id.right_frame, rightFragment);
 
-		mainFragment = new MainFragment();
-		t.replace(R.id.center_frame, mainFragment);
 		t.commit();
 	}
 

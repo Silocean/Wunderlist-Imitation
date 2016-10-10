@@ -87,114 +87,6 @@
 		        android:duplicateParentState="true"
 		        android:textColor="@drawable/groupname_color_selector" />
 		</RelativeLayout>
-		<!-- <RelativeLayout 
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:id="@+id/group_execute"
-		    android:background="@drawable/row_bg_icon_selector" >
-		    
-			<ImageView 
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:id="@+id/groupitem_execute_icon"
-			    android:layout_alignParentLeft="true"
-			    android:layout_marginLeft="5dip"
-			    android:layout_centerVertical="true"
-			    android:duplicateParentState="true"
-			    android:src="@drawable/inbox_icon_selector" />
-		    <TextView 
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:id="@+id/groupitem_execute_name"
-		        android:layout_toRightOf="@id/groupitem_execute_icon"
-		        android:layout_marginLeft="10dip"
-		        android:layout_centerVertical="true"
-		        android:textSize="20sp"
-		        android:text="我执行的"
-		        android:duplicateParentState="true"
-		        android:textColor="@drawable/groupname_color_selector" />
-		    <TextView 
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:id="@+id/groupitem_execute_count"
-		        android:layout_alignParentRight="true"
-		        android:layout_marginRight="10dip"
-		        android:layout_centerVertical="true"
-		        android:duplicateParentState="true"
-		        android:textColor="@drawable/groupname_color_selector" />
-		</RelativeLayout>
-		<RelativeLayout 
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:id="@+id/group_follow"
-		    android:background="@drawable/row_bg_icon_selector" >
-		    
-			<ImageView 
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:id="@+id/groupitem_follow_icon"
-			    android:layout_alignParentLeft="true"
-			    android:layout_marginLeft="5dip"
-			    android:layout_centerVertical="true"
-			    android:duplicateParentState="true"
-			    android:src="@drawable/inbox_icon_selector" />
-		    <TextView 
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:id="@+id/groupitem_follow_name"
-		        android:layout_toRightOf="@id/groupitem_follow_icon"
-		        android:layout_marginLeft="10dip"
-		        android:layout_centerVertical="true"
-		        android:textSize="20sp"
-		        android:text="我关注的"
-		        android:duplicateParentState="true"
-		        android:textColor="@drawable/groupname_color_selector" />
-		    <TextView 
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:id="@+id/groupitem_follow_count"
-		        android:layout_alignParentRight="true"
-		        android:layout_marginRight="10dip"
-		        android:layout_centerVertical="true"
-		        android:duplicateParentState="true"
-		        android:textColor="@drawable/groupname_color_selector" />
-		</RelativeLayout> -->
-		<!-- <RelativeLayout 
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:id="@+id/group_initiate"
-		    android:background="@drawable/row_bg_icon_selector" >
-		    
-			<ImageView 
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:id="@+id/groupitem_initiate_icon"
-			    android:layout_alignParentLeft="true"
-			    android:layout_marginLeft="5dip"
-			    android:layout_centerVertical="true"
-			    android:duplicateParentState="true"
-			    android:src="@drawable/inbox_icon_selector" />
-		    <TextView 
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:id="@+id/groupitem_initiate_name"
-		        android:layout_toRightOf="@id/groupitem_initiate_icon"
-		        android:layout_marginLeft="10dip"
-		        android:layout_centerVertical="true"
-		        android:textSize="20sp"
-		        android:text="我发起的"
-		        android:duplicateParentState="true"
-		        android:textColor="@drawable/groupname_color_selector" />
-		    <TextView 
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:id="@+id/groupitem_initiate_count"
-		        android:layout_alignParentRight="true"
-		        android:layout_marginRight="10dip"
-		        android:layout_centerVertical="true"
-		        android:duplicateParentState="true"
-		        android:textColor="@drawable/groupname_color_selector" />
-		</RelativeLayout> -->
     </LinearLayout>
     
    	<RelativeLayout 
@@ -209,7 +101,7 @@
    	          android:layout_alignParentLeft="true"
    	          android:layout_marginLeft="1dip"
    	          android:layout_centerVertical="true"
-   	          android:src="@drawable/wl_sidebar_icon_sync" />
+   	          android:src="@drawable/sidebar_sync_icon_selector" />
    	      <TextView 
    	          android:layout_width="wrap_content"
    	          android:layout_height="wrap_content"

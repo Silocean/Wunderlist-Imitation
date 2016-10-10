@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.wunderlist.R;
+import com.wunderlist.entity.Common;
 import com.wunderlist.entity.Receiver;
 import com.wunderlist.entity.User;
 import com.wunderlist.tools.StreamTool;
@@ -75,10 +76,10 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before,
 				int count) {
-			if(s.toString().equals("")) {
-				addEmailIcon.setVisibility(View.GONE);
-			} else {
+			if(s.toString().matches(Common.EMAILREGEX)) {
 				addEmailIcon.setVisibility(View.VISIBLE);
+			} else {
+				addEmailIcon.setVisibility(View.GONE);
 			}
 			dynamicMatchEmail(s.toString());
 		}

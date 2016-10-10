@@ -11,6 +11,8 @@ public class Common {
 	
 	public static final String WEBSERVICEPATH = "http://10.0.2.2/XMALWEBSERVICE/TaskService.asmx";
 	
+	public static final String EMAILREGEX = "[\\w[.-]]+@[\\w[.-]]+\\.[\\w]+";
+	
 	public static final Integer[] BGS = { R.drawable.wl_background0,
 		R.drawable.wl_background1, R.drawable.wl_background2,
 		R.drawable.wl_background3, R.drawable.wl_background4,
