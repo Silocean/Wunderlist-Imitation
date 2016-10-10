@@ -13,6 +13,12 @@ public final class R {
         public static final int translate_in=0x7f040001;
         public static final int translate_out=0x7f040002;
     }
+    public static final class array {
+        public static final int day=0x7f0d0000;
+        public static final int hour=0x7f0d0001;
+        public static final int minute=0x7f0d0002;
+        public static final int type=0x7f0d0003;
+    }
     public static final class attr {
         /**  Custom divider drawable to use for elements in the action bar. 
          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"

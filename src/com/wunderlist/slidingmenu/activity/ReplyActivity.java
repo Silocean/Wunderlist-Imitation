@@ -51,6 +51,8 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 	private EditText replyContentEditText;
 	private Button replyButton;
 	
+	private String replyContent = null;
+	
 	@Override
 	@SuppressWarnings("deprecation")
 	protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +176,16 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 	}
 	
 	/**
+	 * 格式化回复字符串
+	 * @param note
+	 * @return
+	 */
+	private String formatReplyContent(String replyContent) {
+		return replyContent.replaceAll("<[a-zA-Z]+>", "").replaceAll("</[a-zA-Z]+>", "")
+				.replaceAll("&nbsp;", " ");
+	}
+	
+	/**
 	 * 回复列表数据填充器
 	 * @author Silocean
 	 *
@@ -224,8 +236,9 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 				holder = (ViewHolder)convertView.getTag();
 			}
 			Reply reply = this.list.get(position);
+			replyContent = formatReplyContent(reply.getReplyContent());
 			holder.replyEmailTextView.setText(reply.getUserEmail());
-			holder.replyContentTextView.setText(reply.getReplyContent());
+			holder.replyContentTextView.setText(replyContent);
 			holder.replyTimeTextView.setText(TimeConvertTool.calDateTime(reply.getCreateDate()));
 			return convertView;
 		}

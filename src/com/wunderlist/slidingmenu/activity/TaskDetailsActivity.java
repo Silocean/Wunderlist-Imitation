@@ -72,6 +72,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private String remindnum = null;
 	private String remindtype = null;
 	private String priority = null;
+	private String replyContent = null;
 	private boolean isReceiversChange = false;
 	private ArrayList<String> receivers = new ArrayList<String>();
 	private boolean isTaskChange = false;
@@ -135,7 +136,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		super.setTitle(barTitle);
 		titleEditText.setText(task.getSubject());
 		subject = task.getSubject();
-		note = this.formatNote(task.getDisc());
+		note = this.formatNoteAndReplyContent(task.getDisc());
 		noteEditText.setText(note);
 		this.updateDateView(enddate);
 		this.updateClockTextView(task.getRemindnum(), task.getRemindtype());
@@ -167,8 +168,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * @param note
 	 * @return
 	 */
-	private String formatNote(String note) {
-		return note.replaceAll("<[a-zA-Z]+>", "").replaceAll("</[a-zA-Z]+>", "")
+	private String formatNoteAndReplyContent(String str) {
+		return str.replaceAll("<[a-zA-Z]+>", "").replaceAll("</[a-zA-Z]+>", "")
 				.replaceAll("&nbsp;", " ");
 	}
 	
@@ -254,11 +255,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		protected void onPostExecute(LinkedList<Reply> replys) {
 			if (replys.size() != 0) {
 				Reply reply = replys.getLast();
-				taskReplyRelativeLayout.setVisibility(View.VISIBLE);
-				replyEmailTextView.setText(reply.getUserEmail());
-				replyContentTextView.setText(reply.getReplyContent());
-				replyTimeTextView.setText(TimeConvertTool.calDateTime(reply
-						.getCreateDate()));
+				updateReplyView(reply);
 			}
 		}
 
@@ -479,10 +476,14 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			break;
 		}
 		case R.id.taskdetais_clock: {
-			ClockDialogUtil clockDialog = new ClockDialogUtil(
-					TaskDetailsActivity.this, task.getRemindnum(),
-					task.getRemindtype());
-			clockDialog.showClockDialog();
+			if(this.enddate.equals("")) {
+				Toast.makeText(getApplicationContext(), "请先设定截止日期", Toast.LENGTH_SHORT).show();
+			} else {
+				ClockDialogUtil clockDialog = new ClockDialogUtil(
+						TaskDetailsActivity.this, this.remindnum,
+						this.remindtype);
+				clockDialog.showClockDialog();
+			}
 			break;
 		}
 		case R.id.taskdetails_note: {
@@ -657,9 +658,10 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * @param reply
 	 */
 	private void updateReplyView(Reply reply) {
+		replyContent = this.formatNoteAndReplyContent(reply.getReplyContent());
 		taskReplyRelativeLayout.setVisibility(View.VISIBLE);
 		replyEmailTextView.setText(reply.getUserEmail());
-		replyContentTextView.setText(reply.getReplyContent());
+		replyContentTextView.setText(replyContent);
 		replyTimeTextView.setText(TimeConvertTool.calDateTime(reply.getCreateDate()));
 	}
 
@@ -759,7 +761,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		sb.append("\"DISC\":");
 		sb.append("\""+this.note+"\",");
 		sb.append("\"PRIORITY\":");
-		sb.append("\"0\",");
+		sb.append("\""+this.priority+"\",");
 		sb.append("\"ENDDATE\":");
 		sb.append("\""+this.enddate+"\",");
 		sb.append("\"REMINDTYPE\":");

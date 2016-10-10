@@ -97,7 +97,6 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		case android.R.id.home:
 			showLeft();
 			break;
-			
 		default:
 			break;
 		}

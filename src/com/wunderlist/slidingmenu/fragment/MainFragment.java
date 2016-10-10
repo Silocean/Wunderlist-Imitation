@@ -20,12 +20,15 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -79,7 +82,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 
 	private static boolean showCompleteTasks = true;
 
-	private StringBuilder sb = new StringBuilder();
 	private String[] receivers = new String[] { CommonUser.USEREMAIL };
 
 	private static RelativeLayout mainfragmentLayout;
@@ -97,7 +99,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private RelativeLayout sortByEnddateLayout;
 
 	private ListView listView;
-	
+
 	private String priority = null;
 
 	private EditText taskEditText = null;
@@ -121,6 +123,22 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	public static long duration = 0L;
 	public static long timeStart = 0L;
 	public static long timeEnd = 0L;
+	
+	private UIHandler handler = new UIHandler();
+
+	@SuppressLint("HandlerLeak")
+	private class UIHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case 1:
+				Common.ToastIfNetworkProblem(getActivity());
+				break;
+			default:
+				break;
+			}
+		}
+	}
 
 	public MainFragment(SlidingActivity slidingActivity) {
 		MainFragment.slidingActivity = slidingActivity;
@@ -136,10 +154,19 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		mainfragmentLayout = (RelativeLayout) view
 				.findViewById(R.id.head_layout);
 		taskEditText = (EditText) view.findViewById(R.id.taskEdit);
-		taskEditText.setOnEditorActionListener(new OnEditorActionListener() {
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_SEND) {
+		/*
+		 * taskEditText.setOnEditorActionListener(new OnEditorActionListener() {
+		 * public boolean onEditorAction(TextView v, int actionId, KeyEvent
+		 * event) { if (actionId == EditorInfo.IME_ACTION_SEND) { String subject
+		 * = taskEditText.getText().toString().trim(); if (!subject.equals(""))
+		 * { taskEditText.setText(""); addTask(subject); } else {
+		 * Toast.makeText(getActivity(), "主题不能为空", Toast.LENGTH_SHORT).show(); }
+		 * } return false; } });
+		 */
+		taskEditText.setOnKeyListener(new OnKeyListener() {
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if (keyCode == KeyEvent.KEYCODE_ENTER
+						&& event.getAction() == KeyEvent.ACTION_DOWN) {
 					String subject = taskEditText.getText().toString().trim();
 					if (!subject.equals("")) {
 						taskEditText.setText("");
@@ -256,9 +283,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		protected void onProgressUpdate(Integer... values) {
 		}
 	}
-	
+
 	/**
 	 * 给任务设置星标
+	 * 
 	 * @param taskId
 	 * @param status
 	 */
@@ -268,8 +296,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 
 	/**
 	 * 异步任务，用于给任务设置星标
+	 * 
 	 * @author Silocean
-	 *
+	 * 
 	 */
 	private class SetStarTask extends AsyncTask<String, Integer, String> {
 
@@ -290,9 +319,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				InputStream inputStream = this.getClass().getClassLoader()
 						.getResourceAsStream("SetStar.xml");
 				byte[] data = StreamTool.read(inputStream);
-				String string = new String(data)
-					.replaceAll("\\&strTaskID", taskId)
-					.replaceAll("\\&strStatus", status);
+				String string = new String(data).replaceAll("\\&strTaskID",
+						taskId).replaceAll("\\&strStatus", status);
 				data = string.getBytes();
 				json = WebServiceRequest.SendPost(inputStream, data,
 						"SetStarResult");
@@ -308,8 +336,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				if (parseUpdateJSON(result)) {
 					updateTaskBoxList(position, status);
 				} else {
-					Toast.makeText(getActivity(), "设置星标任务失败", Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(getActivity(), "设置星标任务失败",
+							Toast.LENGTH_SHORT).show();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -329,6 +357,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	 * @return
 	 */
 	private StringBuilder constructReceiversString(String[] receivers) {
+		StringBuilder sb = new StringBuilder();
 		if (receivers.length != 0) {
 			for (int i = 0; i < receivers.length; i++) {
 				sb.append("<string>");
@@ -452,9 +481,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 更新任务列表（不从网络获取数据，用于任务星标状态更改后的刷新）
+	 * 
 	 * @param position
 	 * @param status
 	 */
@@ -480,6 +510,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		task.setTaskFrom(obj.getString("MFROM"));
 		task.setSubject(obj.getString("SUBJECT"));
 		task.setDisc(obj.getString("DISC"));
+		task.setPriority(obj.getString("PRIORITY"));
 		task.setEnddate(obj.getString("ENDDATE"));
 		task.setRemindtype(obj.getString("REMINDTYPE"));
 		task.setRemindnum(obj.getString("REMINDNUM"));
@@ -548,8 +579,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					adapter.notifyDataSetChanged();
 				}
 				tasksComplete = tasks;
-
-				System.out.println(tasksTotal);
 
 				hideRefreshMenu();
 				showOrDismissCompleteTasks();
@@ -632,7 +661,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				System.out.println("没有数据");
 			}
 		} else { // 网络连接出现问题
-			// Common.ToastIfNetworkProblem(getActivity());
+			handler.sendEmptyMessage(1);
 		}
 		return tasks;
 	}
@@ -816,7 +845,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 						R.color.listitem_text_complete_color));
 				holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags()
 						| Paint.STRIKE_THRU_TEXT_FLAG);
-				if (task.getPriority() != null && !task.getPriority().equals("")
+				if (task.getPriority() != null
+						&& !task.getPriority().equals("")
 						&& task.getPriority().equals("1")) { // 该任务是星标任务
 					holder.taskIcon
 							.setImageResource(R.drawable.wl_task_ribbon_disabled_selected);
@@ -870,13 +900,15 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				holder.taskIcon.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
 						priority = list.get(position).getPriority();
-						if(priority != null) {
-							if(priority.equals("") || priority.equals("0")) {
-								//holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon);
-								setStar(list.get(position).getTaskId(), "1", position);
+						if (priority != null) {
+							if (priority.equals("") || priority.equals("0")) {
+								// holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon);
+								setStar(list.get(position).getTaskId(), "1",
+										position);
 							} else {
-								//holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon_selected);
-								setStar(list.get(position).getTaskId(), "0", position);
+								// holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon_selected);
+								setStar(list.get(position).getTaskId(), "0",
+										position);
 							}
 						}
 					}
@@ -961,8 +993,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				holder.taskIcon
 						.setImageResource(R.drawable.wl_task_ribbon_selected);
 			} else {
-				holder.taskIcon
-						.setImageResource(R.drawable.wl_task_ribbon);
+				holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon);
 			}
 			final String title = task.getSubject();
 			holder.taskTitle.setText(title);
@@ -990,9 +1021,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		 * 
 		 * @param position
 		 * @param convertView
-		 * @param task 
+		 * @param task
 		 */
-		private void initListItemOthers(int position, View convertView, Task task) {
+		private void initListItemOthers(int position, View convertView,
+				Task task) {
 			this.initListItemView(position, convertView, task);
 			holder.taskEnddate = (TextView) convertView
 					.findViewById(R.id.task_middle_enddate);
@@ -1139,7 +1171,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				int tag = bundle.getInt("tag");
 				this.updateTaskBoxList(position, tag);
 			}
-			if(isTaskStarChange) {
+			if (isTaskStarChange) {
 				int position = bundle.getInt("position");
 				String status = bundle.getString("taskStar");
 				this.updateTaskBoxList(position, status);
