@@ -36,6 +36,9 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	
 	private static final String TASKNORMAL = "1";
 	private static final String TASKCOMPLETE = "2";
+	
+	private static final int NORMALTOCOMPLETEORCANCEL = 1;
+	private static final int COMPLETEORCANCELTONORMAL = 2;
 
 	private ImageView checkboxImageView;
 	private EditText titleEditText;
@@ -57,6 +60,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private Button replyButton;
 	
 	private boolean isComplete = false;
+	
+	private int position = 0;
 
 	private Task task = null;
 	private String barTitle = null;
@@ -115,6 +120,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * 填充界面数据
 	 */
 	private void initData() {
+		position = getIntent().getIntExtra("position", 0);
 		isComplete = getIntent().getBooleanExtra("isComplete", false);
 		if(isComplete) {
 			checkboxImageView.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
@@ -493,7 +499,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		case R.id.taskdetails_checkbox: {
 			//Toast.makeText(getApplicationContext(), "标记", Toast.LENGTH_SHORT).show();
 			if(isComplete) { // 如果任务状态为已完成
-				this.updataTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKNORMAL);
+				this.updataTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKNORMAL, COMPLETEORCANCELTONORMAL);
 				checkboxImageView.setImageResource(R.drawable.wl_task_checkbox);
 				this.titleEditText.setEnabled(true);
 				this.receiversRelativeLayout.setEnabled(true);
@@ -504,7 +510,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				updateClockTextView(remindnum, remindtype);
 				isComplete = false;
 			} else { // 如果任务状态为未完成
-				this.updataTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKCOMPLETE);
+				this.updataTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKCOMPLETE, NORMALTOCOMPLETEORCANCEL);
 				checkboxImageView.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
 				this.disableView();
 				isComplete = true;
@@ -664,10 +670,11 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			json = WebServiceRequest.SendPost(inputStream, data, "UpdateTaskResult");
 			//System.out.println("++++"+json);
 			if(parseUpdateJSON(json)) {
-				Toast.makeText(getApplicationContext(), "更改任务信息成功",
-						Toast.LENGTH_SHORT).show();
+				//Toast.makeText(getApplicationContext(), "更改任务信息成功", Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent();
 				intent.putExtra("isTaskChange", isTaskChange);
+				intent.putExtra("position", position);
+				intent.putExtra("taskJSON", constructTaskJSON());
 				setResult(1, intent);
 			} else {
 				Toast.makeText(getApplicationContext(), "更改任务信息失败",
@@ -679,12 +686,44 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	}
 	
 	/**
+	 * 构造任务json字符串
+	 * @return
+	 */
+	private String constructTaskJSON() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{\"SID\":");
+		sb.append("\""+task.getTaskId()+"\",");
+		sb.append("\"USERID\":");
+		sb.append("\""+task.getUserId()+"\",");
+		sb.append("\"MFROM\":");
+		sb.append("\""+task.getTaskFrom()+"\",");
+		sb.append("\"SUBJECT\":");
+		sb.append("\""+this.subject+"\",");
+		sb.append("\"DISC\":");
+		sb.append("\""+this.note+"\",");
+		sb.append("\"PRIORITY\":");
+		sb.append("\"0\",");
+		sb.append("\"ENDDATE\":");
+		sb.append("\""+this.enddate+"\",");
+		sb.append("\"REMINDTYPE\":");
+		sb.append("\""+this.remindtype+"\",");
+		sb.append("\"REMINDNUM\":");
+		sb.append("\""+this.remindnum+"\",");
+		sb.append("\"ATTFILES\":");
+		sb.append("\"\",");
+		sb.append("\"CREATEDATE\":");
+		sb.append("\""+task.getCreateDate()+"\"}");
+		return sb.toString();
+	}
+	
+	/**
 	 * 更改任务状态
 	 * @param taskId
 	 * @param useremail
 	 * @param status
+	 * @param tag 
 	 */
-	private void updataTaskStatus(String taskId, String useremail, String status) {
+	private void updataTaskStatus(String taskId, String useremail, String status, int tag) {
 		String json = "";
 		try {
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("UpdateTaskStatus.xml");
@@ -696,8 +735,11 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			data = string.getBytes();
 			json = WebServiceRequest.SendPost(inputStream, data, "UpdateTaskStatusResult");
 			if (parseUpdateJSON(json)) {
-				Toast.makeText(getApplicationContext(), "更改任务状态成功", Toast.LENGTH_SHORT).show();
-				setResult(2);
+				//Toast.makeText(getApplicationContext(), "更改任务状态成功", Toast.LENGTH_SHORT).show();
+				Intent intent = new Intent();
+				intent.putExtra("position", position);
+				intent.putExtra("tag", tag);
+				setResult(2, intent);
 			} else {
 				Toast.makeText(getApplicationContext(), "更改任务状态失败", Toast.LENGTH_SHORT).show();
 			}

@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,8 +15,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -59,7 +56,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private static final String TASKCANCEL = "0";
 	private static final String TASKNORMAL = "1";
 	private static final String TASKCOMPLETE = "2";
-
+	
+	private static final int NORMALTOCOMPLETEORCANCEL = 1;
+	private static final int COMPLETEORCANCELTONORMAL = 2;
+	
 	private StringBuilder sb = new StringBuilder();
 	private String[] receivers = new String[] { User.USEREMAIL };
 
@@ -76,10 +76,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 
 	private TaskListItemAdapter adapter = null;
 
-	private LinkedList<Task> tasksTotal = new LinkedList<Task>();
-	private LinkedList<Task> tasksNormal = new LinkedList<Task>();
-	private LinkedList<Task> tasksComplete = new LinkedList<Task>();
-
+	private static LinkedList<Task> tasksTotal = new LinkedList<Task>();
+	private static LinkedList<Task> tasksNormal = new LinkedList<Task>();
+	private static LinkedList<Task> tasksComplete = new LinkedList<Task>();
+	
 	private Task task = null;
 
 	private boolean isComplete = false;
@@ -203,6 +203,77 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	public void updateTaskBoxList() {
 		this.getTaskBoxList();
 	}
+	
+	/**
+	 * 更新任务列表（不从网络获取数据）
+	 * @param position
+	 * @param tag 
+	 */
+	private void updateTaskBoxList(int position, int tag) {
+		Task task = tasksTotal.get(position);
+		switch (tag) {
+		case NORMALTOCOMPLETEORCANCEL:
+			tasksNormal.remove(position);
+			tasksComplete.add(task);
+			tasksTotal.removeAll(tasksTotal);
+			tasksTotal.addAll(tasksNormal);
+			tasksTotal.add(new Task());
+			tasksTotal.addAll(tasksComplete);
+			tasksTotal.add(new Task());
+			break;
+		case COMPLETEORCANCELTONORMAL:
+			tasksComplete.remove(position-tasksNormal.size()-1);
+			tasksNormal.add(task);
+			tasksTotal.removeAll(tasksTotal);
+			tasksTotal.addAll(tasksNormal);
+			tasksTotal.add(new Task());
+			tasksTotal.addAll(tasksComplete);
+			tasksTotal.add(new Task());
+			break;
+		default:
+			break;
+		}
+		adapter.setData(tasksTotal);
+		adapter.notifyDataSetChanged();
+	}
+	
+	/**
+	 * 更新任务列表（不从网络获取数据）
+	 * @param taskJSON 
+	 * @param position
+	 */
+	private void updateTaskBoxList(String taskJSON, int position) {
+		try {
+			Task task = this.parseSingleTaskJSON(taskJSON);
+			tasksTotal.remove(position);
+			tasksTotal.add(position, task);
+			adapter.setData(tasksTotal);
+			adapter.notifyDataSetChanged();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 解析单个任务json字符串
+	 * @param taskJSON
+	 * @return
+	 * @throws Exception
+	 */
+	private Task parseSingleTaskJSON(String taskJSON) throws Exception {
+		Task task = new Task();
+		JSONObject obj = new JSONObject(taskJSON);
+		task.setTaskId(obj.getString("SID"));
+		task.setUserId(obj.getString("USERID"));
+		task.setTaskFrom(obj.getString("MFROM"));
+		task.setSubject(obj.getString("SUBJECT"));
+		task.setDisc(obj.getString("DISC"));
+		task.setEnddate(obj.getString("ENDDATE"));
+		task.setRemindtype(obj.getString("REMINDTYPE"));
+		task.setRemindnum(obj.getString("REMINDNUM"));
+		task.setCreateDate(obj.getString("CREATEDATE"));
+		return task;
+	}
 
 	/**
 	 * 异步任务，用于获取用户所有任务列表
@@ -251,20 +322,17 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		@Override
 		protected void onPostExecute(LinkedList<Task> tasks) {
 			if (tag.equals(TAGNORMAL)) {
-				tasks.addLast(new Task());
 				tasksTotal.addAll(tasks);
+				tasksTotal.add(new Task());
 				GetTaskBoxListData task = new GetTaskBoxListData(TAGCOMPLETE,
 						tasksComplete);
 				task.execute("");
 				tasksNormal = tasks;
 			} else if (tag.equals(TAGCOMPLETE)) {
-				tasks.addLast(new Task());
 				tasksTotal.addAll(tasks);
+				tasksTotal.add(new Task());
 				if (tasksTotal.size() != 0) {
 					adapter.setData(tasksTotal);
-					for(int i=0; i<tasksTotal.size(); i++) {
-						System.out.println(tasksTotal.get(i));
-					}
 					adapter.notifyDataSetChanged();
 				}
 				tasksComplete = tasks;
@@ -310,7 +378,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		}
 		return tasks;
 	}
-
+	
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		this.initHeadimagePopupWindow();
@@ -326,7 +394,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		private static final int TYPE_COMPLETE = 2;
 		private static final int TYPE_COMPLETE_LAYOUT = 3;
 		private static final int TYPE_BOTTOMLAYOUT = 4;
-
+		
 		private Context context;
 		private LinkedList<Task> list;
 		private int resId;
@@ -367,9 +435,9 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			if(position == getCount() - 1) {
 				return TYPE_BOTTOMLAYOUT;
 			} else {
-				if (position == (getCount() - tasksComplete.size() - 1)) {
+				if (position == (getCount() - tasksComplete.size() - 2)) {
 					return TYPE_COMPLETE_LAYOUT;
-				} else if (position > (getCount() - tasksComplete.size() - 1)) {
+				} else if (position > (getCount() - tasksComplete.size() - 2)) {
 					return TYPE_COMPLETE;
 				} else {
 					return TYPE_NORMAL;
@@ -407,14 +475,12 @@ public class MainFragment extends Fragment implements OnScrollListener {
 						.findViewById(R.id.task_complete_count_text);
 				holder.taskCompleteVisibleIcon = (ImageView) convertView
 						.findViewById(R.id.task_complete_visible_icon);
-				holder.taskCompleteCountTextView.setText(tasksComplete.size()-1
+				holder.taskCompleteCountTextView.setText(tasksComplete.size()
 						+ "个已完成的任务");
 				holder.taskCompleteVisibleIcon
 						.setOnClickListener(new OnClickListener() {
-							@Override
 							public void onClick(View v) {
-								Toast.makeText(context, "visibleIcon完成",
-										Toast.LENGTH_SHORT).show();
+								//Toast.makeText(context, "visibleIcon完成", Toast.LENGTH_SHORT).show();
 							}
 						});
 				break;
@@ -440,7 +506,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					@Override
 					public void onClick(View v) {
 						// 解除任务完成状态
-						updateTaskStatus(list.get(position).getTaskId(), User.USEREMAIL, TASKNORMAL);
+						updateTaskStatus(list.get(position).getTaskId(), User.USEREMAIL, TASKNORMAL, position, COMPLETEORCANCELTONORMAL);
 					}
 				});
 				holder.middleLayout.setOnLongClickListener(new OnLongClickListener() {
@@ -450,7 +516,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 										new DialogInterface.OnClickListener() {
 											public void onClick(DialogInterface dialog, int which) {
 												//Toast.makeText(context, "确定", 0).show();
-												updateTaskStatus(list.get(position).getTaskId(), User.USEREMAIL, TASKNORMAL);
+												updateTaskStatus(list.get(position).getTaskId(), User.USEREMAIL, TASKNORMAL, position, COMPLETEORCANCELTONORMAL);
 											}
 										}).setNegativeButton("取消", null).show();
 						return false;
@@ -469,7 +535,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				holder.checkBox.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						updateTaskStatus(list.get(position).getTaskId(), User.USEREMAIL, TASKCOMPLETE);
+						updateTaskStatus(list.get(position).getTaskId(), User.USEREMAIL, TASKCOMPLETE, position, NORMALTOCOMPLETEORCANCEL);
 					}
 				});
 				holder.middleLayout.setOnLongClickListener(new OnLongClickListener() {
@@ -479,7 +545,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 										new DialogInterface.OnClickListener() {
 											public void onClick(DialogInterface dialog, int which) {
 												//Toast.makeText(context, "确定", 0).show();
-												updateTaskStatus(list.get(position).getTaskId(), User.USEREMAIL, TASKCANCEL);
+												updateTaskStatus(list.get(position).getTaskId(), User.USEREMAIL, TASKCANCEL, position, NORMALTOCOMPLETEORCANCEL);
 											}
 										}).setNegativeButton("取消", null).show();
 						return false;
@@ -520,6 +586,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					Intent intent = new Intent(context, TaskDetailsActivity.class);
 					intent.putExtra("task", (Task) getItem(position));
 					intent.putExtra("title", SlidingActivity.getBarTitle());
+					intent.putExtra("position", position);
 					if (position > (getCount() - tasksComplete.size() - 1)) {
 						isComplete = true;
 					} else {
@@ -572,13 +639,14 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	
 	/**
 	 * 更改任务状态
-	 * 
 	 * @param taskId
 	 * @param useremail
-	 * @param string
+	 * @param status
+	 * @param position
+	 * @param tag 1表示normal->complete|cancel,2表示complete|cancel->normal
 	 */
-	private void updateTaskStatus(String taskId, String useremail, String status) {
-		new UpdateTaskStatus(taskId, useremail, status).execute("");
+	private void updateTaskStatus(String taskId, String useremail, String status, int position, int tag) {
+		new UpdateTaskStatus(taskId, useremail, status, position, tag).execute("");
 	}
 
 	/**
@@ -592,11 +660,15 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		private String taskId;
 		private String useremail;
 		private String status;
+		private int position;
+		private int tag;
 
-		public UpdateTaskStatus(String taskId, String useremail, String status) {
+		public UpdateTaskStatus(String taskId, String useremail, String status, int position, int tag) {
 			this.taskId = taskId;
 			this.useremail = useremail;
 			this.status = status;
+			this.position = position;
+			this.tag = tag;
 		}
 
 		@Override
@@ -623,7 +695,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		protected void onPostExecute(String result) {
 			try {
 				if (parseUpdateJSON(result)) {
-					updateTaskBoxList();
+					updateTaskBoxList(position, tag);
 				} else {
 					Toast.makeText(getActivity(), "更改任务状态失败",
 							Toast.LENGTH_SHORT).show();
@@ -660,20 +732,26 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (resultCode) {
-		case 1:
+		case 1: {
 			boolean isTaskChange = data.getBooleanExtra("isTaskChange", false);
+			int position = data.getIntExtra("position", 0);
+			String taskJSON = data.getStringExtra("taskJSON");
 			if (isTaskChange) {
-				this.updateTaskBoxList();
+				this.updateTaskBoxList(taskJSON, position);
 			}
 			break;
-		case 2:
-			this.updateTaskBoxList();
+		}
+		case 2: {
+			int tag = data.getIntExtra("tag", 0);
+			int position = data.getIntExtra("position", 0);
+			this.updateTaskBoxList(position, tag);
 			break;
+		}
 		default:
 			break;
 		}
 	}
-
+	
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
@@ -683,7 +761,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		switch (scrollState) {
 		case OnScrollListener.SCROLL_STATE_IDLE:
-			popupHandler.sendEmptyMessageDelayed(0, 1000); // 执行延迟任务
+			showOrDismissPopupWindow();
 			break;
 		default:
 			break;
@@ -753,17 +831,4 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		});
 	}
 	
-	@SuppressLint("HandlerLeak")
-	private Handler popupHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case 0:
-				showOrDismissPopupWindow();
-				break;
-			default:
-				break;
-			}
-		}
-	};
-
 }
