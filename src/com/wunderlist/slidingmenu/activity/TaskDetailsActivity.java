@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
+import com.wunderlist.entity.Common;
 import com.wunderlist.entity.CommonUser;
 import com.wunderlist.entity.Reply;
 import com.wunderlist.entity.Task;
@@ -274,7 +275,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				System.out.println("没有数据");
 			}
 		} else {
-			//Common.ToastIfNetworkProblem(getApplicationContext());
+			Common.ToastIfNetworkProblem(getApplicationContext());
 		}
 		return replys;
 	}
@@ -413,7 +414,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				}
 			}
 		} else {
-			//Common.ToastIfNetworkProblem(getApplicationContext());
+			Common.ToastIfNetworkProblem(getApplicationContext());
 		}
 		return receivers;
 	}
@@ -424,7 +425,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		case R.id.taskdetails_checkbox: {
 			//Toast.makeText(getApplicationContext(), "标记", Toast.LENGTH_SHORT).show();
 			if(isComplete) { // 如果任务状态为已完成
-				this.updataTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKNORMAL, COMPLETEORCANCELTONORMAL);
+				this.updateTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKNORMAL, COMPLETEORCANCELTONORMAL);
 				checkboxImageView.setImageResource(R.drawable.wl_task_checkbox);
 				this.titleEditText.setEnabled(true);
 				this.receiversRelativeLayout.setEnabled(true);
@@ -435,7 +436,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				updateClockTextView(remindnum, remindtype);
 				isComplete = false;
 			} else { // 如果任务状态为未完成
-				this.updataTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKCOMPLETE, NORMALTOCOMPLETEORCANCEL);
+				this.updateTaskStatus(task.getTaskId(), task.getTaskFrom(), TASKCOMPLETE, NORMALTOCOMPLETEORCANCEL);
 				checkboxImageView.setImageResource(R.drawable.wl_task_checkbox_checked_pressed);
 				this.disableView();
 				isComplete = true;
@@ -544,6 +545,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 * @param note
 	 */
 	private void updateNoteEditText(String note) {
+		this.note = note;
 		this.noteEditText.setText(note);
 	}
 
@@ -570,7 +572,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 					|| !(this.remindtype + "").equals(task.getRemindtype())
 					|| !this.note.equals(task.getDisc()) || isReceiversChange) {
 				isTaskChange = true;
-				updateTask();
+				this.updateTask();
 			}
 			Intent intent = new Intent();
 			intent.putExtra("bundle", bundle);
@@ -582,34 +584,60 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	}
 	
 	/**
-	 * 更新任务
+	 * 更新任务详细信息
 	 */
 	private void updateTask() {
-		String json = null;
-		try {
-			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("UpdateTask.xml");
-			byte[] data = StreamTool.read(inputStream);
-			String string = new String(data).replaceAll("\\&strTaskID", task.getTaskId())
-					.replaceAll("\\&USERID", task.getUserId())
-					.replaceAll("\\&MFROM", task.getTaskFrom())
-					.replaceAll("\\&SUBJECT", subject).replaceAll("\\&DISC", note)
-					.replaceAll("\\&PRIORITY", "").replaceAll("\\&ENDDATE", enddate)
-					.replaceAll("\\&REMINDTYPE", remindtype).replaceAll("\\&REMINDNUM", remindnum)
-					.replaceAll("\\&ATTFILES", "").replaceAll("<string>\\&string</string>", constructReceiversString(receivers).toString());
-			data = string.getBytes();
-			json = WebServiceRequest.SendPost(inputStream, data, "UpdateTaskResult");
-			if(parseUpdateJSON(json)) {
-				//Toast.makeText(getApplicationContext(), "更改任务信息成功", Toast.LENGTH_SHORT).show();
-				bundle.putBoolean("isTaskChange", isTaskChange);
-				bundle.putInt("position", position);
-				bundle.putString("taskJSON", constructTaskJSON());
-			} else {
-				Toast.makeText(getApplicationContext(), "更改任务信息失败",
-						Toast.LENGTH_SHORT).show();
+		new UpdateTask().execute("");
+		bundle.putBoolean("isTaskChange", isTaskChange);
+		bundle.putInt("position", position);
+		bundle.putString("taskJSON", constructTaskJSON());
+	}
+	
+	/**
+	 * 异步任务，用户更新任务详细信息
+	 * @author Silocean
+	 *
+	 */
+	private class UpdateTask extends AsyncTask<String, Integer, String> {
+
+		@Override
+		protected String doInBackground(String... params) {
+			String json = null;
+			try {
+				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("UpdateTask.xml");
+				byte[] data = StreamTool.read(inputStream);
+				String string = new String(data).replaceAll("\\&strTaskID", task.getTaskId())
+						.replaceAll("\\&USERID", task.getUserId())
+						.replaceAll("\\&MFROM", task.getTaskFrom())
+						.replaceAll("\\&SUBJECT", subject).replaceAll("\\&DISC", note)
+						.replaceAll("\\&PRIORITY", "").replaceAll("\\&ENDDATE", enddate)
+						.replaceAll("\\&REMINDTYPE", remindtype).replaceAll("\\&REMINDNUM", remindnum)
+						.replaceAll("\\&ATTFILES", "").replaceAll("<string>\\&string</string>", constructReceiversString(receivers).toString());
+				data = string.getBytes();
+				json = WebServiceRequest.SendPost(inputStream, data, "UpdateTaskResult");
+			}catch(Exception e) {
+				e.printStackTrace();
 			}
-		}catch(Exception e) {
-			e.printStackTrace();
+			return json;
 		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			try {
+				if(parseUpdateJSON(result)) {
+					//Toast.makeText(getApplicationContext(), "更改任务信息成功", Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(getApplicationContext(), "更改任务信息失败", Toast.LENGTH_SHORT).show();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+		}
+		
 	}
 	
 	/**
@@ -644,35 +672,72 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	}
 	
 	/**
-	 * 更改任务状态
+	 * 更新任务执行状态
 	 * @param taskId
 	 * @param useremail
 	 * @param status
-	 * @param tag 
+	 * @param tag
 	 */
-	private void updataTaskStatus(String taskId, String useremail, String status, int tag) {
-		String json = "";
-		try {
-			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("UpdateTaskStatus.xml");
-			byte[] data = StreamTool.read(inputStream);
-			String string = new String(data)
-					.replaceAll("\\&strTaskID", taskId)
-					.replaceAll("\\&strEmail", useremail)
-					.replaceAll("\\&strStatus", status);
-			data = string.getBytes();
-			json = WebServiceRequest.SendPost(inputStream, data, "UpdateTaskStatusResult");
-			if (parseUpdateJSON(json)) {
-				//Toast.makeText(getApplicationContext(), "更改任务状态成功", Toast.LENGTH_SHORT).show();
-				isTaskStatusChange = true;
-				bundle.putBoolean("isTaskStatusChange", isTaskStatusChange);
-				bundle.putInt("position", position);
-				bundle.putInt("tag", tag);
-			} else {
-				Toast.makeText(getApplicationContext(), "更改任务状态失败", Toast.LENGTH_SHORT).show();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+	private void updateTaskStatus(String taskId, String useremail, String status, int tag) {
+		new UpdateTaskStatus(taskId, useremail, status).execute("");
+		isTaskStatusChange = true;
+		bundle.putBoolean("isTaskStatusChange", isTaskStatusChange);
+		bundle.putInt("position", position);
+		bundle.putInt("tag", tag);
+	}
+	
+	/**
+	 * 异步任务，用于更新任务执行状态
+	 * @author Silocean
+	 *
+	 */
+	private class UpdateTaskStatus extends AsyncTask<String, Integer, String> {
+		
+		private String taskId = null;
+		private String useremail = null;
+		private String status = null;
+		
+		public UpdateTaskStatus(String taskId, String useremail, String status) {
+			this.taskId = taskId;
+			this.useremail = useremail;
+			this.status = status;
 		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			String json = "";
+			try {
+				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("UpdateTaskStatus.xml");
+				byte[] data = StreamTool.read(inputStream);
+				String string = new String(data)
+						.replaceAll("\\&strTaskID", taskId)
+						.replaceAll("\\&strEmail", useremail)
+						.replaceAll("\\&strStatus", status);
+				data = string.getBytes();
+				json = WebServiceRequest.SendPost(inputStream, data, "UpdateTaskStatusResult");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return json;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			try {
+				if (parseUpdateJSON(result)) {
+					//Toast.makeText(getApplicationContext(), "更改任务状态成功", Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(getApplicationContext(), "更改任务状态失败", Toast.LENGTH_SHORT).show();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+		}
+		
 	}
 	
 	/**

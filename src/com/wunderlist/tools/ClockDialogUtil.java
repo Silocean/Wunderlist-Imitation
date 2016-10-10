@@ -11,6 +11,11 @@ import android.widget.RelativeLayout;
 import com.example.wunderlist.R;
 import com.wunderlist.slidingmenu.activity.TaskDetailsActivity;
 
+/**
+ * 提醒设置对话框
+ * @author Silocean
+ *
+ */
 public class ClockDialogUtil implements android.view.View.OnClickListener {
 
 	private TaskDetailsActivity activity;

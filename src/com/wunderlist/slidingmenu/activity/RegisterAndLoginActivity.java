@@ -10,6 +10,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+/**
+ * 登录和注册界面
+ * @author Silocean
+ *
+ */
 public class RegisterAndLoginActivity extends Activity implements OnClickListener{
 	
 	private Button registerButton;

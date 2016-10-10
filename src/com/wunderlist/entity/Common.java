@@ -6,18 +6,19 @@ import android.widget.Toast;
 import com.example.wunderlist.R;
 
 /**
- * 全局变量类，用户保存程序中要用的变量
+ * 全局变量类，用于保存程序中要用的变量
  * @author SIYUNFEI
- *
+ * 
  */
 public class Common {
 	
-	public static final String WEBSERVICEPATH = "http://10.0.2.2/XMALWEBSERVICE/TaskService.asmx";
+	/**webservice地址**/
+	public static final String WEBSERVICEPATH = "http://tr-info.gicp.net:81/XMAILWEBSERVICE/TaskService.asmx";
 	
+	/**email正则表达式**/
 	public static final String EMAILREGEX = "[\\w[.-]]+@[\\w[.-]]+\\.[\\w]+";
 	
-	public static boolean isBack = false;
-	
+	/**主界面背景图片ID**/
 	public static final Integer[] BGS = { R.drawable.wl_background0,
 		R.drawable.wl_background1, R.drawable.wl_background2,
 		R.drawable.wl_background3, R.drawable.wl_background4,
@@ -31,10 +32,18 @@ public class Common {
 		R.drawable.wl_background19, R.drawable.wl_background20,
 		R.drawable.wl_background21, R.drawable.wl_background22 };
 	
+	/**
+	 * 提示网络不可用
+	 * @param context
+	 */
 	public static void ToastIfNetworkIsNotAvailable(Context context) {
 		Toast.makeText(context, "当前网络不可用，请检查你的网络设置", Toast.LENGTH_SHORT).show();
 	}
 	
+	/**
+	 * 提示网络连接问题
+	 * @param context
+	 */
 	public static void ToastIfNetworkProblem(Context context) {
 		Toast.makeText(context, "网络连接出现问题", Toast.LENGTH_SHORT).show();
 	}

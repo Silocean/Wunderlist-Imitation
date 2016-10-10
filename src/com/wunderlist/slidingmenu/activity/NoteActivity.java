@@ -7,6 +7,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 
+/**
+ * 笔记界面
+ * @author Silocean
+ *
+ */
 public class NoteActivity extends ActionbarBaseActivity {
 	
 	private EditText noteEditText;

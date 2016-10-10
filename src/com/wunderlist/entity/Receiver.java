@@ -1,5 +1,10 @@
 package com.wunderlist.entity;
 
+/**
+ * 接收人实体类
+ * @author Silocean
+ *
+ */
 public class Receiver {
 	
 	private String receiverEmail;

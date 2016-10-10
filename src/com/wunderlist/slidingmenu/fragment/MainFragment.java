@@ -52,6 +52,7 @@ import com.wunderlist.tools.CheckNetwork;
 import com.wunderlist.tools.ClockAlarmUtil;
 import com.wunderlist.tools.EnddateComparator;
 import com.wunderlist.tools.MySharedPreferences;
+import com.wunderlist.tools.RawFilesUtil;
 import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.SubjectComparator;
 import com.wunderlist.tools.TimeConvertTool;
@@ -59,7 +60,7 @@ import com.wunderlist.tools.WebServiceRequest;
 
 @SuppressLint("ValidFragment")
 public class MainFragment extends Fragment implements OnScrollListener {
-	
+
 	private static final String TAGNORMAL = "1";
 	private static final String TAGCOMPLETE = "0,2";
 
@@ -104,8 +105,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private static LinkedList<Task> tasksTotal = new LinkedList<Task>();
 	private static LinkedList<Task> tasksNormal = new LinkedList<Task>();
 	private static LinkedList<Task> tasksComplete = new LinkedList<Task>();
-	// 临时变量用于保存已完成任务列表
-	private static LinkedList<Task> tempList = new LinkedList<Task>();
+	
+	private static LinkedList<Task> tempCompleteList = new LinkedList<Task>();
 
 	public static ArrayList<Task> clockTimes = new ArrayList<Task>();
 
@@ -140,11 +141,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					String subject = taskEditText.getText().toString().trim();
 					if (!subject.equals("")) {
 						taskEditText.setText("");
-						try {
-							addTask(subject);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						addTask(subject);
 					} else {
 						Toast.makeText(getActivity(), "主题不能为空",
 								Toast.LENGTH_SHORT).show();
@@ -167,7 +164,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		}
 		return view;
 	}
-	
+
 	/**
 	 * 取得sharedPreference
 	 */
@@ -189,31 +186,73 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	}
 
 	/**
-	 * 发起任务
+	 * 添加任务
+	 * 
+	 * @param subject
 	 */
-	public void addTask(String subject) throws Exception {
-		InputStream inputStream = this.getClass().getClassLoader()
-				.getResourceAsStream("AddTask.xml");
-		byte[] data = StreamTool.read(inputStream);
-		String string = new String(data)
-				.replaceAll("\\&USERID", CommonUser.USERID)
-				.replaceAll("\\&MFROM", CommonUser.USEREMAIL)
-				.replaceAll("\\&SUBJECT", subject)
-				.replaceAll("\\&DISC", "")
-				.replaceAll("\\&PRIORITY", "")
-				.replaceAll("\\&ENDDATE", "")
-				.replaceAll("\\&REMINDTYPE", "")
-				.replaceAll("\\&REMINDNUM", "")
-				.replaceAll("\\&ATTFILES", "")
-				.replaceAll("<string>\\&string</string>",
-						this.constructReceiversString(receivers).toString());
-		data = string.getBytes();
-		String json = WebServiceRequest.SendPost(inputStream, data,
-				"AddTaskResult");
-		if (parseUpdateJSON(json)) {
-			this.updateTaskBoxList();
-		} else {
-			Toast.makeText(getActivity(), "添加任务失败", Toast.LENGTH_SHORT).show();
+	private void addTask(String subject) {
+		new AddTask(subject).execute("");
+	}
+
+	/**
+	 * 异步任务，用于添加任务
+	 * 
+	 * @author Silocean
+	 * 
+	 */
+	private class AddTask extends AsyncTask<String, Integer, String> {
+
+		private String subject = null;
+
+		public AddTask(String subject) {
+			this.subject = subject;
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			String json = "";
+			try {
+				InputStream inputStream = this.getClass().getClassLoader()
+						.getResourceAsStream("AddTask.xml");
+				byte[] data = StreamTool.read(inputStream);
+				String string = new String(data)
+						.replaceAll("\\&USERID", CommonUser.USERID)
+						.replaceAll("\\&MFROM", CommonUser.USEREMAIL)
+						.replaceAll("\\&SUBJECT", subject)
+						.replaceAll("\\&DISC", "")
+						.replaceAll("\\&PRIORITY", "")
+						.replaceAll("\\&ENDDATE", "")
+						.replaceAll("\\&REMINDTYPE", "")
+						.replaceAll("\\&REMINDNUM", "")
+						.replaceAll("\\&ATTFILES", "")
+						.replaceAll("<string>\\&string</string>",
+								constructReceiversString(receivers).toString());
+				data = string.getBytes();
+				json = WebServiceRequest.SendPost(inputStream, data,
+						"AddTaskResult");
+				System.out.println(string);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return json;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			try {
+				if (parseUpdateJSON(result)) {
+					updateTaskBoxList();
+				} else {
+					Toast.makeText(getActivity(), "添加任务失败", Toast.LENGTH_SHORT)
+							.show();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... values) {
 		}
 	}
 
@@ -279,21 +318,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	}
 
 	/**
-	 * 添加任务后更新任务列表（不从网络获取数据）
-	 * 
-	 * @param subject
-	 */
-	/*
-	 * private void updateTaskBoxList(String subject) { Task task = new Task("",
-	 * "", "", "", "", "", "", "", "", "", ""); task.setSubject(subject);
-	 * tasksTotal.removeAll(tasksTotal); tasksNormal.addFirst(task);
-	 * tasksTotal.addAll(tasksNormal); tasksTotal.add(new Task());
-	 * tasksTotal.addAll(tasksComplete); tasksTotal.add(new Task());
-	 * adapter.setData(tasksTotal); adapter.notifyDataSetChanged();
-	 * this.setClockAlarm(); }
-	 */
-
-	/**
 	 * 更新任务列表（不从网络获取数据）
 	 * 
 	 * @param position
@@ -314,7 +338,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			} else {
 				tasksTotal.removeAll(tasksTotal);
 				tasksNormal.remove(position);
-				tempList.add(task);
+				tempCompleteList.add(task);
 				tasksComplete.removeAll(tasksComplete);
 				tasksTotal.addAll(tasksNormal);
 				tasksTotal.add(new Task());
@@ -447,6 +471,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				}
 				tasksComplete = tasks;
 
+				System.out.println(tasksTotal);
+				
 				hideRefreshMenu();
 				showOrDismissCompleteTasks();
 
@@ -524,7 +550,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				System.out.println("没有数据");
 			}
 		} else { // 网络连接出现问题
-			//Common.ToastIfNetworkProblem(getActivity());
+			// Common.ToastIfNetworkProblem(getActivity());
 		}
 		return tasks;
 	}
@@ -534,8 +560,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	 */
 	private void showOrDismissCompleteTasks() {
 		if (showCompleteTasks) {
-			tasksComplete.addAll(tempList);
-			tempList.removeAll(tempList);
+			tasksComplete.addAll(tempCompleteList);
+			tempCompleteList.removeAll(tempCompleteList);
 
 			tasksTotal.removeAll(tasksTotal);
 			tasksTotal.addAll(tasksNormal);
@@ -545,8 +571,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			adapter.setData(tasksTotal);
 			adapter.notifyDataSetChanged();
 		} else {
-			tempList.removeAll(tempList);
-			tempList.addAll(tasksComplete);
+			tempCompleteList.removeAll(tempCompleteList);
+			tempCompleteList.addAll(tasksComplete);
 			tasksComplete.removeAll(tasksComplete);
 
 			tasksTotal.removeAll(tasksTotal);
@@ -566,7 +592,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	}
 
 	/**
-	 * 任务列表项数据填充器
+	 * 任务列表数据填充器
 	 */
 	private class TaskListItemAdapter extends BaseAdapter {
 
@@ -666,7 +692,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					holder.taskCompleteVisibleIcon
 							.setImageResource(R.drawable.wl_taskview_icon_hide_selected);
 				} else {
-					holder.taskCompleteCountTextView.setText(tempList.size()
+					holder.taskCompleteCountTextView.setText(tempCompleteList.size()
 							+ "个已完成的任务");
 					holder.taskCompleteVisibleIcon
 							.setImageResource(R.drawable.wl_taskview_icon_hide);
@@ -724,28 +750,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				holder.middleLayout
 						.setOnLongClickListener(new OnLongClickListener() {
 							public boolean onLongClick(View v) {
-								new AlertDialog.Builder(context)
-										.setTitle("恢复任务")
-										.setMessage("确认恢复此任务，将此任务标记为未完成状态？")
-										.setPositiveButton(
-												"确定",
-												new DialogInterface.OnClickListener() {
-													public void onClick(
-															DialogInterface dialog,
-															int which) {
-														// Toast.makeText(context,
-														// "确定", 0).show();
-														updateTaskStatus(
-																list.get(
-																		position)
-																		.getTaskId(),
-																CommonUser.USEREMAIL,
-																TASKNORMAL,
-																position,
-																COMPLETEORCANCELTONORMAL);
-													}
-												})
-										.setNegativeButton("取消", null).show();
+								recoverCancelTask(position);
 								return false;
 							}
 						});
@@ -763,6 +768,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				holder.checkBox.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						RawFilesUtil.ring(getActivity(), 2);
 						updateTaskStatus(list.get(position).getTaskId(),
 								CommonUser.USEREMAIL, TASKCOMPLETE, position,
 								NORMALTOCOMPLETEORCANCEL);
@@ -771,26 +777,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				holder.middleLayout
 						.setOnLongClickListener(new OnLongClickListener() {
 							public boolean onLongClick(View v) {
-								new AlertDialog.Builder(context)
-										.setTitle("取消任务")
-										.setMessage("确认取消此任务，将此任务标记为取消状态？")
-										.setPositiveButton(
-												"确定",
-												new DialogInterface.OnClickListener() {
-													public void onClick(
-															DialogInterface dialog,
-															int which) {
-														updateTaskStatus(
-																list.get(
-																		position)
-																		.getTaskId(),
-																CommonUser.USEREMAIL,
-																TASKCANCEL,
-																position,
-																NORMALTOCOMPLETEORCANCEL);
-													}
-												})
-										.setNegativeButton("取消", null).show();
+								cancleTask(position);
 								return false;
 							}
 						});
@@ -803,9 +790,51 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			convertView.setTag(holder);
 			return convertView;
 		}
-		
+
+		/**
+		 * 取消任务
+		 * 
+		 * @param position
+		 */
+		private void cancleTask(final int position) {
+			new AlertDialog.Builder(context)
+					.setTitle("取消任务")
+					.setMessage("确认取消此任务，将此任务标记为取消状态？")
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									updateTaskStatus(list.get(position)
+											.getTaskId(), CommonUser.USEREMAIL,
+											TASKCANCEL, position,
+											NORMALTOCOMPLETEORCANCEL);
+								}
+							}).setNegativeButton("取消", null).show();
+		}
+
+		/**
+		 * 恢复取消任务
+		 * @param position
+		 */
+		private void recoverCancelTask(final int position) {
+			new AlertDialog.Builder(context)
+					.setTitle("恢复任务")
+					.setMessage("确认恢复此任务，将此任务标记为未完成状态？")
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									updateTaskStatus(list.get(position)
+											.getTaskId(), CommonUser.USEREMAIL,
+											TASKNORMAL, position,
+											COMPLETEORCANCELTONORMAL);
+								}
+							}).setNegativeButton("取消", null).show();
+		}
+
 		/**
 		 * 初始化一般ListItem布局
+		 * 
 		 * @param position
 		 * @param convertView
 		 * @param task
@@ -858,9 +887,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				}
 			});
 		}
-		
+
 		/**
 		 * 初始化含有other控件的ListItem布局
+		 * 
 		 * @param position
 		 * @param convertView
 		 */
@@ -977,7 +1007,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	/**
 	 * 解析更新任务状态返回的json字符串
 	 * 
-	 * @param json 要解析的json字符串
+	 * @param json
+	 *            要解析的json字符串
 	 * @return 0表示出现异常，1表示保存成功
 	 * @throws Exception
 	 */
@@ -990,7 +1021,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		}
 		return false;
 	}
-
+	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (resultCode) {

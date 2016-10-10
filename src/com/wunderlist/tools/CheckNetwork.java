@@ -4,6 +4,11 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+/**
+ * 检查网络情况
+ * @author Silocean
+ *
+ */
 public class CheckNetwork {
 	
 	/**

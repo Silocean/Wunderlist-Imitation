@@ -5,6 +5,11 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.example.wunderlist.R;
 
+/**
+ * 带actionBar的界面，供其他activity继承
+ * @author Silocean
+ *
+ */
 public class ActionbarBaseActivity extends SherlockActivity {
 
 	@Override

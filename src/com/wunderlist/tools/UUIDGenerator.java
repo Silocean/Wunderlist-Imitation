@@ -2,6 +2,11 @@ package com.wunderlist.tools;
 
 import java.util.UUID;
 
+/**
+ * UUID生成器
+ * @author Silocean
+ *
+ */
 public class UUIDGenerator {
 	
 	public UUIDGenerator() {

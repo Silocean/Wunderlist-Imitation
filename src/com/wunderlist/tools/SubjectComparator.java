@@ -7,6 +7,11 @@ import java.util.Locale;
 
 import com.wunderlist.entity.Task;
 
+/**
+ * 任务标题比较器
+ * @author Silocean
+ *
+ */
 public class SubjectComparator implements Comparator<Task> {
 
 	@Override

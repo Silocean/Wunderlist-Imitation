@@ -9,6 +9,11 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import com.wunderlist.entity.Common;
 
+/**
+ * 处理webservice请求
+ * @author Silocean
+ *
+ */
 public class WebServiceRequest {
 	
 	/**

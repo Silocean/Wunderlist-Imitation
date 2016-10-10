@@ -12,6 +12,11 @@ import com.wunderlist.entity.User;
 import com.wunderlist.sqlite.SQLiteService;
 import com.wunderlist.tools.MyActivityManager;
 
+/**
+ * 程序开始界面
+ * @author Silocean
+ *
+ */
 public class StartActivity extends Activity {
 
 	@Override

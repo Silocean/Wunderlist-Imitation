@@ -3,6 +3,11 @@ package com.wunderlist.tools;
 import java.util.Comparator;
 import java.util.Date;
 
+/**
+ * 提醒时间比较器
+ * @author Silocean
+ *
+ */
 public class ClockTimeComparator implements Comparator<Date> {
 
 	@Override

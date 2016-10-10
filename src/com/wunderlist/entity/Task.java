@@ -2,11 +2,13 @@ package com.wunderlist.entity;
 
 import java.io.Serializable;
 
+/**
+ * 任务实体类
+ * @author Silocean
+ *
+ */
 public class Task implements Serializable {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private String taskId;
 	private String userId;

@@ -15,7 +15,11 @@ import android.widget.TimePicker.OnTimeChangedListener;
 import com.example.wunderlist.R;
 import com.wunderlist.slidingmenu.activity.TaskDetailsActivity;
 
-
+/**
+ * 截止日期设置对话框
+ * @author Silocean
+ *
+ */
 public class DateTimePickDialogUtil implements OnDateChangedListener, OnTimeChangedListener {
 	
 	private DatePicker datePicker;
@@ -44,8 +48,8 @@ public class DateTimePickDialogUtil implements OnDateChangedListener, OnTimeChan
 		if (!(null == initDateTime || "".equals(initDateTime) || "1900/1/1 0:00:00".equals(initDateTime))) {
 			calendar = this.getCalendarByInintData(initDateTime);
 		} else {
-			initDateTime = calendar.get(Calendar.YEAR) + "//"
-					+ calendar.get(Calendar.MONTH) + "//"
+			initDateTime = calendar.get(Calendar.YEAR) + "-"
+					+ calendar.get(Calendar.MONTH) + "-"
 					+ calendar.get(Calendar.DAY_OF_MONTH) + " "
 					+ calendar.get(Calendar.HOUR_OF_DAY) + ":"
 					+ calendar.get(Calendar.MINUTE);
@@ -106,7 +110,7 @@ public class DateTimePickDialogUtil implements OnDateChangedListener, OnTimeChan
 				timePicker.getCurrentMinute());
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 		dateTime = dateFormat.format(calendar.getTime());
 		ad.setTitle(sdf.format(calendar.getTime()));
@@ -123,9 +127,9 @@ public class DateTimePickDialogUtil implements OnDateChangedListener, OnTimeChan
 		Calendar calendar = Calendar.getInstance();
 
 		String strs[] = initDateTime.split(" ");
-		String yearStr = strs[0].split("/")[0];
-		String monthStr = strs[0].split("/")[1];
-		String dayStr = strs[0].split("/")[2];
+		String yearStr = strs[0].split("-")[0];
+		String monthStr = strs[0].split("-")[1];
+		String dayStr = strs[0].split("-")[2];
 		String hourStr = strs[1].split(":")[0];
 		String minuteStr = strs[1].split(":")[1];
 

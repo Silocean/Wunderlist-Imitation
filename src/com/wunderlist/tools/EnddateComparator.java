@@ -5,6 +5,11 @@ import java.util.Date;
 
 import com.wunderlist.entity.Task;
 
+/**
+ * 截止日期比较器
+ * @author Silocean
+ *
+ */
 public class EnddateComparator implements Comparator<Task> {
 
 	@Override

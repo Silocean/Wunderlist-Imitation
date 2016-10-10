@@ -9,13 +9,20 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Common;
+import com.wunderlist.entity.CommonUser;
 import com.wunderlist.sqlite.SQLiteService;
 import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.MySharedPreferences;
 
+/**
+ * 设置界面
+ * @author Silocean
+ *
+ */
 public class SettingsActivity extends ActionbarBaseActivity implements
 		OnClickListener {
 
@@ -28,6 +35,8 @@ public class SettingsActivity extends ActionbarBaseActivity implements
 	private RelativeLayout settingsFeedback = null;
 
 	private ImageView settingsImageicon = null;
+	
+	private TextView usernameTextView = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +60,20 @@ public class SettingsActivity extends ActionbarBaseActivity implements
 		settingsFeedback.setOnClickListener(this);
 		settingsImageicon = (ImageView) findViewById(R.id.settings_imageicon);
 		this.getPreferences();
+		this.initData();
 	}
 
+	/**
+	 * 初始化界面数据
+	 */
+	private void initData() {
+		usernameTextView = (TextView)findViewById(R.id.settings_name);
+		usernameTextView.setText(CommonUser.USERNAME);
+	}
+
+	/**
+	 * 获取sharedPreference
+	 */
 	private void getPreferences() {
 		SharedPreferences preferences = MySharedPreferences
 				.getPreferences(getApplicationContext());

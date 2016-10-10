@@ -1369,12 +1369,22 @@ containing a value of this type.
         /**  Description of a share target (both in the list of such or the default share button) in a ShareActionProvider (share UI). [CHAR LIMIT=NONE] 
          */
         public static final int abs__shareactionprovider_share_with_application=0x7f0b0007;
-        public static final int action_settings=0x7f0b0011;
+        public static final int action_settings=0x7f0b0010;
+        public static final int activity_addreceiver_addemail=0x7f0b001b;
+        public static final int activity_addreceiver_contract=0x7f0b001c;
+        public static final int activity_reply_addcomment=0x7f0b0019;
+        public static final int activity_reply_empty_text1=0x7f0b0017;
+        public static final int activity_reply_empty_text2=0x7f0b0018;
+        public static final int activity_reply_sendbutton=0x7f0b001a;
         public static final int app_name=0x7f0b000d;
+        public static final int email=0x7f0b0012;
         public static final int hello_world=0x7f0b000e;
+        public static final int login=0x7f0b0014;
         public static final int menu_settings=0x7f0b000f;
-        public static final int title_activity_settings=0x7f0b0012;
-        public static final int title_activity_settingsactivity=0x7f0b0010;
+        public static final int password=0x7f0b0013;
+        public static final int popup_sortby_enddate=0x7f0b0016;
+        public static final int popup_sortby_subject=0x7f0b0015;
+        public static final int title_activity_settings=0x7f0b0011;
     }
     public static final class style {
         public static final int AnimationPreview=0x7f0c005d;

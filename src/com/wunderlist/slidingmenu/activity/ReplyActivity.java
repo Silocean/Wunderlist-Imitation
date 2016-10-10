@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
+import com.wunderlist.entity.Common;
 import com.wunderlist.entity.CommonUser;
 import com.wunderlist.entity.Reply;
 import com.wunderlist.tools.MyActivityManager;
@@ -31,6 +32,11 @@ import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.TimeConvertTool;
 import com.wunderlist.tools.WebServiceRequest;
 
+/**
+ * 回复界面
+ * @author Silocean
+ *
+ */
 public class ReplyActivity extends ActionbarBaseActivity implements OnClickListener {
 	
 	private String barTitle = null;
@@ -65,6 +71,9 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		super.onCreate(savedInstanceState);
 	}
 	
+	/**
+	 * 初始化界面数据
+	 */
 	private void initData() {
 		barTitle = getIntent().getStringExtra("title");
 		setTitle(barTitle);
@@ -159,11 +168,16 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 				System.out.println("没有数据");
 			}
 		} else {
-			//Common.ToastIfNetworkProblem(getApplicationContext());
+			Common.ToastIfNetworkProblem(getApplicationContext());
 		}
 		return replys;
 	}
 	
+	/**
+	 * 回复列表数据填充器
+	 * @author Silocean
+	 *
+	 */
 	private class ReplyListItemAdapter extends BaseAdapter {
 		
 		private LinkedList<Reply> list;
@@ -202,7 +216,6 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 			holder = new ViewHolder();
 			if(convertView == null) {
 				convertView = inflater.inflate(resId, null);
-				//holder.replyHeadImageView = (ImageView)convertView.findViewById(R.id.reply_headimage);
 				holder.replyEmailTextView = (TextView)convertView.findViewById(R.id.reply_email);
 				holder.replyContentTextView = (TextView)convertView.findViewById(R.id.reply_content);
 				holder.replyTimeTextView = (TextView)convertView.findViewById(R.id.reply_time);
@@ -218,7 +231,6 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		}
 		
 		private class ViewHolder {
-			//private ImageView replyHeadImageView;
 			private TextView replyEmailTextView;
 			private TextView replyContentTextView;
 			private TextView replyTimeTextView;
@@ -245,16 +257,16 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 	
 	/**
 	 * 添加回复
-	 * @param taskId2
+	 * @param taskId
 	 * @param userid
 	 * @param useremail
 	 * @param content
 	 */
 	private void addReply(String taskId, String userid, String useremail,
 			String content) {
-		AddReply task = new AddReply(taskId, userid, useremail, content);
-		task.execute("");
+		new AddReply(taskId, userid, useremail, content).execute("");
 	}
+	
 	/**
 	 * 异步任务，用户添加回复
 	 * @author Silocean

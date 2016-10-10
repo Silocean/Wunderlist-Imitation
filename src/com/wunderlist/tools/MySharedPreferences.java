@@ -4,6 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+/**
+ * sharedPreferee管理
+ * @author Silocean
+ *
+ */
 public class MySharedPreferences {
 	
 	private static final String PREFERRENCES_NAME = "sharedPreferences";

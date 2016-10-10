@@ -9,6 +9,11 @@ import android.content.Intent;
 
 import com.wunderlist.entity.Task;
 
+/**
+ * 闹铃提醒
+ * @author Silocean
+ *
+ */
 public class ClockAlarmUtil {
 	
 	public static AlarmManager alarmManager = null;

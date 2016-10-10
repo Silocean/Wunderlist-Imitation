@@ -7,6 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.wunderlist.entity.User;
 
+/**
+ * 对sqlLite数据库进行数据操作的类
+ * @author Silocean
+ *
+ */
 public class SQLiteService {
 	
 	DBOpenHelper openHelper;

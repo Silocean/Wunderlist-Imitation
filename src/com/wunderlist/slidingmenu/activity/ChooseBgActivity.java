@@ -21,6 +21,11 @@ import com.wunderlist.slidingmenu.fragment.MainFragment;
 import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.MySharedPreferences;
 
+/**
+ * 选择主界面背景界面
+ * @author Silocean
+ *
+ */
 @SuppressWarnings("deprecation")
 public class ChooseBgActivity extends ActionbarBaseActivity {
 
@@ -51,12 +56,20 @@ public class ChooseBgActivity extends ActionbarBaseActivity {
 		super.onCreate(savedInstanceState);
 	}
 
+	/**
+	 * 获取sharedPreference
+	 */
 	private void getPreferences() {
 		SharedPreferences preferences = MySharedPreferences
 				.getPreferences(getApplicationContext());
 		bgId = preferences.getInt(MySharedPreferences.BGID, 0);
 	}
 
+	/**
+	 * 背景图片数据填充器
+	 * @author Silocean
+	 *
+	 */
 	private class ImageAdapter extends BaseAdapter {
 
 		int mGalleryItemBackground;

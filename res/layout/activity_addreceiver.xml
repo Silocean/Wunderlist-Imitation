@@ -16,7 +16,7 @@
 	        android:id="@+id/addreceiver_email_edittext"
 	        android:inputType="textEmailAddress"
 	        android:background="@drawable/wl_add_message_edit_text"
-	        android:hint="电子邮件地址..."
+	        android:hint="@string/activity_addreceiver_addemail"
 	        android:textSize="12sp"
 	        android:layout_marginLeft="5dip"
 	        android:layout_marginRight="5dip"
@@ -24,6 +24,7 @@
 	    <ImageView 
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:contentDescription="@string/app_name"
 	        android:id="@+id/addreceiver_rightaddicon"
 	        android:visibility="gone"
 	        android:layout_alignParentRight="true"
@@ -41,7 +42,7 @@
 	    <TextView 
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="相关联系人"
+	        android:text="@string/activity_addreceiver_contract"
 	        android:layout_alignParentLeft="true"
 	        android:layout_marginLeft="10dip" />
     </RelativeLayout>

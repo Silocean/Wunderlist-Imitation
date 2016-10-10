@@ -28,7 +28,18 @@ import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.WebServiceRequest;
 
+/**
+ * 登录界面
+ * @author Silocean
+ *
+ */
 public class LoginActivity extends Activity implements OnClickListener {
+	
+	private static final int MSG_CONNECT_TIMEOUT = 0;
+	private static final int MSG_WRONG_Account = 1;
+	private static final int MSG_WRONG_PASSWORD = 2;
+	private static final int MSG_SUCCESS_LOGIN = 3;
+	private static final int MSG_WRONG_PATH = 4;
 	
 	private EditText emailEditText;
 	private EditText passwordeEditText;
@@ -43,21 +54,23 @@ public class LoginActivity extends Activity implements OnClickListener {
 	UIHandler handler = new UIHandler();
 	
 	@SuppressLint("HandlerLeak")
-	private class UIHandler extends Handler{
+	private class UIHandler extends Handler {
 
 		@Override
 		public void handleMessage(Message msg) {
 			dialog.dismiss();
-			if(msg.arg1 == 0){
+			if(msg.arg1 == MSG_CONNECT_TIMEOUT){
 				Toast.makeText(getApplicationContext(), "连接超时!", Toast.LENGTH_SHORT).show();
-			} else if(msg.arg1 == 1){
+			} else if(msg.arg1 == MSG_SUCCESS_LOGIN){
 				Intent intent = new Intent(getApplicationContext(), SlidingActivity.class);
 				startActivity(intent);
 				finish();
-			} else if(msg.arg1 == 2){
+			} else if(msg.arg1 == MSG_WRONG_PASSWORD){
 				Toast.makeText(getApplicationContext(), "密码不对!", Toast.LENGTH_SHORT).show();
-			} else if(msg.arg1 == 3){
+			} else if(msg.arg1 == MSG_WRONG_Account){
 				Toast.makeText(getApplicationContext(), "没有此用户，请检查用户名是否正确!", Toast.LENGTH_SHORT).show();
+			} else if(msg.arg1 == MSG_WRONG_PATH){
+				Toast.makeText(getApplicationContext(), "网络路径有问题", Toast.LENGTH_SHORT).show();
 			}
 		}
 		
@@ -92,7 +105,8 @@ public class LoginActivity extends Activity implements OnClickListener {
 			break;
 		}
 	}
-	/*
+	
+	/**
 	 * 登录线程
 	 */
 	private class LoginThread extends Thread {
@@ -103,10 +117,13 @@ public class LoginActivity extends Activity implements OnClickListener {
 				login(email, password);
 				handler.sendMessage(message);
 			} catch (Exception e) {
+				message.arg1 = MSG_WRONG_PATH;
+				handler.sendMessage(message);
 				e.printStackTrace();
 			}
 		}
 	}
+	
 	/**
 	 * 登录
 	 * @param email 用户邮箱
@@ -118,8 +135,8 @@ public class LoginActivity extends Activity implements OnClickListener {
 		String string = new String(data).replaceAll("\\$strUserCode", email).replaceAll("\\$strPwd", password);
 		data = string.getBytes();
 		String json = WebServiceRequest.SendPost(inputStream, data, "CheckUserResult");
-		if(json==null){// 如果json数据为null
-			message.arg1 = 0; //表示连接超时
+		if(json==null){// 如果json数据为null，表示连接超时
+			message.arg1 = MSG_CONNECT_TIMEOUT;
 		} else {// 如果json不为null，解析它，并做相应判断
 			JSONObject object = new JSONObject(json);
 			String str = (String) object.get("msg");
@@ -131,11 +148,11 @@ public class LoginActivity extends Activity implements OnClickListener {
 				CommonUser.USERID = user.getUserSID();
 				CommonUser.USEREMAIL = user.getUserEmail();
 				CommonUser.UERPASSWORD = user.getUserPassword();
-				message.arg1 = 1; //表示登陆成功
+				message.arg1 = MSG_SUCCESS_LOGIN; //表示登陆成功
 			} else if(str.equals("失败!密码不正确!")){
-				message.arg1 = 2; //表示登陆失败，密码不对
+				message.arg1 = MSG_WRONG_PASSWORD; //表示登陆失败，密码不对
 			} else if(str.equals("失败!系统不存在此用户，请确认用户名是否正确!")){
-				message.arg1 = 3; //表示登陆失败，用户名不对
+				message.arg1 = MSG_WRONG_Account; //表示登陆失败，用户名不对
 			}
 		}
 	}

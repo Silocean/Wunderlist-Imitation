@@ -1,5 +1,10 @@
 package com.wunderlist.entity;
 
+/**
+ * 用户实体类
+ * @author Silocean
+ *
+ */
 public class User {
 	
 	private String userSID;

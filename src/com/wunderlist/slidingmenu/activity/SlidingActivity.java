@@ -10,7 +10,6 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.example.wunderlist.R;
-import com.wunderlist.entity.Common;
 import com.wunderlist.entity.CommonUser;
 import com.wunderlist.entity.User;
 import com.wunderlist.slidingmenu.fragment.LeftFragment;
@@ -20,6 +19,11 @@ import com.wunderlist.slidingmenu.view.SlidingMenu;
 import com.wunderlist.sqlite.SQLiteService;
 import com.wunderlist.tools.MyActivityManager;
 
+/**
+ * 主窗体，包含三个fragment
+ * @author Silocean
+ *
+ */
 public class SlidingActivity extends SherlockFragmentActivity {
 	
 	private SlidingMenu mSlidingMenu;
@@ -53,11 +57,11 @@ public class SlidingActivity extends SherlockFragmentActivity {
 	 * 初始化Common类中的静态变量
 	 */
 	private void initCommonData() {
-		Common.isBack = false;
 		SQLiteService service = new SQLiteService(getApplicationContext());
 		User user = service.getUserInfo();
 		CommonUser.USERID = user.getUserSID();
 		CommonUser.USEREMAIL = user.getUserEmail();
+		CommonUser.USERNAME = user.getUserName();
 		CommonUser.UERPASSWORD = user.getUserPassword();
 	}
 	
@@ -100,6 +104,10 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	/**
+	 * 设置是否处于正在刷新数据状态
+	 * @param isRefreshing
+	 */
 	public static void setIsRefreshing(boolean isRefreshing) {
 		SlidingActivity.isRefreshing = isRefreshing;
 	}
@@ -119,6 +127,10 @@ public class SlidingActivity extends SherlockFragmentActivity {
 	public static String getBarTitle() {
 		return actionBar.getTitle().toString();
 	}
+	
+	/**
+	 * 初始化三个fragment
+	 */
 	private void init() {
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.slidingMenu);
 		mSlidingMenu.setLeftView(getLayoutInflater().inflate(R.layout.left_frame, null));
@@ -138,18 +150,18 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		t.commit();
 	}
 
+	/**
+	 * 显示左边的fragment
+	 */
 	public void showLeft() {
 		mSlidingMenu.showLeftView();
 	}
 
+	/**
+	 * 显示右边的fragment
+	 */
 	public void showRight() {
 		mSlidingMenu.showRightView();
-	}
-	
-	@Override
-	protected void onPause() {
-		Common.isBack = true;
-		super.onPause();
 	}
 	
 	@Override

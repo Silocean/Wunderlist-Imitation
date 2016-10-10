@@ -4,6 +4,11 @@ import java.util.HashMap;
 
 import android.app.Activity;
 
+/**
+ * activity管理器
+ * @author Silocean
+ *
+ */
 public class MyActivityManager {
 	
 	public static HashMap<String, Activity> activities = new HashMap<String, Activity>();

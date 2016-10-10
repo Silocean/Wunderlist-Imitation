@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Common;
@@ -31,6 +32,11 @@ import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.WebServiceRequest;
 
+/**
+ * 添加接收人界面
+ * @author Silocean
+ *
+ */
 public class AddReceiverActivity extends ActionbarBaseActivity implements OnClickListener {
 	
 	private ListView listView;
@@ -64,6 +70,11 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 		super.onCreate(savedInstanceState);
 	}
 	
+	/**
+	 * useremail编辑框监视器
+	 * @author Silocean
+	 *
+	 */
 	private class UserEmailEditTextWatcher implements TextWatcher {
 
 		@Override
@@ -104,10 +115,18 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 		adapter.notifyDataSetChanged();
 	}
 	
+	/**
+	 * 获取联系人
+	 */
 	private void getContracts() {
 		new GetContract().execute("");
 	}
 	
+	/**
+	 * 接收人数据列表填充器
+	 * @author Silocean
+	 *
+	 */
 	private class AddReceiverListItemAdapter extends BaseAdapter {
 		
 		private LinkedList<Receiver> list;
@@ -162,10 +181,14 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 			holder.emailTextView.setText(receiver.getReceiverEmail());
 			holder.addImageView.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
-					selectedContracts.add(((Receiver)getItem(position)).getReceiverEmail());
-					contracts.remove(position);
-					adapter.setData(contracts);
-					adapter.notifyDataSetChanged();
+					if(!selectedContracts.contains(((Receiver)getItem(position)).getReceiverEmail())) {
+						selectedContracts.add(((Receiver)getItem(position)).getReceiverEmail());
+						contracts.remove(position);
+						adapter.setData(contracts);
+						adapter.notifyDataSetChanged();
+					} else {
+						Toast.makeText(getApplicationContext(), "你已添加过此接收人", Toast.LENGTH_SHORT).show();
+					}
 				}
 			});
 			return convertView;
@@ -179,6 +202,11 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 		
 	}
 	
+	/**
+	 * 异步任务，用户获取联系人
+	 * @author Silocean
+	 *
+	 */
 	private class GetContract extends AsyncTask<String, Integer, LinkedList<Receiver>> {
 
 		@Override
@@ -198,14 +226,16 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 
 		@Override
 		protected void onPostExecute(LinkedList<Receiver> contracts) {
+			tempList.removeAll(tempList);
 			for(int i=0; i<contracts.size(); i++) {
 				String email = contracts.get(i).getReceiverEmail();
 				for(int j=0; j<receivers.size(); j++) {
 					if(email.equals(receivers.get(j))) {
-						contracts.remove(i);
+						tempList.add(contracts.get(i));
 					}
 				}
 			}
+			contracts.removeAll(tempList);
 			adapter.setData(contracts);
 			adapter.notifyDataSetChanged();
 		}
@@ -245,7 +275,7 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 				System.out.println("没有数据");
 			}
 		} else {
-			//Common.ToastIfNetworkProblem(getApplicationContext());
+			Common.ToastIfNetworkProblem(getApplicationContext());
 		}
 		return contracts;
 	}
@@ -260,19 +290,24 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 
 	@Override
 	public void onClick(View v) {
-		if(contracts.size() > 0) {
-			if(!contracts.get(0).getReceiverEmail().equals(emailEditText.getText().toString().trim())) {
+		String email = emailEditText.getText().toString().trim();
+		if(!email.equals(CommonUser.USEREMAIL)) {
+			if(contracts.size() > 0) {
+				if(!contracts.get(0).getReceiverEmail().equals(email)) {
+					Receiver receiver = new Receiver("", "", "", "", "", "");
+					receiver.setReceiverEmail(emailEditText.getText().toString().trim());
+					contracts.addFirst(receiver);
+				}
+			} else {
 				Receiver receiver = new Receiver("", "", "", "", "", "");
-				receiver.setReceiverEmail(emailEditText.getText().toString().trim());
+				receiver.setReceiverEmail(email);
 				contracts.addFirst(receiver);
 			}
+			adapter.setData(contracts);
+			adapter.notifyDataSetChanged();
 		} else {
-			Receiver receiver = new Receiver("", "", "", "", "", "");
-			receiver.setReceiverEmail(emailEditText.getText().toString().trim());
-			contracts.addFirst(receiver);
+			Toast.makeText(getApplicationContext(), "你不能添加自己为接收人", Toast.LENGTH_SHORT).show();
 		}
-		adapter.setData(contracts);
-		adapter.notifyDataSetChanged();
 	}
 
 }

@@ -7,10 +7,15 @@ import java.util.Date;
 
 import android.annotation.SuppressLint;
 
+/**
+ * 时间转换工具
+ * @author Silocean
+ *
+ */
 public class TimeConvertTool {
 	
 	@SuppressLint("SimpleDateFormat")
-	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	/**
 	 * 日期转换成字符串
@@ -199,9 +204,9 @@ public class TimeConvertTool {
 			} else if(second == 0) {
 				return "刚刚";
 			}
-			return time.substring(5, 10);
+			return time.split(" ")[0].substring(5);
 		}
-		return time.substring(0, 10);
+		return time.split(" ")[0];
 	}
 	
 }

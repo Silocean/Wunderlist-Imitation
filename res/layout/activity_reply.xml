@@ -13,6 +13,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/reply_empty_icon"
+            android:contentDescription="@string/app_name"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:src="@drawable/wl_empty_comments_placeholder" />
@@ -22,13 +23,13 @@
             android:id="@+id/reply_empty_text1"
             android:layout_below="@id/reply_empty_icon"
             android:layout_centerHorizontal="true"
-            android:text="No comments yet." />
+            android:text="@string/activity_reply_empty_text1" />
         <TextView 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/reply_empty_text1"
             android:layout_centerHorizontal="true"
-            android:text="Start your conversation here." />
+            android:text="@string/activity_reply_empty_text2" />
     </RelativeLayout>
     
      <ListView
@@ -53,7 +54,7 @@
 	        android:layout_alignParentLeft="true"
 	        android:layout_marginLeft="5dip"
 	        android:layout_centerVertical="true"
-	        android:hint="Add a comment..."
+	        android:hint="@string/activity_reply_addcomment"
 	        android:background="@drawable/wl_add_message_edit_text"
 	        android:maxLines="3"
 	        android:textSize="14sp"/>
@@ -64,7 +65,7 @@
 	        android:layout_alignParentRight="true"
 	        android:layout_centerVertical="true"
 	        android:layout_marginRight="5dip"
-	        android:text="发送"
+	        android:text="@string/activity_reply_sendbutton"
 	        android:textColor="@color/walkthrough_button_text_color"
 	        android:background="@drawable/walkthrough_loginbutton_icon_selector" />
 	</RelativeLayout>

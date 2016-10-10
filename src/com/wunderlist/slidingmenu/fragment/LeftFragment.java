@@ -13,10 +13,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.wunderlist.R;
-import com.wunderlist.entity.User;
+import com.wunderlist.entity.CommonUser;
 import com.wunderlist.slidingmenu.activity.SettingsActivity;
 import com.wunderlist.slidingmenu.activity.SlidingActivity;
-import com.wunderlist.sqlite.SQLiteService;
 
 @SuppressLint("ValidFragment")
 public class LeftFragment extends Fragment implements OnClickListener {
@@ -61,11 +60,12 @@ public class LeftFragment extends Fragment implements OnClickListener {
 		super.onActivityCreated(savedInstanceState);
 	}
 
+	/**
+	 * 初始化界面数据
+	 */
 	private void initData() {
-		SQLiteService service = new SQLiteService(getActivity());
-		User user = service.getUserInfo();
-		userNameTextView.setText(user.getUserName());
-		userEmailTextView.setText(user.getUserEmail());
+		userNameTextView.setText(CommonUser.USERNAME);
+		userEmailTextView.setText(CommonUser.USEREMAIL);
 	}
 
 	@Override

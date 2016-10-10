@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="@drawable/wl_walkthrough_login_background" >
     
     <ImageView 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/login_ribbon"
+        android:contentDescription="@string/app_name"
         android:src="@drawable/wl_login_ribbon_new_lower_part"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
@@ -16,6 +17,7 @@
         android:layout_width="250dip"
         android:layout_height="wrap_content"
         android:id="@+id/login_paper_top"
+        android:contentDescription="@string/app_name"
         android:layout_below="@id/login_ribbon"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dip"
@@ -32,6 +34,7 @@
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:id="@+id/login_email_icon"
+    	    android:contentDescription="@string/app_name"
     	    android:src="@drawable/wl_login_email_glyph"
     	    android:layout_alignParentLeft="true"
     	    android:layout_marginLeft="15dip"
@@ -39,7 +42,7 @@
     	<EditText 
     	    android:layout_width="fill_parent"
     	    android:layout_height="wrap_content"
-    	    android:hint="电子邮箱"
+    	    android:hint="@string/email"
     	    android:textColor="@color/listitem_text_color"
     	    android:id="@+id/login_email_editText"
     	    android:inputType="textEmailAddress"
@@ -61,6 +64,7 @@
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:id="@+id/login_password_icon"
+    	    android:contentDescription="@string/app_name"
     	    android:src="@drawable/wl_login_password_glyph"
     	    android:layout_alignParentLeft="true"
     	    android:layout_marginLeft="15dip"
@@ -68,7 +72,7 @@
     	<EditText 
     	    android:layout_width="fill_parent"
     	    android:layout_height="wrap_content"
-    	    android:hint="密码"
+    	    android:hint="@string/password"
     	    android:textColor="@color/listitem_text_color"
     	    android:id="@+id/login_password_editText"
     	    android:inputType="textPassword"
@@ -82,6 +86,7 @@
         android:layout_width="250dip"
         android:layout_height="wrap_content"
         android:id="@+id/login_paper_bottom"
+        android:contentDescription="@string/app_name"
         android:layout_below="@id/login_paper_middle_down"
         android:layout_centerHorizontal="true"
         android:background="@drawable/wl_login_paper_bottom" />
@@ -89,7 +94,7 @@
     <Button 
         android:layout_width="250dip"
         android:layout_height="50dip"
-        android:text="登录"
+        android:text="@string/login"
         android:textSize="16sp"
         android:textColor="@color/walkthrough_button_text_color"
         android:id="@+id/login_loginbutton"

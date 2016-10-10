@@ -20,10 +20,12 @@ import com.example.wunderlist.R;
 import com.wunderlist.entity.CommonUser;
 import com.wunderlist.tools.MyActivityManager;
 
+/**
+ * 接收人界面
+ * @author Silocean
+ *
+ */
 public class ReceiversActivity extends ActionbarBaseActivity implements OnClickListener {
-	
-	//private String barTitle = null;
-	//private String taskId = null;
 	
 	private ListView listView;
 	private ReceiverListItemAdapter adapter;
@@ -69,16 +71,22 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 		adapter.notifyDataSetChanged();
 	}
 	
+	/**
+	 * 初始化界面数据
+	 */
 	private void initData() {
-		//barTitle = getIntent().getStringExtra("title");
 		setTitle("成员列表");
-		//taskId = getIntent().getStringExtra("taskId");
 		receivers = getIntent().getStringArrayListExtra("receivers");
 		orignialReceivers.addAll(receivers);
 		adapter.setData(receivers);
 		adapter.notifyDataSetChanged();
 	}
 	
+	/**
+	 * 接收人数据列表填充器
+	 * @author Silocean
+	 *
+	 */
 	private class ReceiverListItemAdapter extends BaseAdapter {
 		
 		private ArrayList<String> list;
