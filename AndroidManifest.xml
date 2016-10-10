@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.wunderlist"
-    android:versionCode="2"
-    android:versionName="wunderlist 1.9" >
+    package="com.trinfo.wunderlist"
+    android:versionCode="1"
+    android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="18" />
     
     <permission
-        android:name="com.example.wunderlist.permission.JPUSH_MESSAGE"
+        android:name="com.trinfo.wunderlist.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
     
     <!-- Required  一些系统要求的权限，如访问网络等-->
@@ -33,34 +33,34 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-	
+
     <application
         android:allowBackup="true"
-        android:name="com.wunderlist.application.StartApplication"
+        android:name="com.trinfo.wunderlist.application.StartApplication"
         android:icon="@drawable/my_icon_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.SlidingActivity"
+            android:name="com.trinfo.wunderlist.activity.MainActivity"
             android:launchMode="singleTask"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.SettingsActivity"
+            android:name="com.trinfo.wunderlist.activity.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.TaskDetailsActivity" >
+            android:name="com.trinfo.wunderlist.activity.TaskDetailsActivity" >
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.NoteActivity" >
+            android:name="com.trinfo.wunderlist.activity.NoteActivity" >
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.LoginActivity"
+            android:name="com.trinfo.wunderlist.activity.LoginActivity"
             android:theme="@style/Theme.Sherlock.NoActionBar" >
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.StartActivity"
+            android:name="com.trinfo.wunderlist.activity.StartActivity"
             android:theme="@style/Theme.Sherlock.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -68,27 +68,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.RegisterAndLoginActivity"
+            android:name="com.trinfo.wunderlist.activity.RegisterAndLoginActivity"
             android:theme="@style/Theme.Sherlock.NoActionBar" >
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.ReplyActivity" >
+            android:name="com.trinfo.wunderlist.activity.ReplyActivity" >
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.InboxActivity" >
+            android:name="com.trinfo.wunderlist.activity.InboxActivity" >
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.ReceiversActivity" >
+            android:name="com.trinfo.wunderlist.activity.ReceiversActivity" >
         </activity>
          <activity
-            android:name="com.wunderlist.slidingmenu.activity.AddReceiverActivity" >
+            android:name="com.trinfo.wunderlist.activity.AddReceiverActivity" >
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.ChooseBgActivity"
+            android:name="com.trinfo.wunderlist.activity.ChooseBgActivity"
             android:theme="@style/Theme.Sherlock.NoActionBar" >
         </activity>
         
-        <!-- Required  SDK核心功能-->
+         <!-- Required  SDK核心功能-->
         <service
             android:name="cn.jpush.android.service.DownloadService"
             android:enabled="true"
@@ -130,7 +130,7 @@
         <receiver android:name="cn.jpush.android.service.AlarmReceiver" />
         <!-- User defined.  For test only  用户自定义的广播接收器-->
         <receiver
-            android:name="com.wunderlist.service.PushNotificationReceiver"
+            android:name="com.trinfo.wunderlist.service.PushNotificationReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.REGISTRATION" /> <!--Required  用户注册SDK的intent-->
@@ -143,8 +143,8 @@
             </intent-filter>
         </receiver>
         
-        <receiver 
-            android:name="com.wunderlist.service.ClockBroadCastReceiver">
+         <receiver 
+            android:name="com.trinfo.wunderlist.service.ClockBroadCastReceiver">
             <intent-filter >
                 <action android:name="com.wunderlist.clockremind"/>
             </intent-filter>
@@ -156,5 +156,5 @@
         <meta-data android:name="JPUSH_MASTERSECRET" android:value="05ff2313df19e4036533ae61"/> <!--  </>值来自开发者平台取得的MasterSecret-->
         
     </application>
-    
+
 </manifest>
