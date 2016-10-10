@@ -45,6 +45,7 @@ import android.widget.Toast;
 
 import com.trinfo.wunderlist.R;
 import com.trinfo.wunderlist.activity.MainActivity;
+import com.trinfo.wunderlist.activity.ReceiversActivity;
 import com.trinfo.wunderlist.activity.TaskDetailsActivity;
 import com.trinfo.wunderlist.entity.Common;
 import com.trinfo.wunderlist.entity.CommonUser;
@@ -539,6 +540,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				String json = WebServiceRequest.SendPost(inputStream, data,
 						"GetTaskBoxListResult");
 				tasks = parseJSON(json);
+System.out.println("="+json);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -960,7 +962,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		 * @param task
 		 */
 		private void initListItemView(final int position, View convertView,
-				Task task) {
+				final Task task) {
 			holder.leftLayout = (RelativeLayout) convertView
 					.findViewById(R.id.task_left_relativelayout);
 			holder.middleLayout = (RelativeLayout) convertView
@@ -1006,7 +1008,11 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			holder.taskReveiversIcon.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Toast.makeText(mainActivity, "icon", Toast.LENGTH_SHORT).show();
+					//Toast.makeText(mainActivity, "icon", Toast.LENGTH_SHORT).show();
+					Intent intent = new Intent(mainActivity, ReceiversActivity.class);
+					intent.putExtra("tag", 1);
+					intent.putExtra("task", task);
+					startActivity(intent);
 				}
 			});
 		}

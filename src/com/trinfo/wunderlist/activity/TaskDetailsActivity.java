@@ -69,6 +69,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 
 	private Task task = null;
 	private String barTitle = null;
+	private String note = null;
 	private String subject = null;
 	private String enddate = null;
 	private String clock = null;
@@ -141,6 +142,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		remindnum = task.getRemindnum();
 		remindtype = task.getRemindtype();
 		priority = task.getPriority();
+		note = this.formatNoteAndReplyContent(task.getDisc());
 		super.setTitle(barTitle);
 		titleEditText.setText(task.getSubject());
 		subject = task.getSubject();
@@ -641,6 +643,21 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		}
 
 	}
+	
+	/**
+	 * 格式化笔记字符串
+	 * 
+	 * @param note
+	 * @return
+	 */
+	private String formatNoteAndReplyContent(String str) {
+		if(str == null) {
+			return "";
+		} else {
+			return str.replaceAll("<[a-zA-Z]+>", "").replaceAll("</[a-zA-Z]+>", "")
+					.replaceAll("&nbsp;", " ");
+		}
+	}
 
 	/**
 	 * 更新任务星标状态
@@ -816,6 +833,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 						.replaceAll("\\&USERID", task.getUserId())
 						.replaceAll("\\&MFROM", task.getTaskFrom())
 						.replaceAll("\\&SUBJECT", subject)
+						.replaceAll("\\&DISC", note)
 						.replaceAll("\\&PRIORITY", task.getPriority())
 						.replaceAll("\\&ENDDATE", enddate)
 						.replaceAll("\\&REMINDTYPE", remindtype)
@@ -875,6 +893,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		sb.append("\"" + task.getTaskFrom() + "\",");
 		sb.append("\"SUBJECT\":");
 		sb.append("\"" + this.subject + "\",");
+		sb.append("\"DISC\":");
+		sb.append("\"" + this.note + "\",");
 		sb.append("\"PRIORITY\":");
 		sb.append("\"" + this.priority + "\",");
 		sb.append("\"ENDDATE\":");
