@@ -7,17 +7,18 @@ package com.trinfo.wunderlist.entity;
  */
 public class User {
 	
-	private String userSID;
-	private String userEmail;
-	private String userName;
-	private String userNameEn;
-	private String userImageUrl;
-	private String userPassword;
-	private String userSex;
-	private String userAge;
-	private String userHobby;
-	private String userMemo;
-	private String userMobile;
+	private String userSID = "";
+	private String userEmail = "";
+	private String userName = "";
+	private String userNameEn = "";
+	private String userImageUrl = "";
+	private String userPassword = "";
+	private String userSex = "";
+	private String userAge = "";
+	private String userHobby = "";
+	private String userMemo = "";
+	private String userMobile = "";
+	
 	public String getUserSID() {
 		return userSID;
 	}

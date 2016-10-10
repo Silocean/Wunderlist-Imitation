@@ -3,7 +3,9 @@ package com.trinfo.wunderlist.activity;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -266,7 +268,6 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		@Override
 		protected void onPostExecute(LinkedList<Reply> replys) {
 			adapter.setData(replys);
-			adapter.notifyDataSetChanged();
 			listView.setSelection(listView.getCount() - 1);
 		}
 
@@ -432,7 +433,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private ArrayList<String> parseReceiverJSON(String json) throws Exception {
 		ArrayList<String> receivers = new ArrayList<String>();
 		if (json != null) {
-			if(!json.equals("")) {
+			if (!json.equals("")) {
 				JSONObject object = new JSONObject(json);
 				int rows = Integer.parseInt(object.getString("rows"));
 				if (rows > 0) {
@@ -460,7 +461,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	private ArrayList<String> parseReceiverIdJSON(String json) throws Exception {
 		ArrayList<String> receiversId = new ArrayList<String>();
 		if (json != null) {
-			if(!json.equals("")) {
+			if (!json.equals("")) {
 				JSONObject object = new JSONObject(json);
 				int rows = Integer.parseInt(object.getString("rows"));
 				if (rows > 0) {
@@ -541,6 +542,16 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			} else {
 				addReply(task.getTaskId(), CommonUser.USERID,
 						CommonUser.USEREMAIL, content);
+				Reply reply = new Reply();
+				reply.setTaskId(task.getTaskId());
+				reply.setUserId(CommonUser.USERID);
+				reply.setUserEmail(CommonUser.USEREMAIL);
+				reply.setReplyContent(content);
+				reply.setCreateDate(TimeConvertTool.convertToString(new Date()));
+				replys.add(reply);
+				adapter.setData(replys);
+				adapter.notifyDataSetChanged();
+				listView.setSelection(listView.getCount());
 			}
 			replyContentEditText.setText("");
 			break;
@@ -624,17 +635,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		protected void onPostExecute(String json) {
 			try {
 				if (parseUpdateJSON(json)) {
-					Reply reply = new Reply();
-					reply.setTaskId(taskId);
-					reply.setUserId(userId);
-					reply.setUserEmail(userEmail);
-					reply.setReplyContent(content);
-					reply.setCreateDate(TimeConvertTool
-							.convertToString(new Date()));
-					replys.add(reply);
-					adapter.setData(replys);
-					adapter.notifyDataSetChanged();
-					listView.setSelection(listView.getCount());
+
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1001,6 +1002,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		System.out.println(result.getErrcode() + "===" + result.getErrmsg());
 	}
 
+
 	private class ChatListViewAdapter extends BaseAdapter {
 
 		LinkedList<Reply> list;
@@ -1011,6 +1013,30 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		private final int type_left = 0;
 		private final int type_right = 1;
 		private final int type_count = 2;
+		
+		// 用于存储信息是否显示时间的tag
+		private Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		private long time = 0L;
+		private int timeTag = 0;
+		private long timeBased = 0L;
+
+		private void recordTimeViewShowOrNot(LinkedList<Reply> list) {
+			map.clear();
+			for (int i = 0; i < list.size(); i++) {
+				Reply reply = list.get(i);
+				String sendTime = reply.getCreateDate();
+				time = TimeConvertTool.convertToDate(sendTime).getTime();
+				if (time - timeBased > 60 * 5 * 1000) {
+					timeBased = TimeConvertTool.convertToDate(sendTime).getTime();
+					map.put(i, 0);
+				} else {
+					map.put(i, 1);
+				}
+			}
+			time = 0L;
+			timeTag = 0;
+			timeBased = 0L;
+		}
 
 		public ChatListViewAdapter(Context context, LinkedList<Reply> list) {
 			this.list = list;
@@ -1020,6 +1046,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 
 		public void setData(LinkedList<Reply> list) {
 			this.list = list;
+			this.recordTimeViewShowOrNot(list);
 			notifyDataSetChanged();
 		}
 
@@ -1077,7 +1104,14 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 
 			// 时间
 			String sendTime = reply.getCreateDate();
-			holder.sendTimeTextView.setText(sendTime);
+			timeTag = map.get(position);
+
+			if (timeTag == 0) { // 显示时间
+				holder.sendTimeTextView.setVisibility(View.VISIBLE);
+				holder.sendTimeTextView.setText(sendTime);
+			} else {
+				holder.sendTimeTextView.setVisibility(View.GONE);
+			}
 
 			// 内容
 			String replyContent = reply.getReplyContent();

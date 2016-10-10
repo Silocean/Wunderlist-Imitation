@@ -14,7 +14,7 @@
     <string name="popup_sortby_enddate">按截止日期排序</string>
     <string name="activity_reply_empty_text1">No comments yet.</string>
     <string name="activity_reply_empty_text2">Start your conversation here.</string>
-    <string name="activity_reply_addcomment">Add a comment……</string>
+    <string name="activity_reply_addcomment">添加回复</string>
     <string name="activity_reply_sendbutton">发送</string>
     <string name="activity_addreceiver_addemail">电子邮件地址……</string>
     <string name="activity_addreceiver_contract">相关联系人</string>

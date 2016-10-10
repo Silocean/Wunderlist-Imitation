@@ -94,6 +94,7 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 				data = string.getBytes();
 				receiverJSON = WebServiceRequest.SendPost(inputStream, data,
 						"GetTaskDDetailResult");
+				System.out.println(taskId + "======");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

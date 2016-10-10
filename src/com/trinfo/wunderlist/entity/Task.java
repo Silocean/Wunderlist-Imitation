@@ -10,17 +10,17 @@ import java.io.Serializable;
 public class Task implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	private String taskId;
-	private String userId;
-	private String taskFrom;
-	private String subject;
-	private String disc;
-	private String priority;
-	private String enddate;
-	private String remindtype;
-	private String remindnum;
-	private String createDate;
-	private String isActive;
+	private String taskId = "";
+	private String userId = "";
+	private String taskFrom = "";
+	private String subject = "";
+	private String disc = "";
+	private String priority = "";
+	private String enddate = "";
+	private String remindtype = "";
+	private String remindnum = "";
+	private String createDate = "";
+	private String isActive = "";
 	
 	public Task() {
 	}

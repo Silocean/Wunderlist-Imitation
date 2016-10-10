@@ -7,13 +7,13 @@ package com.trinfo.wunderlist.entity;
  */
 public class Receiver {
 	
-	private String receiverId;
-	private String receiverEmail;
-	private String receiverName;
-	private String receiverSex;
-	private String receiverAge;
-	private String receiverHobby;
-	private String receiverMobile;
+	private String receiverId = "";
+	private String receiverEmail = "";
+	private String receiverName = "";
+	private String receiverSex = "";
+	private String receiverAge = "";
+	private String receiverHobby = "";
+	private String receiverMobile = "";
 	
 	public Receiver() {
 	}

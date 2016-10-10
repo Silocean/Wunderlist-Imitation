@@ -10,12 +10,13 @@ import java.io.Serializable;
 public class Reply implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
-	private String replyId;
-	private String taskId;
-	private String userId;
-	private String userEmail;
-	private String replyContent;
-	private String createDate;
+	private String replyId = "";
+	private String taskId = "";
+	private String userId = "";
+	private String userEmail = "";
+	private String replyContent = "";
+	private String createDate = "";
+	
 	public String getReplyId() {
 		return replyId;
 	}

@@ -38,14 +38,14 @@
             android:id="@+id/chat_item_chatcontent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/chat_item_headimage"
             android:layout_marginLeft="10dp"
             android:layout_toRightOf="@id/chat_item_headimage"
             android:background="@drawable/chat_item_left_chatcontent_bg_selector"
             android:clickable="true"
             android:focusable="true"
-            android:maxWidth="210dip"
-            android:textColor="#7f7f7f"
+            android:gravity="left|center"
+            android:lineSpacingExtra="2dp"
+            android:textColor="@android:color/black"
             android:textSize="16sp" />
     </RelativeLayout>
 

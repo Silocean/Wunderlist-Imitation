@@ -45,7 +45,7 @@
             android:focusable="true"
             android:gravity="left|center"
             android:lineSpacingExtra="2dp"
-            android:textColor="#f0f0f0"
+            android:textColor="@android:color/black"
             android:textSize="16sp" />
     </RelativeLayout>
 

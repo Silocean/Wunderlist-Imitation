@@ -254,9 +254,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			int totalHeight = 0;
 			for (int i = 0; i < adapter.getCount(); i++) {
 				View listItem = adapter.getView(i, null, listView);
-				if (listItem == null) {
-					System.out.println("nullllllll");
-				}
 				listItem.setLayoutParams(new LayoutParams(
 						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 				listItem.measure(0, 0);
@@ -267,6 +264,16 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					+ (listView.getDividerHeight() * (adapter.getCount() - 1));
 			((MarginLayoutParams) params).setMargins(0, 0, 0, 0);
 			listView.setLayoutParams(params);
+
+			completeCountTxt.setText(tasksComplete.size() + "个已完成的任务");
+			if (showCompleteTasks) {
+				completeVisibleIcon
+						.setImageResource(R.drawable.wl_taskview_icon_hide_selected);
+			} else {
+				completeVisibleIcon
+						.setImageResource(R.drawable.wl_taskview_icon_hide);
+			}
+
 		}
 	}
 
@@ -365,9 +372,10 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	 * 
 	 * @param taskId
 	 * @param status
+	 * @param position
 	 */
-	private void setStar(String taskId, String status) {
-		new SetStarTask(taskId, status).execute("");
+	private void setStar(String taskId, String status, int position) {
+		new SetStarTask(taskId, status, position).execute("");
 	}
 
 	/**
@@ -380,10 +388,12 @@ public class MainFragment extends Fragment implements OnScrollListener {
 
 		private String taskId;
 		private String status;
+		private int position;
 
-		public SetStarTask(String taskId, String status) {
+		public SetStarTask(String taskId, String status, int position) {
 			this.taskId = taskId;
 			this.status = status;
+			this.position = position;
 		}
 
 		@Override
@@ -408,7 +418,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		protected void onPostExecute(String result) {
 			try {
 				if (parseUpdateJSON(result)) {
-					updateTaskBoxList();
+					// updateTaskBoxList();
+					updateTaskBoxListStar(position, status);
 				} else {
 					Toast.makeText(getActivity(), "设置星标任务失败",
 							Toast.LENGTH_SHORT).show();
@@ -447,6 +458,18 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			sb.append("</string>");
 		}
 		return sb;
+	}
+
+	/**
+	 * 更新任务列表（星标状态更改）
+	 * 
+	 * @param position
+	 * @param status
+	 */
+	public void updateTaskBoxListStar(int position, String status) {
+		Task task = tasksNormal.get(position);
+		task.setPriority(status);
+		normalAdapter.setData(tasksNormal);
 	}
 
 	/**
@@ -542,14 +565,6 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				normalAdapter.setData(tasksNormal);
 				completeAdapter.setData(tasksComplete);
 
-				completeCountTxt.setText(tasksComplete.size() + "个已完成的任务");
-				if (showCompleteTasks) {
-					completeVisibleIcon
-							.setImageResource(R.drawable.wl_taskview_icon_hide_selected);
-				} else {
-					completeVisibleIcon
-							.setImageResource(R.drawable.wl_taskview_icon_hide);
-				}
 				showOrDismissCompleteTasks();
 
 				setListViewHeightBasedOnChildren(listView_taskComplete);
@@ -727,6 +742,11 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					.findViewById(R.id.task_right_icon);
 			holder.taskReveiversIcon = (ImageView) convertView
 					.findViewById(R.id.task_receivers_icon);
+			if (!task.getUserId().equals(CommonUser.USERID)) {
+				holder.taskReveiversIcon.setVisibility(View.GONE);
+			} else {
+				holder.taskReveiversIcon.setVisibility(View.VISIBLE);
+			}
 			if (task.getPriority() != null && !task.getPriority().equals("")
 					&& task.getPriority().equals("1")) { // 该任务是星标任务
 				holder.taskStarIcon
@@ -759,10 +779,12 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					if (priority != null) {
 						if (priority.equals("") || priority.equals("0")) {
 							// holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon);
-							setStar(list.get(position).getTaskId(), "1");
+							setStar(list.get(position).getTaskId(), "1",
+									position);
 						} else {
 							// holder.taskIcon.setImageResource(R.drawable.wl_task_ribbon_selected);
-							setStar(list.get(position).getTaskId(), "0");
+							setStar(list.get(position).getTaskId(), "0",
+									position);
 						}
 					}
 				}
@@ -785,7 +807,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					Intent intent = new Intent(getActivity(),
 							ReceiversActivity.class);
 					intent.putExtra("tag", 1);
-					intent.putExtra("task", task);
+					intent.putExtra("task", (Task) getItem(position));
 					startActivity(intent);
 				}
 			});
@@ -915,6 +937,11 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					.findViewById(R.id.task_right_icon);
 			holder.taskReveiversIcon = (ImageView) convertView
 					.findViewById(R.id.task_receivers_icon);
+			if (!task.getUserId().equals(CommonUser.USERID)) {
+				holder.taskReveiversIcon.setVisibility(View.GONE);
+			} else {
+				holder.taskReveiversIcon.setVisibility(View.VISIBLE);
+			}
 			if (task.getPriority() != null && !task.getPriority().equals("")
 					&& task.getPriority().equals("1")) { // 该任务是星标任务
 				holder.taskStarIcon
@@ -963,7 +990,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(),
 							TaskDetailsActivity.class);
-					intent.putExtra("task", (Task) getItem(position));
+					intent.putExtra("task", list.get(position));
 					intent.putExtra("title", MainActivity.getBarTitle());
 					intent.putExtra("position", position);
 					intent.putExtra("isComplete", true);
@@ -976,7 +1003,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					Intent intent = new Intent(getActivity(),
 							ReceiversActivity.class);
 					intent.putExtra("tag", 1);
-					intent.putExtra("task", task);
+					intent.putExtra("task", list.get(position));
 					startActivity(intent);
 				}
 			});
@@ -1046,12 +1073,16 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		private String taskId;
 		private String useremail;
 		private String status;
+		private int position;
+		private int tag;
 
 		public UpdateTaskStatus(String taskId, String useremail, String status,
 				int position, int tag) {
 			this.taskId = taskId;
 			this.useremail = useremail;
 			this.status = status;
+			this.position = position;
+			this.tag = tag;
 		}
 
 		@Override
@@ -1078,7 +1109,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		protected void onPostExecute(String result) {
 			try {
 				if (parseUpdateJSON(result)) {
-					updateTaskBoxList();
+					// updateTaskBoxList();
+					updateTaskBoxList(position, tag);
 				} else {
 					Toast.makeText(getActivity(), "更改任务状态失败",
 							Toast.LENGTH_SHORT).show();
@@ -1112,6 +1144,40 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		return false;
 	}
 
+	/**
+	 * 更新任务列表（normal to complete and complete to normal）
+	 * 
+	 * @param position
+	 * @param tag
+	 */
+	public void updateTaskBoxList(int position, int tag) {
+		Task tempTask;
+		switch (tag) {
+		case NORMALTOCOMPLETEORCANCEL:
+			tempTask = tasksNormal.get(position);
+			if (showCompleteTasks) {
+				tasksNormal.remove(position);
+				tasksComplete.addFirst(tempTask);
+			} else {
+				tasksNormal.remove(position);
+				tempCompleteList.add(tempTask);
+				tasksComplete.removeAll(tasksComplete);
+			}
+			break;
+		case COMPLETEORCANCELTONORMAL:
+			tempTask = tasksComplete.get(position);
+			tasksComplete.remove(position);
+			tasksNormal.add(tempTask);
+			break;
+		default:
+			break;
+		}
+		normalAdapter.setData(tasksNormal);
+		completeAdapter.setData(tasksComplete);
+		this.setListViewHeightBasedOnChildren(listView_taskComplete);
+		this.setClockAlarm();
+	}
+
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (resultCode) {
@@ -1122,19 +1188,65 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					.getBoolean("isTaskStatusChange");
 			boolean isTaskStarChange = bundle.getBoolean("isTaskStarChange");
 			if (isTaskChange) {
-				this.updateTaskBoxList();
+				// this.updateTaskBoxList();
+				int position = bundle.getInt("position");
+				String taskJSON = bundle.getString("taskJSON");
+				this.updateTaskBoxListSingleTask(taskJSON, position);
 			}
 			if (isTaskStatusChange) {
 				updateTaskBoxList();
 			}
 			if (isTaskStarChange) {
-				this.updateTaskBoxList();
+				// this.updateTaskBoxList();
+				int position = bundle.getInt("position");
+				String status = bundle.getString("taskStar");
+				this.updateTaskBoxListStar(position, status);
 			}
 			break;
 		}
 		default:
 			break;
 		}
+	}
+
+	/**
+	 * 更新任务列表（单个任务信息更改）
+	 * 
+	 * @param taskJSON
+	 * @param position
+	 */
+	private void updateTaskBoxListSingleTask(String taskJSON, int position) {
+		try {
+			Task task = this.parseSingleTaskJSON(taskJSON);
+			tasksNormal.remove(position);
+			tasksNormal.add(position, task);
+			normalAdapter.setData(tasksNormal);
+			this.setClockAlarm();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 解析单个任务json字符串
+	 * 
+	 * @param taskJSON
+	 * @return
+	 * @throws Exception
+	 */
+	private Task parseSingleTaskJSON(String taskJSON) throws Exception {
+		Task task = new Task();
+		JSONObject obj = new JSONObject(taskJSON);
+		task.setTaskId(obj.getString("SID"));
+		task.setUserId(obj.getString("USERID"));
+		task.setTaskFrom(obj.getString("MFROM"));
+		task.setSubject(obj.getString("SUBJECT"));
+		task.setPriority(obj.getString("PRIORITY"));
+		task.setEnddate(obj.getString("ENDDATE"));
+		task.setRemindtype(obj.getString("REMINDTYPE"));
+		task.setRemindnum(obj.getString("REMINDNUM"));
+		task.setCreateDate(obj.getString("CREATEDATE"));
+		return task;
 	}
 
 	@Override
