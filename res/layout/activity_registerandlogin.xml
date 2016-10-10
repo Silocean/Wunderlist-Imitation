@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/wl_walkthrough_login_background" >
+    
+    <ImageView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/walkthrough_ribbon"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/wl_walkthrough_ribbon"/>
+    
+    <Button 
+        android:layout_width="250dip"
+        android:layout_height="50dip"
+        android:text="注册"
+        android:textSize="16sp"
+        android:textColor="@color/walkthrough_button_text_color"
+        android:id="@+id/walkthrough_registerbutton"
+        android:layout_below="@id/walkthrough_ribbon"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dip"
+        android:background="@drawable/walkthrough_registerbutton_icon_selector" />
+    
+    <Button 
+        android:layout_width="250dip"
+        android:layout_height="50dip"
+        android:text="登录"
+        android:textSize="16sp"
+        android:textColor="@color/walkthrough_button_text_color"
+        android:id="@+id/walkthrough_loginbutton"
+        android:layout_below="@id/walkthrough_registerbutton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dip"
+        android:background="@drawable/walkthrough_loginbutton_icon_selector" />
+
+</RelativeLayout>

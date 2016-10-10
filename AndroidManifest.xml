@@ -7,7 +7,9 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="18" />
-
+    
+	<uses-permission android:name="android.permission.INTERNET"/>
+	
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -28,9 +30,17 @@
         <activity
             android:name="com.wunderlist.slidingmenu.activity.TaskDetailsActivity" >
         </activity>
-         <activity
+        <activity
             android:name="com.wunderlist.slidingmenu.activity.NoteActivity" >
         </activity>
+        <activity
+            android:name="com.wunderlist.slidingmenu.activity.LoginActivity" >
+        </activity>
+        <activity
+            android:name="com.wunderlist.slidingmenu.activity.RegisterAndLoginActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >
+           
+        </activity>
     </application>
-
+    
 </manifest>

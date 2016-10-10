@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <AddTask xmlns="http://tempuri.org/">
+      <USERID>&USERID</USERID>
+      <MFROM>&MFROM</MFROM>
+      <SUBJECT>&SUBJECT</SUBJECT>
+      <DISC>&DISC</DISC>
+      <PRIORITY>&PRIORITY</PRIORITY>
+      <ENDDATE>&ENDDATE</ENDDATE>
+      <REMINDTYPE>&REMINDTYPE</REMINDTYPE>
+      <REMINDNUM>&REMINDNUM</REMINDNUM>
+      <ATTFILES>&ATTFILES</ATTFILES>
+      <TOMAILADDR>
+        <string>string</string>
+        <string>string</string>
+      </TOMAILADDR>
+    </AddTask>
+  </soap:Body>
+</soap:Envelope>

@@ -18,8 +18,8 @@ public class SlidingActivity extends SherlockFragmentActivity {
 	private SlidingMenu mSlidingMenu;
 	private LeftFragment leftFragment;
 	private RightFragment rightFragment;
-	private MainFragment viewPageFragment;
-	private ActionBar actionBar = null;
+	public static MainFragment mainFragment;
+	private static ActionBar actionBar = null;
 
 	@Override
 	protected void onCreate(Bundle arg0) {
@@ -33,10 +33,9 @@ public class SlidingActivity extends SherlockFragmentActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO Auto-generated method stub
 		return super.onCreateOptionsMenu(menu);
 	}
-
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -49,7 +48,22 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
+	
+	/**
+	 * 设置标题栏标题
+	 * @param title
+	 */
+	public static void setBarTitle(String title) {
+		actionBar.setTitle(title);
+	}
+	
+	/**
+	 * 获取标题栏标题
+	 * @return
+	 */
+	public static String getBarTitle() {
+		return actionBar.getTitle().toString();
+	}
 	private void init() {
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.slidingMenu);
 		mSlidingMenu.setLeftView(getLayoutInflater().inflate(R.layout.left_frame, null));
@@ -63,8 +77,8 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		rightFragment = new RightFragment();
 		t.replace(R.id.right_frame, rightFragment);
 
-		viewPageFragment = new MainFragment();
-		t.replace(R.id.center_frame, viewPageFragment);
+		mainFragment = new MainFragment();
+		t.replace(R.id.center_frame, mainFragment);
 		t.commit();
 	}
 

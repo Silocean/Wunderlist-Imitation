@@ -25,7 +25,5 @@ public class ActionbarBaseActivity extends SherlockActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	
 
 }

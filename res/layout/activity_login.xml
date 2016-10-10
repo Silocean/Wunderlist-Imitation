@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/wl_walkthrough_login_background" >
+    
+    <ImageView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/login_ribbon"
+        android:src="@drawable/wl_login_ribbon_new_lower_part"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+    
+    <ImageView
+        android:layout_width="250dip"
+        android:layout_height="wrap_content"
+        android:id="@+id/login_paper_top"
+        android:layout_below="@id/login_ribbon"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dip"
+        android:background="@drawable/wl_login_paper_top" />
+    
+    <RelativeLayout 
+        android:layout_width="250dip"
+        android:layout_height="wrap_content"
+        android:id="@+id/login_paper_middle_up"
+        android:layout_below="@id/login_paper_top"
+        android:background="@drawable/wl_login_paper_middle"
+        android:layout_centerHorizontal="true">
+    	<ImageView 
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:id="@+id/login_email_icon"
+    	    android:src="@drawable/wl_login_email_glyph"
+    	    android:layout_alignParentLeft="true"
+    	    android:layout_marginLeft="15dip"
+    	    android:layout_centerVertical="true"/>
+    	<EditText 
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:hint="电子邮箱"
+    	    android:text="946818013@qq.com"
+    	    android:id="@+id/login_email_editText"
+    	    android:inputType="textEmailAddress"
+    	    android:layout_toRightOf="@id/login_email_icon"
+    	    android:layout_marginLeft="5dip"
+    	    android:layout_centerVertical="true"
+    	    android:background="@null"/>
+    </RelativeLayout>
+    
+    
+    <RelativeLayout 
+        android:layout_width="250dip"
+        android:layout_height="wrap_content"
+        android:id="@+id/login_paper_middle_down"
+        android:layout_below="@id/login_paper_middle_up"
+        android:background="@drawable/wl_login_paper_middle"
+        android:layout_centerHorizontal="true">
+    	<ImageView 
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:id="@+id/login_password_icon"
+    	    android:src="@drawable/wl_login_password_glyph"
+    	    android:layout_alignParentLeft="true"
+    	    android:layout_marginLeft="15dip"
+    	    android:layout_centerVertical="true"/>
+    	<EditText 
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:hint="密码"
+    	    android:text="123456"
+    	    android:id="@+id/login_password_editText"
+    	    android:inputType="textPassword"
+    	    android:layout_toRightOf="@id/login_password_icon"
+    	    android:layout_marginLeft="5dip"
+    	    android:layout_centerVertical="true"
+    	    android:background="@null"/>
+    </RelativeLayout>
+    
+    <ImageView
+        android:layout_width="250dip"
+        android:layout_height="wrap_content"
+        android:id="@+id/login_paper_bottom"
+        android:layout_below="@id/login_paper_middle_down"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/wl_login_paper_bottom" />
+    
+    <Button 
+        android:layout_width="250dip"
+        android:layout_height="50dip"
+        android:text="登录"
+        android:textSize="16sp"
+        android:textColor="@color/walkthrough_button_text_color"
+        android:id="@+id/login_loginbutton"
+        android:layout_below="@id/login_paper_bottom"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dip"
+        android:background="@drawable/walkthrough_loginbutton_icon_selector" />
+
+</RelativeLayout>

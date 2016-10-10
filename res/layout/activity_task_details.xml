@@ -49,6 +49,7 @@
             <RelativeLayout 
                 android:layout_width="fill_parent"
                 android:layout_height="50dip"
+                android:id="@+id/taskdetais_deadline"
                 android:background="@drawable/row_bg_icon_selector" >
                 <ImageView 
                     android:layout_width="wrap_content"
@@ -56,7 +57,8 @@
                     android:id="@+id/taskdetails_deadline_icon"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/wl_taskdetails_icon_deadline" />
+                    android:duplicateParentState="true"
+                    android:src="@drawable/taskdetails_icon_deadline_selector" />
                 <TextView 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -64,11 +66,14 @@
                     android:layout_toRightOf="@id/taskdetails_deadline_icon"
                     android:layout_centerVertical="true"
                     android:text="截止日期"
-                    android:textColor="@color/sidebar_useremail_color" />
+                    android:textSize="16sp"
+                    android:duplicateParentState="true"
+                    android:textColor="@drawable/groupname_color_selector" />
             </RelativeLayout>
             <RelativeLayout 
                 android:layout_width="fill_parent"
                 android:layout_height="50dip"
+                android:id="@+id/taskdetais_clock"
                 android:background="@drawable/row_bg_icon_selector" >
                 <ImageView 
                     android:layout_width="wrap_content"
@@ -76,7 +81,8 @@
                     android:id="@+id/taskdetails_clock_icon"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/wl_taskdetails_icon_clock" />
+                    android:duplicateParentState="true"
+                    android:src="@drawable/taskdetails_icon_clock_selector" />
                 <TextView 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -84,7 +90,9 @@
                     android:layout_toRightOf="@id/taskdetails_clock_icon"
                     android:layout_centerVertical="true"
                     android:text="提醒我"
-                    android:textColor="@color/sidebar_useremail_color" />
+                    android:textSize="16sp"
+                    android:duplicateParentState="true"
+                    android:textColor="@drawable/groupname_color_selector" />
             </RelativeLayout>
             <RelativeLayout 
                 android:layout_width="fill_parent"
@@ -106,6 +114,7 @@
 	<RelativeLayout 
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
+	    android:id="@+id/taskdetails_bottomLayout"
 	    android:layout_alignParentBottom="true" >
 	    <EditText 
 	        android:layout_width="250dip"

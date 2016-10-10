@@ -17,4 +17,8 @@
 	<color name="sidebar_useremail_color">#b0b0b0</color>
 	<color name="sidebar_bg_color">#e4e4e4</color>
 	<color name="settings_seperator_bg_color">#b1b1b1</color>
+	<color name="taskdetails_item_color">#9f9f9f</color>
+	<color name="walkthrough_button_text_color">#e0e0e0</color>
+	<color name="task_complete_count_text_color">#f5f5f5</color>
+	<color name="complete_color">#cc0000</color>
 </resources>

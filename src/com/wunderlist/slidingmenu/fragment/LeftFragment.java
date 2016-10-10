@@ -1,87 +1,55 @@
-/*
- * Copyright (C) 2012 yueyueniao
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.wunderlist.slidingmenu.fragment;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
-import com.wunderlist.entity.Group;
 import com.wunderlist.slidingmenu.activity.SettingsActivity;
 import com.wunderlist.slidingmenu.activity.SlidingActivity;
 
-public class LeftFragment extends Fragment implements OnClickListener, OnItemClickListener {
-	
-	private ListView listView;
+public class LeftFragment extends Fragment implements OnClickListener {
 	
 	private ImageView notifImageView = null;
 	private ImageView syncImageView = null;
 	private TextView synctimeTextView = null;
 	private ImageView settingsImageView = null;
 	
-	static String[] str = new String[]{"收件箱", "我执行的", "我关注的"};
+	private RelativeLayout groupReceive = null;
+	//private RelativeLayout groupExecute = null;
+	//private RelativeLayout groupFollow = null;
+	private RelativeLayout groupInitiate = null;
 	
-	private void initTestData() {
-		List<Group> list = new LinkedList<Group>();
-		for (int i = 0; i < str.length; i++) {
-			Group group = new Group(str[i], i);
-			list.add(group);
-		}
-		GroupListItemAdapter adapter = new GroupListItemAdapter(getActivity(), list, R.layout.listitem_group);
-		listView.setAdapter(adapter);
-		listView.setOnItemClickListener(this);
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				listView.getChildAt(0).setSelected(true);
-			}
-		};
-		//这里做1秒的延时，以防getChildAt()出现空指针问题
-		new Handler().postDelayed(runnable, 1000);
-	}
-
+	private MainFragment mainFragment = null;
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.left, null);
-		listView = (ListView)view.findViewById(R.id.grouplist);
-		this.initTestData();
 		notifImageView = (ImageView)view.findViewById(R.id.user_notification);
 		syncImageView = (ImageView)view.findViewById(R.id.sidebar_sync);
 		synctimeTextView = (TextView)view.findViewById(R.id.sidebar_synctime);
 		settingsImageView = (ImageView)view.findViewById(R.id.siderbar_settings);
+		groupReceive = (RelativeLayout)view.findViewById(R.id.group_receive);
+		//groupExecute = (RelativeLayout)view.findViewById(R.id.group_execute);
+		//groupFollow = (RelativeLayout)view.findViewById(R.id.group_follow);
+		groupInitiate = (RelativeLayout)view.findViewById(R.id.group_initiate);
 		notifImageView.setOnClickListener(this);
 		syncImageView.setOnClickListener(this);
 		settingsImageView.setOnClickListener(this);
+		groupReceive.setOnClickListener(this);
+		//groupExecute.setOnClickListener(this);
+		//groupFollow.setOnClickListener(this);
+		groupInitiate.setOnClickListener(this);
+		groupReceive.setSelected(true);
+		mainFragment = new MainFragment();
 		return view;
 	}
 
@@ -105,71 +73,43 @@ public class LeftFragment extends Fragment implements OnClickListener, OnItemCli
 			startActivity(intent);
 			break;
 		}
+		case R.id.group_receive: {
+			((SlidingActivity)getActivity()).showLeft();
+			groupReceive.setSelected(true);
+			//groupExecute.setSelected(false);
+			//groupFollow.setSelected(false);
+			groupInitiate.setSelected(false);
+			SlidingActivity.mainFragment.getTaskBoxList();
+			break;
+		}
+		/*case R.id.group_execute: {
+			((SlidingActivity)getActivity()).showLeft();
+			groupReceive.setSelected(false);
+			groupExecute.setSelected(true);
+			groupFollow.setSelected(false);
+			groupInitiate.setSelected(false);
+			break;
+		}
+		case R.id.group_follow: {
+			((SlidingActivity)getActivity()).showLeft();
+			groupReceive.setSelected(false);
+			groupExecute.setSelected(false);
+			groupFollow.setSelected(true);
+			groupInitiate.setSelected(false);
+			break;
+		}*/
+		case R.id.group_initiate: {
+			((SlidingActivity)getActivity()).showLeft();
+			groupReceive.setSelected(false);
+			//groupExecute.setSelected(false);
+			//groupFollow.setSelected(false);
+			groupInitiate.setSelected(true);
+			SlidingActivity.mainFragment.getTaskList();
+			break;
+		}
 		default:
 			break;
 		}
-	}
-	
-	@Override
-	public void onItemClick(AdapterView<?> arg0, View view, int arg2, long arg3) {
-		view.setSelected(true);
-		((SlidingActivity)getActivity()).showLeft();
-	}
-	
-	private class GroupListItemAdapter extends BaseAdapter {
-		
-		private Context context;
-		private List<Group> list;
-		private int resId;
-		private LayoutInflater inflater;
-		
-		private ViewHolder holder;
-		
-		public GroupListItemAdapter(Context context, List<Group> list, int resId) {
-			this.context = context;
-			this.list = list;
-			this.resId = resId;
-			this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		}
-
-		@Override
-		public int getCount() {
-			return list.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return list.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(final int position, View convertView, ViewGroup parent) {
-			holder = new ViewHolder();
-			if(convertView == null) {
-				convertView = inflater.inflate(resId, null);
-				holder.groupItemName = (TextView)convertView.findViewById(R.id.groupitem_name);
-				holder.groupItemCount = (TextView)convertView.findViewById(R.id.groupitem_count);
-				convertView.setTag(holder);
-			} else {
-				holder = (ViewHolder)convertView.getTag();
-			}
-			String name = list.get(position).getGroupName();
-			holder.groupItemName.setText(name);
-			int count = list.get(position).getGroupTaskCount();
-			holder.groupItemCount.setText(count+"");
-			return convertView;
-		}
-		
-		private class ViewHolder {
-			private TextView groupItemName;
-			private TextView groupItemCount;
-		}
-		
 	}
 
 }
