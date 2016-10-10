@@ -1,5 +1,8 @@
 package com.wunderlist.entity;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import com.example.wunderlist.R;
 
 /**
@@ -25,5 +28,9 @@ public class Common {
 		R.drawable.wl_background17, R.drawable.wl_background18,
 		R.drawable.wl_background19, R.drawable.wl_background20,
 		R.drawable.wl_background21, R.drawable.wl_background22, };
+	
+	public static void ToastIfNetworkIsNotAvailable(Context context) {
+		Toast.makeText(context, "当前网络不可用，请检查你的网络设置", Toast.LENGTH_SHORT).show();
+	}
 	
 }

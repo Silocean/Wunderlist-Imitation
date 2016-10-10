@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Common;
 import com.wunderlist.slidingmenu.fragment.MainFragment;
+import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.MySharedPreferences;
 
 @SuppressWarnings("deprecation")
@@ -30,6 +31,7 @@ public class ChooseBgActivity extends ActionbarBaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_changebg);
+		MyActivityManager.addActivity("ChooseBgActivity", this);
 		bgLayout = (RelativeLayout) findViewById(R.id.bgLayout);
 		Gallery g = (Gallery) findViewById(R.id.bgGallery);
 		g.setAdapter(new ImageAdapter(getApplicationContext()));

@@ -25,7 +25,8 @@ import android.widget.Toast;
 
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Reply;
-import com.wunderlist.entity.User;
+import com.wunderlist.entity.CommonUser;
+import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.TimeConvertTool;
 import com.wunderlist.tools.WebServiceRequest;
@@ -48,6 +49,7 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 	@SuppressWarnings("deprecation")
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_reply);
+		MyActivityManager.addActivity("ReplyActivity", this);
 		emptyLayout =(RelativeLayout)this.findViewById(R.id.taskreply_emptylayout);
 		replyContentEditText = (EditText)this.findViewById(R.id.taskreply_comment);
 		replyButton = (Button)this.findViewById(R.id.taskreply_reply);
@@ -232,7 +234,7 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 			if(content.equals("")) {
 				Toast.makeText(getApplicationContext(), "回复不能为空", Toast.LENGTH_SHORT).show();
 			} else {
-				addReply(taskId, User.USERID, User.USEREMAIL, content);
+				addReply(taskId, CommonUser.USERID, CommonUser.USEREMAIL, content);
 			}
 			replyContentEditText.setText("");
 			break;

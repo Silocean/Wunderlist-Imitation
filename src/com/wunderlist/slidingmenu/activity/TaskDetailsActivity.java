@@ -24,9 +24,10 @@ import android.widget.Toast;
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Reply;
 import com.wunderlist.entity.Task;
-import com.wunderlist.entity.User;
+import com.wunderlist.entity.CommonUser;
 import com.wunderlist.tools.ClockDialogUtil;
 import com.wunderlist.tools.DateTimePickDialogUtil;
+import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.TimeConvertTool;
 import com.wunderlist.tools.WebServiceRequest;
@@ -86,6 +87,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_task_details);
+		MyActivityManager.addActivity("TaskDetailsActivity", this);
 		checkboxImageView = (ImageView) findViewById(R.id.taskdetails_checkbox);
 		checkboxImageView.setOnClickListener(this);
 		titleEditText = (EditText) findViewById(R.id.taskdetails_title);
@@ -135,7 +137,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		noteEditText.setText(note);
 		this.updateDateView(enddate);
 		this.updateClockTextView(task.getRemindnum(), task.getRemindtype());
-		if (!task.getUserId().equals(User.USERID) || isComplete) { // 如果该任务不是用户自己发起的或者该任务已完成
+		if (!task.getUserId().equals(CommonUser.USERID) || isComplete) { // 如果该任务不是用户自己发起的或者该任务已完成
 			this.disableView();
 		}
 	}

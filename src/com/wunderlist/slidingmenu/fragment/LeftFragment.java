@@ -61,7 +61,6 @@ public class LeftFragment extends Fragment implements OnClickListener {
 			break;
 		}
 		case R.id.sidebar_sync: {
-			//Toast.makeText(getActivity(), "sync", Toast.LENGTH_SHORT).show();
 			mainFragment.updateTaskBoxList();
 			/*long duration = MainFragment.getRefreshingDuration();
 			Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_refresh);

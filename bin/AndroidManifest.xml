@@ -16,7 +16,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >
-        <receiver android:name="com.wunderlist.broadcast.ClockBroadCastReceiver">
+        <receiver android:name="com.wunderlist.service.ClockBroadCastReceiver">
             <intent-filter >
                 <action android:name="com.wunderlist.clockremind"/>
             </intent-filter>
@@ -24,10 +24,6 @@
         <activity
             android:name="com.wunderlist.slidingmenu.activity.SlidingActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.wunderlist.slidingmenu.activity.SettingsActivity"
@@ -44,9 +40,16 @@
             android:theme="@style/Theme.Sherlock.NoActionBar" >
         </activity>
         <activity
+            android:name="com.wunderlist.slidingmenu.activity.StartActivity"
+            android:theme="@style/Theme.Sherlock.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="com.wunderlist.slidingmenu.activity.RegisterAndLoginActivity"
             android:theme="@style/Theme.Sherlock.NoActionBar" >
-            
         </activity>
         <activity
             android:name="com.wunderlist.slidingmenu.activity.ReplyActivity" >

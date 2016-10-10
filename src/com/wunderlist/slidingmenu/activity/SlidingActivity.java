@@ -2,6 +2,7 @@ package com.wunderlist.slidingmenu.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -9,9 +10,10 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.example.wunderlist.R;
 import com.wunderlist.slidingmenu.fragment.LeftFragment;
-import com.wunderlist.slidingmenu.fragment.RightFragment;
 import com.wunderlist.slidingmenu.fragment.MainFragment;
+import com.wunderlist.slidingmenu.fragment.RightFragment;
 import com.wunderlist.slidingmenu.view.SlidingMenu;
+import com.wunderlist.tools.MyActivityManager;
 
 public class SlidingActivity extends SherlockFragmentActivity {
 	
@@ -25,9 +27,14 @@ public class SlidingActivity extends SherlockFragmentActivity {
 	
 	public static boolean isRefreshing = true;
 	
+	private long waitTime = 2000;
+	private long touchTime = 0 ;
+	private long currentTime = 0;
+	
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
+		MyActivityManager.addActivity("SlidingActivity", this);
 		actionBar = getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setIcon(R.drawable.wl_actionbar_appicon);
@@ -46,7 +53,6 @@ public class SlidingActivity extends SherlockFragmentActivity {
 		MenuItem item = menu.add(0, 0, 0, "接收中...");
 		if(isRefreshing) {
 			item.setTitle("接收中...");
-			//item.setIcon(R.drawable.wl_actionbar_addreceiver);
 			item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		} else {
 			item.setTitle("");
@@ -111,6 +117,28 @@ public class SlidingActivity extends SherlockFragmentActivity {
 
 	public void showRight() {
 		mSlidingMenu.showRightView();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		currentTime = System.currentTimeMillis();
+		if(currentTime-touchTime >= waitTime) {
+			Toast.makeText(getApplicationContext(), "再按一次返回键退出", Toast.LENGTH_SHORT).show();
+			touchTime = currentTime;
+		} else {
+			// 结束所有activity
+			for (String name : MyActivityManager.activities.keySet()) {
+				if(MyActivityManager.getActivity(name) != null) {
+					MyActivityManager.getActivity(name).finish();
+				}
+			}
+			/*// 返回桌面，并不是真正的退出
+			Intent i = new Intent(Intent.ACTION_MAIN);
+			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			i.addCategory(Intent.CATEGORY_HOME);
+			startActivity(i);*/
+			super.onBackPressed();
+		}
 	}
 
 }

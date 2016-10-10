@@ -43,7 +43,7 @@ import android.widget.Toast;
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Common;
 import com.wunderlist.entity.Task;
-import com.wunderlist.entity.User;
+import com.wunderlist.entity.CommonUser;
 import com.wunderlist.slidingmenu.activity.SlidingActivity;
 import com.wunderlist.slidingmenu.activity.TaskDetailsActivity;
 import com.wunderlist.tools.CheckNetwork;
@@ -76,7 +76,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	private static boolean showCompleteTasks = true;
 
 	private StringBuilder sb = new StringBuilder();
-	private String[] receivers = new String[] { User.USEREMAIL };
+	private String[] receivers = new String[] { CommonUser.USEREMAIL };
 
 	private static RelativeLayout mainfragmentLayout;
 
@@ -160,8 +160,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 		if (CheckNetwork.isNetworkAvailable(getActivity())) {
 			this.getTaskBoxList();
 		} else {
-			Toast.makeText(getActivity(), "当前网络不可用，请检查你的网络设置",
-					Toast.LENGTH_SHORT).show();
+			Common.ToastIfNetworkIsNotAvailable(getActivity());
 		}
 		return view;
 	}
@@ -191,8 +190,8 @@ public class MainFragment extends Fragment implements OnScrollListener {
 				.getResourceAsStream("AddTask.xml");
 		byte[] data = StreamTool.read(inputStream);
 		String string = new String(data)
-				.replaceAll("\\&USERID", User.USERID)
-				.replaceAll("\\&MFROM", User.USEREMAIL)
+				.replaceAll("\\&USERID", CommonUser.USERID)
+				.replaceAll("\\&MFROM", CommonUser.USEREMAIL)
 				.replaceAll("\\&SUBJECT", subject)
 				.replaceAll("\\&DISC", "")
 				.replaceAll("\\&PRIORITY", "")
@@ -366,7 +365,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 						.getResourceAsStream("GetTaskBoxList.xml");
 				byte[] data = StreamTool.read(inputStream);
 				String string = new String(data)
-						.replaceAll("\\&strUserID", User.USERID)
+						.replaceAll("\\&strUserID", CommonUser.USERID)
 						.replaceAll("\\&IsActive", tag)
 						.replaceAll("\\&IsRead", "")
 						.replaceAll("\\&strSubject", "");
@@ -648,7 +647,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					public void onClick(View v) {
 						// 解除任务完成状态
 						updateTaskStatus(list.get(position).getTaskId(),
-								User.USEREMAIL, TASKNORMAL, position,
+								CommonUser.USEREMAIL, TASKNORMAL, position,
 								COMPLETEORCANCELTONORMAL);
 					}
 				});
@@ -669,7 +668,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 														updateTaskStatus(list
 																.get(position)
 																.getTaskId(),
-																User.USEREMAIL,
+																CommonUser.USEREMAIL,
 																TASKNORMAL,
 																position,
 																COMPLETEORCANCELTONORMAL);
@@ -694,7 +693,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 					@Override
 					public void onClick(View v) {
 						updateTaskStatus(list.get(position).getTaskId(),
-								User.USEREMAIL, TASKCOMPLETE, position,
+								CommonUser.USEREMAIL, TASKCOMPLETE, position,
 								NORMALTOCOMPLETEORCANCEL);
 					}
 				});
@@ -715,7 +714,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 														updateTaskStatus(list
 																.get(position)
 																.getTaskId(),
-																User.USEREMAIL,
+																CommonUser.USEREMAIL,
 																TASKCANCEL,
 																position,
 																NORMALTOCOMPLETEORCANCEL);
@@ -752,7 +751,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 			holder.taskIcon = (ImageView) convertView
 					.findViewById(R.id.task_right_icon);
 			String userId = task.getUserId();
-			if (userId.equals(User.USERID)) { // 该任务是用户自己发起的
+			if (userId.equals(CommonUser.USERID)) { // 该任务是用户自己发起的
 				// holder.taskTitle.setTextColor(getResources().getColor(R.color.task_normal_initiate_text_color));
 				holder.taskIcon
 						.setImageResource(R.drawable.wl_task_ismeinitiate);

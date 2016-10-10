@@ -25,8 +25,9 @@ import android.widget.TextView;
 
 import com.example.wunderlist.R;
 import com.wunderlist.entity.Common;
+import com.wunderlist.entity.CommonUser;
 import com.wunderlist.entity.Receiver;
-import com.wunderlist.entity.User;
+import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.WebServiceRequest;
 
@@ -49,6 +50,7 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_addreceiver);
+		MyActivityManager.addActivity("AddReceiverActivity", this);
 		listView = (ListView)this.findViewById(R.id.addreceiverlist);
 		adapter = new AddReceiverListItemAdapter(getApplicationContext(), R.layout.listitem_addreceiver);
 		listView.setAdapter(adapter);
@@ -184,7 +186,7 @@ public class AddReceiverActivity extends ActionbarBaseActivity implements OnClic
 			try {
 				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("GetContractList.xml");
 				byte[] data = StreamTool.read(inputStream);
-				String string = new String(data).replaceAll("\\&strUserID", User.USERID);
+				String string = new String(data).replaceAll("\\&strUserID", CommonUser.USERID);
 				data = string.getBytes();
 				String json = WebServiceRequest.SendPost(inputStream, data, "GetContractListResult");
 				contracts = parseJSON(json);

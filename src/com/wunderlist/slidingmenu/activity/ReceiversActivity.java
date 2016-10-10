@@ -17,7 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
-import com.wunderlist.entity.User;
+import com.wunderlist.entity.CommonUser;
+import com.wunderlist.tools.MyActivityManager;
 
 public class ReceiversActivity extends ActionbarBaseActivity implements OnClickListener {
 	
@@ -37,6 +38,7 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_receiver);
+		MyActivityManager.addActivity("ReceiversActivity", this);
 		listView = (ListView)findViewById(R.id.receiverlist);
 		adapter = new ReceiverListItemAdapter(getApplicationContext(), R.layout.listitem_receiver);
 		listView.setAdapter(adapter);
@@ -124,7 +126,7 @@ public class ReceiversActivity extends ActionbarBaseActivity implements OnClickL
 			}
 			final String userEmail = (String)getItem(position);
 			holder.emailTextView.setText(userEmail);
-			if(userEmail.equals(User.USEREMAIL)) {
+			if(userEmail.equals(CommonUser.USEREMAIL)) {
 				holder.deleteImageView.setVisibility(View.GONE);
 				holder.owneTextView.setVisibility(View.VISIBLE);
 			} else {

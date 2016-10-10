@@ -1,6 +1,7 @@
 package com.wunderlist.slidingmenu.activity;
 
 import com.example.wunderlist.R;
+import com.wunderlist.tools.MyActivityManager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ public class NoteActivity extends ActionbarBaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_note);
+		MyActivityManager.addActivity("NoteActivity", this);
 		noteEditText = (EditText)this.findViewById(R.id.note_editText);
 		this.initData();
 		super.onCreate(savedInstanceState);

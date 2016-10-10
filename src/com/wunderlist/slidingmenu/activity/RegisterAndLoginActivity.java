@@ -1,6 +1,7 @@
 package com.wunderlist.slidingmenu.activity;
 
 import com.example.wunderlist.R;
+import com.wunderlist.tools.MyActivityManager;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,6 +18,7 @@ public class RegisterAndLoginActivity extends Activity implements OnClickListene
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		MyActivityManager.addActivity("RegisterAndLoginActivity", this);
 		setContentView(R.layout.activity_registerandlogin);
 		registerButton = (Button)findViewById(R.id.walkthrough_registerbutton);
 		registerButton.setOnClickListener(this);

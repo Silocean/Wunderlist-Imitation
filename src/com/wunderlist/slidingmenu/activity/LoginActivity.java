@@ -2,6 +2,7 @@ package com.wunderlist.slidingmenu.activity;
 
 import java.io.InputStream;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
@@ -18,6 +19,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
+import com.wunderlist.entity.Common;
+import com.wunderlist.entity.CommonUser;
+import com.wunderlist.entity.User;
+import com.wunderlist.sqlite.SQLiteService;
+import com.wunderlist.tools.CheckNetwork;
+import com.wunderlist.tools.MyActivityManager;
 import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.WebServiceRequest;
 
@@ -58,6 +65,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		MyActivityManager.addActivity("LoginActivity", this);
 		setContentView(R.layout.activity_login);
 		emailEditText = (EditText)findViewById(R.id.login_email_editText);
 		passwordeEditText = (EditText)findViewById(R.id.login_password_editText);
@@ -69,9 +77,13 @@ public class LoginActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.login_loginbutton: {
-			if(check()){
-				dialog = ProgressDialog.show(LoginActivity.this, "", "正在登录，请稍等...", true);
-				new LoginThread().start();
+			if(CheckNetwork.isNetworkAvailable(getApplicationContext())) {
+				if(check()){
+					dialog = ProgressDialog.show(LoginActivity.this, "", "正在登录，请稍等...", true);
+					new LoginThread().start();
+				}
+			} else {
+				Common.ToastIfNetworkIsNotAvailable(getApplicationContext());
 			}
 			break;
 		}
@@ -111,6 +123,13 @@ public class LoginActivity extends Activity implements OnClickListener {
 			JSONObject object = new JSONObject(json);
 			String str = (String) object.get("msg");
 			if(str.equals("成功!")){
+				User user = getUserInfoFromNet(email);
+				SQLiteService service = new SQLiteService(getApplicationContext());
+				service.deleteUserInfo();
+				service.saveUserInfo(user);
+				CommonUser.USERID = user.getUserSID();
+				CommonUser.USEREMAIL = user.getUserEmail();
+				CommonUser.UERPASSWORD = user.getUserPassword();
 				message.arg1 = 1; //表示登陆成功
 			} else if(str.equals("失败!密码不正确!")){
 				message.arg1 = 2; //表示登陆失败，密码不对
@@ -118,6 +137,55 @@ public class LoginActivity extends Activity implements OnClickListener {
 				message.arg1 = 3; //表示登陆失败，用户名不对
 			}
 		}
+	}
+	
+	/**
+	 * 从网络获取用户基本信息
+	 * @param email
+	 * @return
+	 */
+	private User getUserInfoFromNet(String email) {
+		User user = null;
+		try {
+			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("GetUserInfo.xml");
+			byte[] data = StreamTool.read(inputStream);
+			String string = new String(data).replaceAll("\\&strEmail", email);
+			data = string.getBytes();
+			String json = WebServiceRequest.SendPost(inputStream, data, "GETUSERINFOResult");
+			user = parseJSON(json);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return user;
+	}
+	
+	/**
+	 * 解析json字符串
+	 * @param json
+	 * @return
+	 * @throws Exception
+	 */
+	private User parseJSON(String json) throws Exception {
+		User user = null;
+		if(json != null) {
+			JSONObject object = new JSONObject(json);
+			int row = Integer.parseInt(object.getString("rows"));
+			if(row == 1) {
+				user = new User();
+				JSONArray array = new JSONArray(object.getString("Items"));
+				JSONObject obj = array.getJSONObject(0);
+				user.setUserSID(obj.getString("SID"));
+				user.setUserEmail(obj.getString("USERCODE"));
+				user.setUserName(obj.getString("USERNAME"));
+				user.setUserImageUrl(obj.getString("IAMGURL"));
+				user.setUserSex(obj.getString("SEX"));
+				user.setUserAge(obj.getString("AGE"));
+				user.setUserHobby(obj.getString("HOBBY"));
+				user.setUserMemo(obj.getString("MEMO"));
+				user.setUserMobile(obj.getString("MOBILE"));
+			}
+		}
+		return user;
 	}
 	
 	/**
