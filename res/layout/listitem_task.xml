@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="afterDescendants" >
+    
+    
+    <ImageView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/task_left_checkbox"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/checkbox_icon_selector"
+        android:background="@drawable/wl_task_background_left" />
+   
+    
+    <TextView 
+        android:layout_width="220dip"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:id="@+id/task_middle_TextView"
+        android:layout_toRightOf="@id/task_left_checkbox"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:background="@drawable/task_middle_bg_selector" />
+    
+    
+    <ImageView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/task_right_icon"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/wl_task_ribbon"
+        android:background="@drawable/wl_task_background_right" />
+   
+</RelativeLayout>

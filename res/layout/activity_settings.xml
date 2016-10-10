@@ -1,0 +1,253 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+   	android:layout_width="match_parent"
+   	android:layout_height="match_parent" >
+    
+<RelativeLayout 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsActivity" >
+	
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="100dip"
+        android:id="@+id/settings_firstLayout"
+        android:background="@drawable/wl_sidebar_bottombar" >
+        <ImageView 
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:id="@+id/settings_headImage"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dip"
+            android:layout_centerVertical="true"
+            android:background="@drawable/wl_userimage_placeholder_you_big" />
+        <TextView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/settings_name"
+            android:layout_toRightOf="@id/settings_headImage"
+            android:layout_marginLeft="15dip"
+            android:layout_alignTop="@id/settings_headImage"
+            android:text="Silocean"
+            android:textSize="20sp" />
+        <TextView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/settings_signs"
+            android:layout_toRightOf="@id/settings_headImage"
+            android:layout_below="@id/settings_name"
+            android:layout_marginTop="5dip"
+            android:layout_marginRight="5dip"
+            android:layout_alignLeft="@id/settings_name"
+            android:text="No man can walk out on his own story."
+            android:ellipsize="end"
+            android:textColor="@color/sidebar_useremail_color"
+            android:textSize="12sp" />
+    </RelativeLayout>
+    
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/settings_seperator1"
+        android:layout_below="@id/settings_firstLayout"
+        android:background="@color/settings_seperator_bg_color" >
+        <TextView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="账户"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dip"
+            style="@style/settings_seperator_style" />
+    </RelativeLayout>
+    
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/settings_secondLayout"
+        android:layout_below="@id/settings_seperator1"  >
+        <RelativeLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:id="@+id/settings_notification"
+            android:background="@drawable/settings_item_bg_icon_selector" >
+            <TextView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="通知"
+                android:duplicateParentState="true"
+                android:layout_centerVertical="true"
+	            android:layout_alignParentLeft="true"
+	            android:layout_marginLeft="10dip"
+                style="@style/settings_item_style"
+                android:textColor="@drawable/groupname_color_selector" />
+        </RelativeLayout>
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="2dip"
+            layout="@layout/line" >
+        </include>
+        <RelativeLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:id="@+id/settings_accountDetails"
+            android:background="@drawable/settings_item_bg_icon_selector" >
+            <TextView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="账户详情"
+                android:duplicateParentState="true"
+                android:layout_centerVertical="true"
+	            android:layout_alignParentLeft="true"
+	            android:layout_marginLeft="10dip"
+                style="@style/settings_item_style"
+                android:textColor="@drawable/groupname_color_selector" />
+        </RelativeLayout>
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="2px"
+            layout="@layout/line" >
+        </include>
+        <RelativeLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:id="@+id/settings_logoff"
+            android:background="@drawable/settings_item_bg_icon_selector" >
+            <TextView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="注销"
+                android:duplicateParentState="true"
+                android:layout_centerVertical="true"
+	            android:layout_alignParentLeft="true"
+	            android:layout_marginLeft="10dip"
+                style="@style/settings_item_style"
+                android:textColor="@drawable/groupname_color_selector" />
+        </RelativeLayout>
+    </LinearLayout>
+    
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/settings_seperator2"
+        android:layout_below="@id/settings_secondLayout"
+        android:background="@color/settings_seperator_bg_color" >
+        <TextView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="通用"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dip"
+            style="@style/settings_seperator_style" />
+    </RelativeLayout>
+    
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/settings_thirdLayout"
+        android:layout_below="@id/settings_seperator2"  >
+        <RelativeLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:id="@+id/settings_bg"
+            android:background="@drawable/settings_item_bg_icon_selector" >
+            <TextView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="背景"
+                android:duplicateParentState="true"
+                android:layout_centerVertical="true"
+	            android:layout_alignParentLeft="true"
+	            android:layout_marginLeft="10dip"
+                style="@style/settings_item_style"
+                android:textColor="@drawable/groupname_color_selector" />
+        </RelativeLayout>
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="2dip"
+            layout="@layout/line" >
+        </include>
+        <RelativeLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:id="@+id/settings_sound"
+            android:background="@drawable/settings_item_bg_icon_selector" >
+            <TextView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="声音"
+                android:duplicateParentState="true"
+                android:layout_centerVertical="true"
+	            android:layout_alignParentLeft="true"
+	            android:layout_marginLeft="10dip"
+                style="@style/settings_item_style"
+                android:textColor="@drawable/groupname_color_selector" />
+        </RelativeLayout>
+    </LinearLayout>
+    
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/settings_seperator3"
+        android:layout_below="@id/settings_thirdLayout"
+        android:background="@color/settings_seperator_bg_color" >
+        <TextView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="其他"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dip"
+            style="@style/settings_seperator_style" />
+    </RelativeLayout>
+    
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/settings_fourthLayout"
+        android:layout_below="@id/settings_seperator3"  >
+        <RelativeLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:id="@+id/settings_about"
+            android:background="@drawable/settings_item_bg_icon_selector" >
+            <TextView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="关于"
+                android:duplicateParentState="true"
+                android:layout_centerVertical="true"
+	            android:layout_alignParentLeft="true"
+	            android:layout_marginLeft="10dip"
+                style="@style/settings_item_style"
+                android:textColor="@drawable/groupname_color_selector" />
+        </RelativeLayout>
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="2dip"
+            layout="@layout/line" >
+        </include>
+        <RelativeLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:id="@+id/settings_feedback"
+            android:background="@drawable/settings_item_bg_icon_selector" >
+            <TextView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="用户反馈"
+                android:duplicateParentState="true"
+                android:layout_centerVertical="true"
+	            android:layout_alignParentLeft="true"
+	            android:layout_marginLeft="10dip"
+                style="@style/settings_item_style"
+                android:textColor="@drawable/groupname_color_selector" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</RelativeLayout>
+</ScrollView>

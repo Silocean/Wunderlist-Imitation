@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/head_layout"
+        android:focusable="true"
+   		android:focusableInTouchMode="true"
+        android:background="@drawable/wl_background" >
+        <RelativeLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/taskEdit_layout"
+            android:layout_marginTop="7dip"
+	        android:layout_marginLeft="7dip"
+	        android:layout_marginRight="7dip"
+            android:background="@drawable/wl_taskview_addtask_input" >
+            <EditText 
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:id="@+id/taskEdit"
+	            android:singleLine="true"
+	            android:layout_marginLeft="5dip"
+	            android:layout_centerVertical="true"
+	            android:hint="添加一个任务..."
+	            android:textSize="16sp"
+	            android:textColorHint="@color/task_text_hint_color"
+	            android:textColor="@color/task_text_color"
+	            android:background="@null"
+	            android:textCursorDrawable="@null"
+	            android:imeOptions="actionSend" />
+        </RelativeLayout>
+       	
+	    <ListView
+            android:id="@+id/tasklist"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/taskEdit_layout"
+            android:layout_marginTop="5dip"
+            android:divider="@null"
+            android:listSelector="#00000000"
+            android:fadingEdge="none" 
+            android:cacheColorHint="#00000000" />
+        
+    </RelativeLayout>
+
+
+</RelativeLayout>

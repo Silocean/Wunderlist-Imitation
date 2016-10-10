@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent" >
+	
+    <RelativeLayout 
+       	android:layout_width="270dip"
+       	android:layout_height="60dip"
+       	android:id="@+id/sidebar_topbar"
+       	android:background="@drawable/wl_sidebar_topbar" >
+        <ImageView 
+            android:layout_width="40dip"
+            android:layout_height="40dip"
+            android:id="@+id/user_headImage"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="15dip"
+            android:layout_centerVertical="true"
+            android:background="@drawable/head" />
+        <TextView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/user_name"
+            android:layout_toRightOf="@id/user_headImage"
+            android:layout_marginLeft="10dip"
+            android:layout_alignTop="@id/user_headImage"
+            android:text="Silocean" />
+        <TextView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/user_email"
+            android:layout_toRightOf="@id/user_headImage"
+            android:layout_below="@id/user_name"
+            android:layout_alignLeft="@id/user_name"
+            android:text="946818013@qq.com"
+            android:textSize="12sp"
+            android:textColor="@color/sidebar_useremail_color" />
+        <ImageView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/user_notification"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dip"
+            android:layout_centerVertical="true"
+            android:src="@drawable/user_notification_icon_selector" />
+    </RelativeLayout>
+    
+    <RelativeLayout 
+        android:layout_width="270dip"
+        android:layout_height="fill_parent"
+        android:background="@color/sidebar_bg_color"
+        android:layout_below="@id/sidebar_topbar"
+         >
+        <ListView
+	          android:id="@+id/grouplist"
+	          android:layout_width="fill_parent"
+	          android:layout_height="fill_parent"
+	          android:divider="@null"
+	          android:fadingEdge="none" 
+	          android:cacheColorHint="#00000000" />
+    </RelativeLayout>
+    
+   	<RelativeLayout 
+   	      android:layout_width="270dip"
+   	      android:layout_height="50dip"
+   	      android:layout_alignParentBottom="true"
+   	      android:background="@drawable/wl_sidebar_bottombar" >
+   	      <ImageView 
+   	          android:layout_width="wrap_content"
+   	          android:layout_height="wrap_content"
+   	          android:id="@+id/sidebar_sync"
+   	          android:layout_alignParentLeft="true"
+   	          android:layout_marginLeft="1dip"
+   	          android:layout_centerVertical="true"
+   	          android:src="@drawable/wl_sidebar_icon_sync" />
+   	      <TextView 
+   	          android:layout_width="wrap_content"
+   	          android:layout_height="wrap_content"
+   	          android:id="@+id/sidebar_synctime"
+   	          android:layout_toRightOf="@id/sidebar_sync"
+   	          android:layout_marginLeft="4dip"
+   	          android:layout_centerVertical="true"
+   	          android:text="最后同步：8分钟前"
+   	          android:textSize="14sp"
+   	          android:textColor="@color/sidebar_useremail_color" />
+   	      <ImageView 
+   	          android:layout_width="wrap_content"
+   	          android:layout_height="wrap_content"
+   	          android:id="@+id/siderbar_settings"
+   	          android:src="@drawable/settings_icon_selector"
+   	          android:layout_alignParentRight="true"
+   	          android:layout_marginRight="5dip"
+   	          android:layout_centerVertical="true" />
+   	</RelativeLayout>
+   	
+</RelativeLayout>
