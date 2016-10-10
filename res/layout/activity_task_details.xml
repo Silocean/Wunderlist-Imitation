@@ -145,7 +145,7 @@
 		            android:id="@+id/task_reply_headimage"
 		            android:layout_alignParentLeft="true"
 		            android:layout_marginLeft="10dip"
-		            android:layout_centerVertical="true"
+		           	android:layout_marginTop="8dip"
 		            android:background="@drawable/wl_userimage_placeholder_you_big" />
 		        <TextView 
 		            android:layout_width="wrap_content"
@@ -153,6 +153,7 @@
 		            android:id="@+id/task_reply_email"
 		            android:layout_toRightOf="@id/task_reply_headimage"
 		            android:layout_marginLeft="10dip"
+		            android:layout_marginTop="-6dip"
 		            android:layout_alignTop="@id/task_reply_headimage" />
 		        <TextView 
 		            android:layout_width="wrap_content"
@@ -161,15 +162,18 @@
 		            android:layout_toRightOf="@id/task_reply_headimage"
 		            android:layout_below="@id/task_reply_email"
 		            android:layout_marginTop="3dip"
+		            android:ellipsize="end"
+		            android:singleLine="true"
 		            android:layout_alignLeft="@id/task_reply_email"
-		            android:textSize="12sp" />
+		            android:textSize="10sp" />
 		        <TextView
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:id="@+id/task_reply_time"
-		            android:layout_alignTop="@id/task_reply_headimage"
+		            android:layout_alignTop="@id/task_reply_email"
 		            android:layout_alignParentRight="true"
 		            android:layout_marginRight="10dip"
+		            android:textSize="11sp"
 		            android:textColor="@color/sidebar_useremail_color" />
 		    </RelativeLayout>
         </LinearLayout>

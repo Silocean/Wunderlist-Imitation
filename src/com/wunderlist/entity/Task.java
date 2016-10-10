@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 public class Task implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String taskId;
 	private String userId;
 	private String taskFrom;
@@ -13,6 +17,7 @@ public class Task implements Serializable {
 	private String enddate;
 	private String remindtype;
 	private String remindnum;
+	private String createDate;
 	private String isActive;
 	
 	public String getTaskId() {
@@ -75,12 +80,21 @@ public class Task implements Serializable {
 	public void setRemindnum(String remindnum) {
 		this.remindnum = remindnum;
 	}
+	public String getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 	@Override
 	public String toString() {
 		return "Task [taskId=" + taskId + ", userId=" + userId + ", taskFrom="
 				+ taskFrom + ", subject=" + subject + ", disc=" + disc
 				+ ", priority=" + priority + ", enddate=" + enddate
 				+ ", remindtype=" + remindtype + ", remindnum=" + remindnum
-				+ ", isActive=" + isActive + "]";
+				+ ", createDate=" + createDate + ", isActive=" + isActive + "]";
 	}
 }

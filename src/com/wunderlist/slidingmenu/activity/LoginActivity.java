@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -17,7 +18,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
-import com.wunderlist.entity.Common;
 import com.wunderlist.tools.StreamTool;
 import com.wunderlist.tools.WebServiceRequest;
 
@@ -35,6 +35,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 	
 	UIHandler handler = new UIHandler();
 	
+	@SuppressLint("HandlerLeak")
 	private class UIHandler extends Handler{
 
 		@Override
@@ -99,7 +100,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 	 * @param password 用户密码
 	 */
 	private void login(String email, String password) throws Exception {
-		String path = Common.WEBSERVICEPATH;
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("CheckUser.xml");
 		byte[] data = StreamTool.read(inputStream);
 		String string = new String(data).replaceAll("\\$strUserCode", email).replaceAll("\\$strPwd", password);

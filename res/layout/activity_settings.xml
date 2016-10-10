@@ -39,7 +39,7 @@
             android:layout_marginTop="5dip"
             android:layout_marginRight="5dip"
             android:layout_alignLeft="@id/settings_name"
-            android:text="No man can walk out on his own story."
+            android:text="在您的待办事项中添加注释，并将它分配给您的同事。团队合作从未如此简单。"
             android:ellipsize="end"
             android:textColor="@color/sidebar_useremail_color"
             android:textSize="12sp" />
@@ -164,6 +164,13 @@
 	            android:layout_marginLeft="10dip"
                 style="@style/settings_item_style"
                 android:textColor="@drawable/groupname_color_selector" />
+            <ImageView 
+                android:layout_width="30dip"
+                android:layout_height="30dip"
+                android:id="@+id/settings_imageicon"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="15dip"
+                android:layout_centerVertical="true" />
         </RelativeLayout>
         <include
             android:layout_width="fill_parent"

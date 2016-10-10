@@ -8,9 +8,27 @@
         android:id="@+id/receiverlist"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginTop="10dip"
         android:listSelector="#00000000"
         android:fadingEdge="none"
         android:cacheColorHint="#00000000" />
+    
+    <RelativeLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:id="@+id/receiverlist_bottomLayout"
+	    android:layout_alignParentBottom="true"
+	    android:layout_marginBottom="5dip" >
+	    <Button 
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/receiverlist_add"
+	        android:layout_alignParentRight="true"
+	        android:layout_centerVertical="true"
+	        android:layout_marginLeft="5dip"
+	        android:layout_marginRight="5dip"
+	        android:text="添加接收人"
+	        android:textColor="@color/walkthrough_button_text_color"
+	        android:background="@drawable/walkthrough_loginbutton_icon_selector" />
+	</RelativeLayout>
     
 </RelativeLayout>

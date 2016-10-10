@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sidebar_bg_color" >
+    
+    <EditText 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/addreceiver_emal_edittext"
+        android:inputType="textEmailAddress"
+        android:background="@null"
+        android:hint="电子邮件地址..."
+        android:textSize="12sp"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="8dip" />
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:id="@+id/addreceiver_recenttext_layout"
+        android:layout_below="@id/addreceiver_emal_edittext" >
+	    <TextView 
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="最近"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginLeft="10dip" />
+    </RelativeLayout>
+    
+    <ListView 
+        android:id="@+id/addreceiverlist"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/addreceiver_recenttext_layout"
+        android:listSelector="#00000000"
+        android:fadingEdge="none"
+        android:cacheColorHint="#00000000" />
+
+</RelativeLayout>

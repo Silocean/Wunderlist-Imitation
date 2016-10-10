@@ -2,24 +2,59 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/wl_listitem_receiver_bg" >
+    android:background="@drawable/wl_sidebar_row_bg" >
+    
+    <ImageView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/receiver_headimage"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="5dip"
+        android:src="@drawable/wl_receivers_list_userhead" />
     
     <TextView 
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/receiver_username"
+        android:text="接收人"
+        android:textColor="@color/listitem_text_color"
+        android:layout_toRightOf="@id/receiver_headimage"
+        android:layout_marginLeft="7dip"
+        android:layout_alignTop="@id/receiver_headimage" />
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/receiver_ownertextview"
+        android:text="所有者"
+        android:textSize="9sp"
+        android:layout_toRightOf="@id/receiver_username"
+       	android:layout_marginLeft="5dip"
+       	android:layout_alignTop="@id/receiver_headimage"
+       	android:layout_marginTop="3dip"
+        android:visibility="gone"
+        android:textColor="@color/listitem_receiver_email_text_color" />
+   
+    
+    <TextView 
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/receiver_email_text"
-        android:textColor="@color/listitem_text_color"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="15dip"
-        android:layout_centerVertical="true" />
+        android:textColor="@color/listitem_receiver_email_text_color"
+        android:textSize="10sp"
+        android:layout_below="@id/receiver_username"
+        android:layout_alignBottom="@id/receiver_headimage"
+        android:layout_alignLeft="@id/receiver_username" />
     
     <ImageView 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/receiver_delete_icon"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="10dip"
         android:layout_centerVertical="true"
-        android:src="@drawable/wl_task_receiver_delete" />
-
+        android:src="@drawable/receivers_list_remove_icon_selector" />
+    
 </RelativeLayout>

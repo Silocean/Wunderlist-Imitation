@@ -12,8 +12,7 @@
       <REMINDNUM>&REMINDNUM</REMINDNUM>
       <ATTFILES>&ATTFILES</ATTFILES>
       <TOMAILADDR>
-        <string>string</string>
-        <string>string</string>
+        <string>&string</string>
       </TOMAILADDR>
     </AddTask>
   </soap:Body>

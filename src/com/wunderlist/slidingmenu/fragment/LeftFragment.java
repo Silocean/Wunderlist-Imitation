@@ -9,7 +9,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
@@ -20,7 +19,7 @@ public class LeftFragment extends Fragment implements OnClickListener {
 	
 	private ImageView notifImageView = null;
 	private ImageView syncImageView = null;
-	private TextView synctimeTextView = null;
+	//private TextView synctimeTextView = null;
 	private ImageView settingsImageView = null;
 	
 	private RelativeLayout groupReceive = null;
@@ -28,14 +27,12 @@ public class LeftFragment extends Fragment implements OnClickListener {
 	//private RelativeLayout groupFollow = null;
 	//private RelativeLayout groupInitiate = null;
 	
-	private MainFragment mainFragment = null;
-	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.left, null);
 		notifImageView = (ImageView)view.findViewById(R.id.user_notification);
 		syncImageView = (ImageView)view.findViewById(R.id.sidebar_sync);
-		synctimeTextView = (TextView)view.findViewById(R.id.sidebar_synctime);
+		//synctimeTextView = (TextView)view.findViewById(R.id.sidebar_synctime);
 		settingsImageView = (ImageView)view.findViewById(R.id.siderbar_settings);
 		groupReceive = (RelativeLayout)view.findViewById(R.id.group_receive);
 		//groupExecute = (RelativeLayout)view.findViewById(R.id.group_execute);
@@ -49,7 +46,6 @@ public class LeftFragment extends Fragment implements OnClickListener {
 		//groupFollow.setOnClickListener(this);
 		//groupInitiate.setOnClickListener(this);
 		groupReceive.setSelected(true);
-		mainFragment = new MainFragment();
 		return view;
 	}
 
@@ -61,11 +57,11 @@ public class LeftFragment extends Fragment implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.user_notification: {
-			Toast.makeText(getActivity(), "notification", 0).show();
+			Toast.makeText(getActivity(), "notification", Toast.LENGTH_SHORT).show();
 			break;
 		}
 		case R.id.sidebar_sync: {
-			Toast.makeText(getActivity(), "sync", 0).show();
+			Toast.makeText(getActivity(), "sync", Toast.LENGTH_SHORT).show();
 			break;
 		}
 		case R.id.siderbar_settings: {

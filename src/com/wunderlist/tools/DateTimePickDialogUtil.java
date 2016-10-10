@@ -3,13 +3,12 @@ package com.wunderlist.tools;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.TimePicker.OnTimeChangedListener;
 
@@ -42,7 +41,7 @@ public class DateTimePickDialogUtil implements OnDateChangedListener, OnTimeChan
 
 	public void init(DatePicker datePicker, TimePicker timePicker) {
 		Calendar calendar = Calendar.getInstance();
-		if (!(null == initDateTime || "".equals(initDateTime))) {
+		if (!(null == initDateTime || "".equals(initDateTime) || "1900/1/1 0:00:00".equals(initDateTime))) {
 			calendar = this.getCalendarByInintData(initDateTime);
 		} else {
 			initDateTime = calendar.get(Calendar.YEAR) + "//"
@@ -97,6 +96,7 @@ public class DateTimePickDialogUtil implements OnDateChangedListener, OnTimeChan
 		onDateChanged(null, 0, 0, 0);
 	}
 
+	@SuppressLint("SimpleDateFormat")
 	public void onDateChanged(DatePicker view, int year, int monthOfYear,
 			int dayOfMonth) {
 		Calendar calendar = Calendar.getInstance();

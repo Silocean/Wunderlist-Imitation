@@ -26,7 +26,7 @@
 	         android:layout_height="wrap_content"
 	         android:id="@+id/task_complete_visible_icon"
 	         android:layout_alignParentRight="true"
-	         android:layout_marginRight="17dip"
+	         android:layout_marginRight="15dip"
 	         android:layout_centerVertical="true"
 	         android:src="@drawable/wl_taskview_icon_hide_selected" />
     </RelativeLayout>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/wl_sidebar_row_bg" >
+    
+    <ImageView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/addreceiver_headimage"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="5dip"
+        android:src="@drawable/wl_receivers_list_userhead" />
+    
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/addreceiver_username"
+        android:text="接收人"
+        android:textColor="@color/listitem_text_color"
+        android:layout_toRightOf="@id/addreceiver_headimage"
+        android:layout_marginLeft="7dip"
+        android:layout_alignTop="@id/addreceiver_headimage" />
+    
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/addreceiver_email_text"
+        android:textColor="@color/listitem_receiver_email_text_color"
+        android:textSize="10sp"
+        android:layout_below="@id/addreceiver_username"
+        android:layout_alignBottom="@id/addreceiver_headimage"
+        android:layout_alignLeft="@id/addreceiver_username" />
+    
+    <ImageView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/addreceiver_add_icon"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/addreceiver_list_invite_button_selector" />
+    
+</RelativeLayout>

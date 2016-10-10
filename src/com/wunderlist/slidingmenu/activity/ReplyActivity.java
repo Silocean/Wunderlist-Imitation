@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -159,7 +158,6 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 	
 	private class ReplyListItemAdapter extends BaseAdapter {
 		
-		private Context context;
 		private LinkedList<Reply> list;
 		private int resId;
 		private LayoutInflater inflater;
@@ -167,7 +165,6 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		private ViewHolder holder;
 		
 		public ReplyListItemAdapter(Context context, int resId) {
-			this.context = context;
 			this.resId = resId;
 			this.list = new LinkedList<Reply>();
 			this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -197,7 +194,7 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 			holder = new ViewHolder();
 			if(convertView == null) {
 				convertView = inflater.inflate(resId, null);
-				holder.replyHeadImageView = (ImageView)convertView.findViewById(R.id.reply_headimage);
+				//holder.replyHeadImageView = (ImageView)convertView.findViewById(R.id.reply_headimage);
 				holder.replyEmailTextView = (TextView)convertView.findViewById(R.id.reply_email);
 				holder.replyContentTextView = (TextView)convertView.findViewById(R.id.reply_content);
 				holder.replyTimeTextView = (TextView)convertView.findViewById(R.id.reply_time);
@@ -213,7 +210,7 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 		}
 		
 		private class ViewHolder {
-			private ImageView replyHeadImageView;
+			//private ImageView replyHeadImageView;
 			private TextView replyEmailTextView;
 			private TextView replyContentTextView;
 			private TextView replyTimeTextView;

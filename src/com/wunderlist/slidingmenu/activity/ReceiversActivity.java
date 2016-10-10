@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,14 +25,16 @@ import com.example.wunderlist.R;
 import com.wunderlist.entity.User;
 import com.wunderlist.tools.AddReceiverDialogUtil;
 
-public class ReceiversActivity extends ActionbarBaseActivity {
+public class ReceiversActivity extends ActionbarBaseActivity implements OnClickListener {
 	
-	private String barTitle = null;
+	//private String barTitle = null;
 	private String receiverJSON = null;
-	private String taskId = null;
+	//private String taskId = null;
 	
 	private ListView listView;
 	private ReceiverListItemAdapter adapter;
+	
+	private Button addButton;
 	
 	private LinkedList<String> orignalReceivers = new LinkedList<String>();
 	private LinkedList<String> receivers;
@@ -43,6 +46,8 @@ public class ReceiversActivity extends ActionbarBaseActivity {
 		listView = (ListView)findViewById(R.id.receiverlist);
 		adapter = new ReceiverListItemAdapter(getApplicationContext(), R.layout.listitem_receiver);
 		listView.setAdapter(adapter);
+		addButton = (Button)findViewById(R.id.receiverlist_add);
+		addButton.setOnClickListener(this);
 		initData();
 		super.onCreate(savedInstanceState);
 	}
@@ -91,9 +96,9 @@ public class ReceiversActivity extends ActionbarBaseActivity {
 	}
 	
 	private void initData() {
-		barTitle = getIntent().getStringExtra("title");
-		setTitle(barTitle);
-		taskId = getIntent().getStringExtra("taskId");
+		//barTitle = getIntent().getStringExtra("title");
+		setTitle("成员列表");
+		//taskId = getIntent().getStringExtra("taskId");
 		receiverJSON = getIntent().getStringExtra("json");
 		try {
 			receivers = this.parseGetReceiversJSON(receiverJSON);
@@ -133,7 +138,6 @@ public class ReceiversActivity extends ActionbarBaseActivity {
 	
 	private class ReceiverListItemAdapter extends BaseAdapter {
 		
-		private Context context;
 		private LinkedList<String> list;
 		private int resId;
 		private LayoutInflater inflater;
@@ -141,7 +145,6 @@ public class ReceiversActivity extends ActionbarBaseActivity {
 		private ViewHolder holder;
 		
 		public ReceiverListItemAdapter(Context context, int resId) {
-			this.context = context;
 			this.resId = resId;
 			this.list = new LinkedList<String>();
 			inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -173,29 +176,31 @@ public class ReceiversActivity extends ActionbarBaseActivity {
 				convertView = inflater.inflate(resId, null);
 				holder.emailTextView = (TextView)convertView.findViewById(R.id.receiver_email_text);
 				holder.deleteImageView = (ImageView)convertView.findViewById(R.id.receiver_delete_icon);
+				holder.owneTextView = (TextView)convertView.findViewById(R.id.receiver_ownertextview);
 				convertView.setTag(holder);
 			} else {
 				holder = (ViewHolder)convertView.getTag();
 			}
 			final String userEmail = (String)getItem(position);
 			holder.emailTextView.setText(userEmail);
-			holder.deleteImageView.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if(!userEmail.equals(User.USEREMAIL)) {
+			if(userEmail.equals(User.USEREMAIL)) {
+				holder.deleteImageView.setVisibility(View.GONE);
+				holder.owneTextView.setVisibility(View.VISIBLE);
+			} else {
+				holder.deleteImageView.setOnClickListener(new OnClickListener() {
+					public void onClick(View v) {
 						receivers.remove(position);
 						updateReceiverList();
-					} else {
-						Toast.makeText(context, "不能删除自己", Toast.LENGTH_SHORT).show();
 					}
-				}
-			});
+				});
+			}
 			return convertView;
 		}
 		
 		private class ViewHolder {
 			private TextView emailTextView;
 			private ImageView deleteImageView;
+			private TextView owneTextView;
 		}
 		
 	}
@@ -207,10 +212,22 @@ public class ReceiversActivity extends ActionbarBaseActivity {
 		if(receivers.containsAll(orignalReceivers) && orignalReceivers.containsAll(receivers)) {
 			isReceiversChange = false; // 表示接收人没有改变
 		}
+		StringBuilder sb = new StringBuilder();
+		for(int i=0; i<receivers.size(); i++) {
+			sb.append(receivers.get(i)+":");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		intent.putExtra("receiversStr", sb.toString());
 		intent.putExtra("isReceiversChange", isReceiversChange);
 		intent.putExtra("receiversNum", receivers.size());
 		setResult(3, intent);
 		super.finish();
+	}
+
+	@Override
+	public void onClick(View v) {
+		Intent intent = new Intent(getApplicationContext(), AddReceiverActivity.class);
+		startActivityForResult(intent, 0);
 	}
 
 }

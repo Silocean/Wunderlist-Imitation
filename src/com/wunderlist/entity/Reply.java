@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 public class Reply implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String replyId;
 	private String taskId;
 	private String userId;

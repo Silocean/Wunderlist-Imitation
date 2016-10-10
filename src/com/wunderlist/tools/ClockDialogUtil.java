@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 
 import com.example.wunderlist.R;
 import com.wunderlist.slidingmenu.activity.TaskDetailsActivity;
@@ -32,8 +31,14 @@ public class ClockDialogUtil implements android.view.View.OnClickListener {
 	public ClockDialogUtil(TaskDetailsActivity activity, String remindnum, String remindtype) {
 		this.activity = activity;
 		this.inflater = (LayoutInflater) activity.getLayoutInflater();
-		this.remindnum = Integer.parseInt(remindnum);
-		this.remindtype = Integer.parseInt(remindtype);
+		if(remindnum.equals("")) {
+			this.remindnum = 1;
+		} else if(remindtype.equals("")) {
+			this.remindtype = 0;
+		} else {
+			this.remindnum = Integer.parseInt(remindnum);
+			this.remindtype = Integer.parseInt(remindtype);
+		}
 		this.initView();
 	}
 
@@ -80,7 +85,6 @@ public class ClockDialogUtil implements android.view.View.OnClickListener {
 	 * @return
 	 */
 	public AlertDialog showClockDialog() {
-		String[] str = new String[] {};
 		AlertDialog alertDialog = new AlertDialog.Builder(activity)
 				.setView(clockLayout).setTitle("设置提醒")
 				.setPositiveButton("保存", new OnClickListener() {
@@ -159,7 +163,7 @@ public class ClockDialogUtil implements android.view.View.OnClickListener {
 		switch (type) {
 		case 0: {
 			new AlertDialog.Builder(activity)
-				.setSingleChoiceItems(remindnumArrayDay, num, new OnClickListener() {
+				.setSingleChoiceItems(remindnumArrayDay, num-1, new OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						remindnum = which;
 						spinnerRemindnum.setText(""+(which+1));
@@ -169,7 +173,7 @@ public class ClockDialogUtil implements android.view.View.OnClickListener {
 		}
 		case 1: {
 			new AlertDialog.Builder(activity)
-			.setSingleChoiceItems(remindnumArrayHour, num, new OnClickListener() {
+			.setSingleChoiceItems(remindnumArrayHour, num-1, new OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					remindnum = which;
 					spinnerRemindnum.setText(""+(which+1));

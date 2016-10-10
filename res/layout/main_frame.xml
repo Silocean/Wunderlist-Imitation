@@ -9,8 +9,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/head_layout"
         android:focusable="true"
-   		android:focusableInTouchMode="true"
-        android:background="@drawable/wl_background4" >
+   		android:focusableInTouchMode="true" >
         <RelativeLayout 
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -45,7 +44,7 @@
             android:listSelector="#00000000"
             android:fadingEdge="none" 
             android:cacheColorHint="#00000000" />
-        
+	    
 	    <!-- <RelativeLayout 
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"

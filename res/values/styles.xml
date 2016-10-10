@@ -24,5 +24,10 @@
     <style name="settings_item_style">
         <item name="android:textSize">20sp</item>
     </style>
+    
+    <style name="AnimationPreview">
+        <item name="android:windowEnterAnimation">@anim/translate_in</item>
+        <item name="android:windowExitAnimation">@anim/translate_out</item>
+    </style>
 
 </resources>

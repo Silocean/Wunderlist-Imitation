@@ -1,5 +1,6 @@
 package com.wunderlist.slidingmenu.view;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -40,6 +41,7 @@ public class SlidingMenu extends RelativeLayout {
 		init(context);
 	}
 
+	@SuppressWarnings("deprecation")
 	private void init(Context context) {
 		
 		mContext = context;
@@ -75,22 +77,23 @@ public class SlidingMenu extends RelativeLayout {
 
 	public void setLeftView(View view) {
 		LayoutParams behindParams = new LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.FILL_PARENT);
+				LayoutParams.MATCH_PARENT);
 		addView(view, behindParams);
 		mMenuView = view;
 	}
 
 	public void setRightView(View view) {
 		LayoutParams behindParams = new LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.FILL_PARENT);
+				LayoutParams.MATCH_PARENT);
 		behindParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		addView(view, behindParams);
 		mDetailView = view;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void setCenterView(View view) {
 		LayoutParams aboveParams = new LayoutParams(LayoutParams.FILL_PARENT,
-				LayoutParams.FILL_PARENT);
+				LayoutParams.MATCH_PARENT);
 
 		LayoutParams bgParams = new LayoutParams(screenWidth, screenHeight);
 		bgParams.addRule(RelativeLayout.CENTER_IN_PARENT);
@@ -204,6 +207,7 @@ public class SlidingMenu extends RelativeLayout {
 	}
 
 	/*处理拦截后的touch事件*/
+	@SuppressLint("Recycle")
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		if (mVelocityTracker == null) {

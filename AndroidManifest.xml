@@ -34,18 +34,26 @@
             android:name="com.wunderlist.slidingmenu.activity.NoteActivity" >
         </activity>
         <activity
-            android:name="com.wunderlist.slidingmenu.activity.LoginActivity" >
+            android:name="com.wunderlist.slidingmenu.activity.LoginActivity"
+            android:theme="@style/Theme.Sherlock.NoActionBar" >
         </activity>
         <activity
             android:name="com.wunderlist.slidingmenu.activity.RegisterAndLoginActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-           
+            android:theme="@style/Theme.Sherlock.NoActionBar" >
+            
         </activity>
         <activity
             android:name="com.wunderlist.slidingmenu.activity.ReplyActivity" >
         </activity>
         <activity
             android:name="com.wunderlist.slidingmenu.activity.ReceiversActivity" >
+        </activity>
+         <activity
+            android:name="com.wunderlist.slidingmenu.activity.AddReceiverActivity" >
+        </activity>
+        <activity
+            android:name="com.wunderlist.slidingmenu.activity.ChooseBgActivity"
+            android:theme="@style/Theme.Sherlock.NoActionBar" >
         </activity>
     </application>
     
