@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/wl_listitem_receiver_bg" >
+    
+    <TextView 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/receiver_email_text"
+        android:textColor="@color/listitem_text_color"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="15dip"
+        android:layout_centerVertical="true" />
+    
+    <ImageView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/receiver_delete_icon"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dip"
+        android:layout_centerVertical="true"
+        android:src="@drawable/wl_task_receiver_delete" />
+
+</RelativeLayout>

@@ -10,7 +10,7 @@
         android:id="@+id/head_layout"
         android:focusable="true"
    		android:focusableInTouchMode="true"
-        android:background="@drawable/wl_background1" >
+        android:background="@drawable/wl_background4" >
         <RelativeLayout 
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -131,24 +131,28 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 	 * @throws Exception
 	 */
 	private LinkedList<Reply> parseJSON(String json) throws Exception {
-		JSONObject object = new JSONObject(json);
-		int rows = Integer.parseInt(object.getString("rows"));
 		LinkedList<Reply> replys = new LinkedList<Reply>();
-		if(rows > 0) {
-			JSONArray array = new JSONArray(object.getString("Items"));
-			for(int i=0; i<array.length(); i++) {
-				JSONObject obj = array.getJSONObject(i);
-				Reply reply = new Reply();
-				reply.setReplyId(obj.getString("SID"));
-				reply.setTaskId(obj.getString("TASKID"));
-				reply.setUserId(obj.getString("USERID"));
-				reply.setUserEmail(obj.getString("MAILADDR"));
-				reply.setReplyContent(obj.getString("REPLY"));
-				reply.setCreateDate(obj.getString("CREATEDATE"));
-				replys.add(reply);
+		if(json != null) {
+			JSONObject object = new JSONObject(json);
+			int rows = Integer.parseInt(object.getString("rows"));
+			if(rows > 0) {
+				JSONArray array = new JSONArray(object.getString("Items"));
+				for(int i=0; i<array.length(); i++) {
+					JSONObject obj = array.getJSONObject(i);
+					Reply reply = new Reply();
+					reply.setReplyId(obj.getString("SID"));
+					reply.setTaskId(obj.getString("TASKID"));
+					reply.setUserId(obj.getString("USERID"));
+					reply.setUserEmail(obj.getString("MAILADDR"));
+					reply.setReplyContent(obj.getString("REPLY"));
+					reply.setCreateDate(obj.getString("CREATEDATE"));
+					replys.add(reply);
+				}
+			} else {
+				System.out.println("没有数据");
 			}
 		} else {
-			System.out.println("没有数据");
+			System.out.println("网络连接出现问题");
 		}
 		return replys;
 	}
@@ -303,9 +307,11 @@ public class ReplyActivity extends ActionbarBaseActivity implements OnClickListe
 	 * @return
 	 */
 	private boolean parseSaveJSON(String json) throws Exception {
-		JSONObject object = new JSONObject(json);
-		if(object.getString("msg").equals("保存成功!")) {
-			return true;
+		if(json != null) {
+			JSONObject object = new JSONObject(json);
+			if(object.getString("msg").equals("保存成功!")) {
+				return true;
+			}
 		}
 		return false;
 	}

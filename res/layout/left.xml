@@ -217,7 +217,7 @@
    	          android:layout_toRightOf="@id/sidebar_sync"
    	          android:layout_marginLeft="4dip"
    	          android:layout_centerVertical="true"
-   	          android:text="最后同步：8分钟前"
+   	          android:text="点击左侧按钮同步任务列表"
    	          android:textSize="14sp"
    	          android:textColor="@color/sidebar_useremail_color" />
    	      <ImageView 

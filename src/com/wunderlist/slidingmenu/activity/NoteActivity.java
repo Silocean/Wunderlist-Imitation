@@ -2,6 +2,7 @@ package com.wunderlist.slidingmenu.activity;
 
 import com.example.wunderlist.R;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 
@@ -28,6 +29,14 @@ public class NoteActivity extends ActionbarBaseActivity {
 		barTitle = getIntent().getStringExtra("title");
 		super.setTitle(barTitle);
 		noteEditText.setText(note);
+	}
+	
+	@Override
+	public void finish() {
+		Intent intent = new Intent();
+		intent.putExtra("note", noteEditText.getText().toString().trim());
+		setResult(2, intent);
+		super.finish();
 	}
 
 }

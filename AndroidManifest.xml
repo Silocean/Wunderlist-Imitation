@@ -44,6 +44,9 @@
         <activity
             android:name="com.wunderlist.slidingmenu.activity.ReplyActivity" >
         </activity>
+        <activity
+            android:name="com.wunderlist.slidingmenu.activity.ReceiversActivity" >
+        </activity>
     </application>
     
 </manifest>

@@ -79,7 +79,7 @@ public class LeftFragment extends Fragment implements OnClickListener {
 			//groupExecute.setSelected(false);
 			//groupFollow.setSelected(false);
 			//groupInitiate.setSelected(false);
-			SlidingActivity.mainFragment.getTaskBoxList();
+			//SlidingActivity.mainFragment.getTaskBoxList();
 			break;
 		}
 		/*case R.id.group_execute: {
