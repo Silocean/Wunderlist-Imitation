@@ -18,6 +18,7 @@ import com.wunderlist.slidingmenu.activity.TaskDetailsActivity;
 
 
 public class DateTimePickDialogUtil implements OnDateChangedListener, OnTimeChangedListener {
+	
 	private DatePicker datePicker;
 	private TimePicker timePicker;
 	private AlertDialog ad;
@@ -65,7 +66,7 @@ public class DateTimePickDialogUtil implements OnDateChangedListener, OnTimeChan
 	 *            :为需要设置的日期时间控件
 	 * @return
 	 */
-	public AlertDialog dateTimePicKDialog(final TextView inputDate) {
+	public AlertDialog dateTimePicKDialog() {
 		LinearLayout dateTimeLayout = (LinearLayout) activity
 				.getLayoutInflater().inflate(R.layout.dialog_datetime, null);
 		datePicker = (DatePicker) dateTimeLayout.findViewById(R.id.datepicker);
@@ -79,13 +80,12 @@ public class DateTimePickDialogUtil implements OnDateChangedListener, OnTimeChan
 				.setView(dateTimeLayout)
 				.setPositiveButton("设置", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						inputDate.setText(dateTime);
 						activity.updateDateView(dateTime);
 					}
 				})
 				.setNegativeButton("移除", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						inputDate.setText("");
+						activity.updateDateView("");
 					}
 				}).show();
 

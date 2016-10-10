@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.wunderlist.R;
@@ -108,32 +106,8 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		super.setTitle(barTitle);
 		titleEditText.setText(task.getSubject());
 		noteEditText.setText(task.getDisc());
-		if(!enddate.equals("")) {
-			enddateTextView.setText(enddate);
-			this.changeDateView();
-		}
-		if(!task.getRemindtype().equals("") && !task.getRemindnum().equals("")) {
-			remindtype = Integer.parseInt(task.getRemindtype());
-			remindnum = Integer.parseInt(task.getRemindnum());
-			this.changeClockView();
-			switch (Integer.parseInt(task.getRemindtype())) {
-			case 0: {
-				clock = "提前"+task.getRemindnum()+"天提醒";
-				break;
-			}
-			case 1: {
-				clock = "提前"+task.getRemindnum()+"小时提醒";
-				break;
-			}
-			case 2: {
-				clock = "提前"+task.getRemindnum()+"分钟提醒";
-				break;
-			}
-			default:
-				break;
-			}
-			clockTextView.setText(clock);
-		}
+		this.updateDateView(enddate);
+		this.updateClockTextView(task.getRemindnum(), task.getRemindtype());
 		if(!task.getUserId().equals(User.USERID)) { // 如果该任务不是用户自己发起的
 			this.titleEditText.setEnabled(false);
 			this.receiversRelativeLayout.setEnabled(false);
@@ -255,7 +229,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			}
 			return replys;
 		}
-
+		
 		@Override
 		protected void onPostExecute(LinkedList<Reply> replys) {
 			if(replys.size() != 0) {
@@ -266,7 +240,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 				replyTimeTextView.setText(TimeConvertTool.calDateTime(reply.getCreateDate()));
 			}
 		}
-
+		
 		@Override
 		protected void onProgressUpdate(Integer... values) {
 		}
@@ -312,7 +286,43 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	 */
 	public void updateDateView(String dateTime) {
 		this.enddate = dateTime;
-		this.changeDateView();
+		if(!dateTime.equals("")) {
+			String enddateStr = "截止至 ";
+			Calendar c = Calendar.getInstance();
+			c.setTime(TimeConvertTool.convertToDate(dateTime));
+			int week = c.get(Calendar.DAY_OF_WEEK);
+			switch (week) {
+			case 1:
+				enddateStr += "周日, ";
+				break;
+			case 2:
+				enddateStr += "周一, ";
+				break;
+			case 3:
+				enddateStr += "周二, ";
+				break;
+			case 4:
+				enddateStr += "周三, ";
+				break;
+			case 5:
+				enddateStr += "周四, ";
+				break;
+			case 6:
+				enddateStr += "周五, ";
+				break;
+			case 7:
+				enddateStr += "周六, ";
+				break;
+			default:
+				break;
+			}
+			enddateStr += dateTime.split(" ")[0].replaceAll("/", ".");
+			enddateTextView.setText(enddateStr);
+			this.changeDateView();
+		} else {
+			enddateTextView.setText(dateTime);
+			enddateiImageView.setImageResource(R.drawable.wl_taskdetails_icon_deadline);
+		}
 	}
 	
 	/**
@@ -344,6 +354,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			this.changeClockView();
 		} else {
 			clockTextView.setText("");
+			clockiImageView.setImageResource(R.drawable.wl_taskdetails_icon_clock);
 		}
 	}
 	
@@ -373,7 +384,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 			try {
 				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("GetTaskDDetail.xml");
 				byte[] data = StreamTool.read(inputStream);
-				String string = new String(data).replaceAll("\\&strTaskID", task.getTaskId());
+				String string = new String(data).replaceAll("\\&strTaskID", taskId);
 				data = string.getBytes();
 				receiverJSON = WebServiceRequest.SendPost(inputStream, data, "GetTaskDDetailResult");
 			} catch (Exception e) {
@@ -421,9 +432,7 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.taskdetails_checkbox: {
-			break;
-		}
-		case R.id.taskdetails_title: {
+			Toast.makeText(getApplicationContext(), "标记", Toast.LENGTH_SHORT).show();
 			break;
 		}
 		case R.id.taskdetails_receivers: {
@@ -435,12 +444,12 @@ public class TaskDetailsActivity extends ActionbarBaseActivity implements
 		}
 		case R.id.taskdetais_deadline: {
 			DateTimePickDialogUtil dateTimePicKDialog = new DateTimePickDialogUtil(
-					TaskDetailsActivity.this, enddateTextView.getText().toString().trim());
-			dateTimePicKDialog.dateTimePicKDialog(enddateTextView);
+					TaskDetailsActivity.this, enddate);
+			dateTimePicKDialog.dateTimePicKDialog();
 			break;
 		}
 		case R.id.taskdetais_clock: {
-			ClockDialogUtil clockDialog = new ClockDialogUtil(TaskDetailsActivity.this);
+			ClockDialogUtil clockDialog = new ClockDialogUtil(TaskDetailsActivity.this, task.getRemindnum(), task.getRemindtype());
 			clockDialog.showClockDialog();
 			break;
 		}

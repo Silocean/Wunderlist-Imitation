@@ -7,11 +7,11 @@
 	    android:layout_width="wrap_content" 
 	    android:layout_height="wrap_content"
 	    android:layout_centerInParent="true" >
-	    <Spinner
+	    <Button
 		    android:id="@+id/remindnumSpinner"
 			android:layout_width="140dip" 
 			android:layout_height="wrap_content" />
-		<Spinner
+		<Button
 		    android:id="@+id/remindtypeSpinner"
 			android:layout_width="140dip" 
 			android:layout_height="wrap_content" />
