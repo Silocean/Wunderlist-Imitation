@@ -1,2 +1,2 @@
 # Wunderlist-Imitation
-an imitation for wunderlist on Android.
+An imitation for wunderlist on Android.
