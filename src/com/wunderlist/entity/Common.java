@@ -7,7 +7,7 @@ import com.example.wunderlist.R;
 
 /**
  * 全局变量类，用于保存程序中要用的变量
- * @author SIYUNFEI
+ * @author Silocean
  * 
  */
 public class Common {
