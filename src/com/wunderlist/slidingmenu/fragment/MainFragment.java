@@ -510,7 +510,7 @@ public class MainFragment extends Fragment implements OnScrollListener {
 	/**
 	 * 异步任务，用于获取用户所有任务列表
 	 * 
-	 * @author SIYUNFEI
+	 * @author Silocean
 	 * 
 	 */
 	private class GetTaskBoxListData extends
